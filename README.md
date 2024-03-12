@@ -2,6 +2,12 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`c3`](https:
 
 ## Getting Started
 
+This project create by 
+
+```bash
+npm create cloudflare@latest
+```
+
 First, run the development server:
 
 ```bash
