@@ -1,5 +1,4 @@
-
-# 1. Create 
+# 1. Create
 
 ```bash
 npm create cloudflare@latest
@@ -11,4 +10,10 @@ npm create cloudflare@latest
 
 ```bash
 npm i @tonconnect/ui-react
+```
+
+## TMA
+
+```bash
+ npm i @tma.js/sdk @tma.js/sdk-react
 ```
