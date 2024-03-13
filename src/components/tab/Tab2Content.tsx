@@ -8,8 +8,8 @@ export default function Tab2Asset() {
         <div className="p-4">
             <div className="mb-3 text-2xl font-bold">TRC-404 Asset</div>
 
-            <div className="mb-20">
-                Pending
+            <div className="mt-20  mb-20">
+                Your TRC-404 balance will be displayed here, along with the corresponding 404 NFTs.
             </div>
         </div>
     );
