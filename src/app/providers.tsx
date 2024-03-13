@@ -21,7 +21,7 @@ export function Providers({children, themeProps}: ProvidersProps) {
                     theme: THEME.DARK,
                 }}
                 actionsConfiguration={{
-                    twaReturnUrl: 'https://t.me/ThePopcoinBot/app',
+                    twaReturnUrl: 'https://t.me/trc404bot/app',
                 }}
             >
                 <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>

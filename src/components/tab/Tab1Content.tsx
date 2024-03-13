@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
 import {SendTransactionRequest} from "@tonconnect/sdk";
 import {TonConnectButton, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
-import {Button} from "@nextui-org/button";
 
 import {Image,} from '@nextui-org/react';
 import {Progress} from "@nextui-org/progress";
-
+import {Card, CardFooter, CardHeader} from "@nextui-org/card";
+import {Button} from "@nextui-org/button";
 
 function buildTx(base: number, amount: number): SendTransactionRequest {
 
@@ -84,21 +84,36 @@ export default function Tab1Content() {
                 </div>
             </div>
 
-            <div className="text-center leading-8 md:leading-10 md:text-left">
-                <div className="inline-block">
-                    <h1
-                        className="tracking-tight inline font-semibold from-[#881CF7] to-[#b249FF] text-[1.5rem] lg:text-3xl bg-clip-text text-transparent bg-gradient-to-b">
-                        TRC-404&nbsp;</h1>
-                </div>
-                <h1 className="tracking-tight inline font-semibold text-[1.5rem] lg:text-3xl"> is an
-                    experimental, mixed Jetton / NFT with native liquidity and
-                    fractionalization.</h1>
-            </div>
+
+            {/*  dd */}
+            <Card isFooterBlurred className="w-full h-[300px] col-span-12 sm:col-span-7">
+                <CardHeader className="absolute z-10 top-1 flex-col items-start">
+                    {/*<p className="text-tiny text-white/60 uppercase font-bold">Your day your way</p>*/}
+                    {/*<h4 className="text-white/90 font-medium text-xl">Your checklist for better sleep</h4>*/}
+                </CardHeader>
+                <Image
+                    removeWrapper
+                    alt="Relaxing app background"
+                    className="z-0 w-full h-full object-cover"
+                    src="/logos/fancy-vivid.png"
+                />
+                <CardFooter
+                    className="absolute bg-black/40 bottom-0 z-10 border-t-1 border-default-600 dark:border-default-100">
+                    <div className="flex flex-grow gap-2 items-center">
+                        <div className="flex flex-col">
+                            <p className=" text-white/80">ERC-404</p>
+                            <p className="text-tiny text-white/80">To Make NFT Flow and Fly Universally.</p>
+                        </div>
+                    </div>
+                </CardFooter>
+            </Card>
+
+            {/*dd qqq*/}
 
 
-            <div className="mb-3 text-2xl">Free Mint</div>
+            <div className="mt-6 text-2xl">Free Mint (Testnet)</div>
             <div className="flex flex-col">
-                <div className="flex justify-center mt-10 mb-5">
+                <div className="flex justify-center mt-1 mb-5">
                     <Progress
                         aria-label="Downloading..."
                         size="md"
@@ -157,6 +172,8 @@ export default function Tab1Content() {
 
 
             {/* FAQ   */}
+
+            <div className="flex w-full flex-col pb-20">&nbsp;</div>
 
             {/* FAQ   */}
 
