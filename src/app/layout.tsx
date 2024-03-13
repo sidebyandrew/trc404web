@@ -1,8 +1,12 @@
+export const runtime = 'edge' // 'nodejs' (default) | 'edge'
+
 import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import {Providers} from '@/app/providers';
 
 import '../styles/globals.css';
+import {ContextProps, TMAProvider} from "@/contexts/TMA";
+import {headers} from "next/headers";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -21,16 +25,22 @@ export default function RootLayout({
                                    }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const headersForContext: ContextProps['headers'] = {};
+    headers().forEach((value, key) => (headersForContext[key] = value));
+    // setDebug(true);
     return (
         <html lang="en" className="dark">
         <body className={inter.className}>
-        <Providers>
-            <div className="relative flex h-screen flex-col">
-                <main className="container mx-auto max-w-7xl flex-grow ">
-                    {children}
-                </main>
-            </div>
-        </Providers>
+        {/* todo remove tma */}
+        <TMAProvider headers={headersForContext}>
+            <Providers themeProps={{attribute: 'class', defaultTheme: 'dark'}}>
+                <div className="relative flex h-screen flex-col">
+                    <main className="container mx-auto max-w-7xl flex-grow ">
+                        {children}
+                    </main>
+                </div>
+            </Providers>
+        </TMAProvider>
         </body>
         </html>
     );

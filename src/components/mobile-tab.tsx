@@ -17,7 +17,7 @@ const MobileTab: React.FC<MobileTabProps> = ({onTabChange}) => {
     return (
         <>
             <div
-                className="bg-blur fixed bottom-5 left-0 right-0 z-50 bg-white dark:bg-black border-t-1 dark:border-t-zinc-800">
+                className="bg-blur fixed bottom-16 left-0 right-0 z-50 bg-white dark:bg-black border-t-1 dark:border-t-zinc-800">
                 <div className="flex items-center justify-center ">
                     <button
                         className={`${
