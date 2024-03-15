@@ -1,29 +1,29 @@
 import React, {useState} from 'react';
-import {CHAIN, SendTransactionRequest} from "@tonconnect/sdk";
+import {SendTransactionRequest} from "@tonconnect/sdk";
 import {TonConnectButton, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 
 import {Image,} from '@nextui-org/react';
 import {Progress} from "@nextui-org/progress";
 import {Card, CardFooter, CardHeader} from "@nextui-org/card";
 import {Button} from "@nextui-org/button";
+import {t404_jetton_master_address_raw} from "@/constant/trc404";
 
 // 1 means 1 ton 1 T404
 // 5 means 5 ton 1 T404
 // TODO: to change for production 1
 const baseRate: number = 1;
 
+
 function buildTx(base: number, amount: number): SendTransactionRequest {
 
     return {
         // TODO: to change for production 2
-        network: CHAIN.TESTNET,
+        // network: CHAIN.TESTNET,
         // The transaction is valid for 10 minutes from now, in unix epoch seconds.
         validUntil: Math.floor(Date.now() / 1000) + 600,
         messages: [
             {
-                // TODO: to change for production 3
-                // EQAVtF8xhb7INQ7S4GEYudtu0fkkyIN8r6XSV7aPPkTwNKJI
-                address: '0:15b45f3185bec8350ed2e06118b9db6ed1f924c8837cafa5d257b68f3e44f034',
+                address: t404_jetton_master_address_raw,
                 amount: String(1000000000 * base * amount),
             },
         ],
@@ -37,10 +37,10 @@ export default function Tab1Content() {
     const wallet = useTonWallet();
     const [tonConnectUi] = useTonConnectUI();
 
-    const [isBtnLoading, setIsBtnLoading] = useState(false);
+    // process bar number
+    const [progressNumber, setProgressNumber] = React.useState(20);
 
-    const [value, setValue] = React.useState(20);
-
+    // mint amount
     const [mintAmount, setMintAmount] = useState(1);
 
     const handleIncrement = () => {
@@ -66,7 +66,7 @@ export default function Tab1Content() {
 
     React.useEffect(() => {
         const interval = setInterval(() => {
-            setValue((v) => (v > 100 ? 100 : v + 1));
+            setProgressNumber((v) => (v > 100 ? 100 : v + 1));
         }, 5000);
 
         return () => clearInterval(interval);
@@ -118,14 +118,14 @@ export default function Tab1Content() {
 
             {/*dd qqq*/}
 
-
-            <div className="mt-6 text-2xl">Free Mint (Testnet)</div>
+            {/*TODO: to change for production */}
+            <div className="mt-6 text-2xl">Free Mint <span className='text-yellow-600'>(Testnet)</span></div>
             <div className="flex flex-col">
                 <div className="flex justify-center mt-1 mb-5">
                     <Progress
                         aria-label="Downloading..."
                         size="md"
-                        value={value}
+                        value={progressNumber}
                         color="success"
                         showValueLabel={true}
                         className="max-w-md "
@@ -159,20 +159,20 @@ export default function Tab1Content() {
                             {/*mint amount end*/}
 
                             <Button size='lg' color="primary" onClick={() => {
-                                setIsBtnLoading(true);
                                 return tonConnectUi.sendTransaction(tx);
                             }
                             }>
-                                Free Mint TRC-404
+                                {/* TODO: to change for production 4 */}
+                                Free Mint [Testnet Only]
                             </Button>
 
                         </>
                     ) : (
                         <Button size='lg' color="primary" onClick={() => {
-                            setIsBtnLoading(true);
                             return tonConnectUi.openModal();
                         }}>
-                            Connect Wallet to Free Mint
+                            {/*Connect Wallet to Free Mint*/}
+                            Connect Wallet [Testnet Only]
                         </Button>
                     )}
                 </div>
