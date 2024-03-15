@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {SendTransactionRequest} from "@tonconnect/sdk";
+import {CHAIN, SendTransactionRequest} from "@tonconnect/sdk";
 import {TonConnectButton, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 
 import {Image,} from '@nextui-org/react';
@@ -7,14 +7,21 @@ import {Progress} from "@nextui-org/progress";
 import {Card, CardFooter, CardHeader} from "@nextui-org/card";
 import {Button} from "@nextui-org/button";
 
+// 1 means 1 ton 1 T404
+// 5 means 5 ton 1 T404
+// TODO: to change for production 1
+const baseRate: number = 1;
+
 function buildTx(base: number, amount: number): SendTransactionRequest {
 
     return {
+        // TODO: to change for production 2
+        network: CHAIN.TESTNET,
         // The transaction is valid for 10 minutes from now, in unix epoch seconds.
-
         validUntil: Math.floor(Date.now() / 1000) + 600,
         messages: [
             {
+                // TODO: to change for production 3
                 // EQAVtF8xhb7INQ7S4GEYudtu0fkkyIN8r6XSV7aPPkTwNKJI
                 address: '0:15b45f3185bec8350ed2e06118b9db6ed1f924c8837cafa5d257b68f3e44f034',
                 amount: String(1000000000 * base * amount),
@@ -26,8 +33,7 @@ function buildTx(base: number, amount: number): SendTransactionRequest {
 
 export default function Tab1Content() {
 
-
-    const [tx, setTx] = useState(buildTx(1, 1));
+    const [tx, setTx] = useState(buildTx(baseRate, 1));
     const wallet = useTonWallet();
     const [tonConnectUi] = useTonConnectUI();
 
@@ -40,14 +46,14 @@ export default function Tab1Content() {
     const handleIncrement = () => {
         if (mintAmount < 5) {
             setMintAmount(mintAmount + 1);
-            setTx(buildTx(1, mintAmount + 1));
+            setTx(buildTx(baseRate, mintAmount + 1));
         }
     };
 
     const handleDecrement = () => {
         if (mintAmount >= 2) {
             setMintAmount(mintAmount - 1);
-            setTx(buildTx(1, mintAmount - 1));
+            setTx(buildTx(baseRate, mintAmount - 1));
         }
     };
 
