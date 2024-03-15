@@ -11,10 +11,12 @@ function buildTx(base: number, amount: number): SendTransactionRequest {
 
     return {
         // The transaction is valid for 10 minutes from now, in unix epoch seconds.
+
         validUntil: Math.floor(Date.now() / 1000) + 600,
         messages: [
             {
-                address: '0:6b64daa146f8389e3fb1c6828b469a0a8cc9da43b71cae59a3ced0b664a38a55',
+                // EQAVtF8xhb7INQ7S4GEYudtu0fkkyIN8r6XSV7aPPkTwNKJI
+                address: '0:15b45f3185bec8350ed2e06118b9db6ed1f924c8837cafa5d257b68f3e44f034',
                 amount: String(1000000000 * base * amount),
             },
         ],
