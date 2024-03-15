@@ -214,14 +214,14 @@ export default function Tab1Content() {
             <div className="mt-8 mb-2 text-2xl">Free Mint <span className='text-yellow-600'>(Testnet)</span></div>
             <div className="flex flex-col">
 
-                {mintInfo.fetchFormRemote && (<div className="flex justify-center text-gray-600">
+                {mintInfo.fetchFormRemote && (<div className="flex justify-center text-gray-500">
                     Minted Count：{mintInfo.freemintCurrentSupply}
                 </div>)}
 
-                <div className="flex justify-center  text-gray-600">
+                <div className="flex justify-center  text-gray-500">
                     Total Supply：1000
                 </div>
-                <div className="flex justify-center text-gray-600">
+                <div className="flex justify-center text-gray-500">
                     Period：2024/03/15 - 2024/03/29
                 </div>
                 {mintInfo.fetchFormRemote && (
