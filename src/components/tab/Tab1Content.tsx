@@ -225,7 +225,7 @@ export default function Tab1Content() {
                     Period：2024/03/15 - 2024/03/29
                 </div>
                 {mintInfo.fetchFormRemote && (
-                    <div className="flex justify-center mt-1 ">
+                    <div className="flex justify-center ">
                         <Progress
                             aria-label="Loading..."
                             isStriped
