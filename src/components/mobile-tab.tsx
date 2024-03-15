@@ -17,12 +17,12 @@ const MobileTab: React.FC<MobileTabProps> = ({onTabChange}) => {
     return (
         <>
             <div
-                className="bg-blur fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-black border-t-1 dark:border-t-zinc-800">
-                <div className="flex items-center justify-center ">
+                className="bg-blur dark:bg-opacity-50 fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-black/80 border-t-1 dark:border-t-zinc-800">
+                <div className="flex items-center justify-center m-3 ">
                     <button
                         className={`${
                             activeTab === "tab1" ? "text-blue-300 underline" : ""
-                        } rounded px-2 py-2 font-bold text-xl `}
+                        } rounded px-2 py-2 font-bold text-xl`}
                         onClick={() => handleTabClick("tab1")}
                     >
                         Mint

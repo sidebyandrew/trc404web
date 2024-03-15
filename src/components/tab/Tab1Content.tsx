@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SendTransactionRequest} from "@tonconnect/sdk";
 import {TonConnectButton, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 
@@ -6,12 +6,16 @@ import {Image,} from '@nextui-org/react';
 import {Progress} from "@nextui-org/progress";
 import {Card, CardFooter, CardHeader} from "@nextui-org/card";
 import {Button} from "@nextui-org/button";
-import {t404_jetton_master_address_raw} from "@/constant/trc404";
+import {ENDPOINT_TESTNET_RPC, t404_jetton_master_address, t404_jetton_master_address_raw} from "@/constant/trc404";
+import {Address} from "@ton/core";
+import {TonClient} from "@ton/ton";
 
 // 1 means 1 ton 1 T404
 // 5 means 5 ton 1 T404
 // TODO: to change for production 1
 const baseRate: number = 1;
+// TODO: to change for production 1
+const endpoint = ENDPOINT_TESTNET_RPC;
 
 
 function buildTx(base: number, amount: number): SendTransactionRequest {
@@ -31,7 +35,21 @@ function buildTx(base: number, amount: number): SendTransactionRequest {
 
 }
 
+
+interface MintInfo {
+    fetchFormRemote: boolean;
+    freemintIsOpen?: boolean;
+    freemintMaxSupply?: number;
+    freemintCurrentSupply?: number;
+    freemintTonPrice?: number;
+    progressRate: number;
+}
+
+
 export default function Tab1Content() {
+
+
+    const [mintInfo, setMintInfo] = useState<MintInfo>({fetchFormRemote: false, progressRate: 0});
 
     const [tx, setTx] = useState(buildTx(baseRate, 1));
     const wallet = useTonWallet();
@@ -71,6 +89,80 @@ export default function Tab1Content() {
 
         return () => clearInterval(interval);
     }, []);
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const client = new TonClient(
+                    {
+                        endpoint: endpoint,
+                    });
+
+                const master_tx = await client.runMethod(
+                    Address.parse(t404_jetton_master_address), 'get_jetton_data');
+                // @ts-ignore
+                let baseNano: bigint = 1000000000n;
+                let master_result = master_tx.stack;
+                let total_supply = master_result.readBigNumber();
+                let mintable = master_result.readBoolean();
+                let owner = master_result.readAddress();
+                let content = master_result.readCell();
+                let jetton_wallet_code = master_result.readCell();
+                let nft_collection_address = master_result.readAddress();
+
+                //-1:true(can mint), 0:false(can not)
+                let freemint_flag = master_result.readNumber();
+
+                //3 000000000n 当前已经 mint 的数字
+                let freemint_current_supply = master_result.readBigNumber();
+                let freemint_current_supply_number = Number(freemint_current_supply / baseNano);
+
+                //1000 000000000n
+                let freemint_max_supply = master_result.readBigNumber();
+                let freemint_max_supply_number = Number(freemint_max_supply / baseNano);
+
+                //1 000000000n
+                let freemint_price = master_result.readBigNumber();
+
+
+                let mintInfo: MintInfo = {
+                    fetchFormRemote: true,
+                    freemintIsOpen: freemint_flag == -1,
+                    freemintCurrentSupply: freemint_current_supply_number,
+                    freemintMaxSupply: freemint_max_supply_number,
+                    freemintTonPrice: Number(freemint_price / baseNano),
+                    progressRate: 100 * freemint_current_supply_number / freemint_max_supply_number,
+                };
+
+                setMintInfo(mintInfo);
+
+                console.log('get_jetton_data freemint_current_supply:', freemint_current_supply,
+                    ',freemint_max_supply:', freemint_max_supply, ",freemint_price", freemint_price,
+                    ',freemint_flag:', freemint_flag);
+
+                console.log('convert: get_jetton_data freemint_current_supply:', mintInfo.freemintCurrentSupply,
+                    ',freemint_max_supply:', mintInfo.freemintMaxSupply,
+                    ",freemint_price", mintInfo.freemintTonPrice,
+                    ',freemint_flag:', mintInfo.freemintIsOpen,
+                    ',progressRate:', mintInfo.progressRate,
+                    ',fetchFormRemote:', mintInfo.fetchFormRemote
+                );
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        // Only execute fetchData if running in the browser
+        if (typeof window !== "undefined") {
+            fetchData().catch(r => {
+                console.error("Yes, I need window." + r)
+            });
+        }
+    }, []);
+
+
     return (
         < div className="p-2">
             <div className="flex justify-between pb-3">
@@ -119,20 +211,34 @@ export default function Tab1Content() {
             {/*dd qqq*/}
 
             {/*TODO: to change for production */}
-            <div className="mt-6 text-2xl">Free Mint <span className='text-yellow-600'>(Testnet)</span></div>
+            <div className="mt-8 mb-2 text-2xl">Free Mint <span className='text-yellow-600'>(Testnet)</span></div>
             <div className="flex flex-col">
-                <div className="flex justify-center mt-1 mb-5">
-                    <Progress
-                        aria-label="Downloading..."
-                        size="md"
-                        value={progressNumber}
-                        color="success"
-                        showValueLabel={true}
-                        className="max-w-md "
-                    />
-                </div>
 
-                <div className="flex flex-col">
+                {mintInfo.fetchFormRemote && (<div className="flex justify-center text-gray-600">
+                    Minted Count：{mintInfo.freemintCurrentSupply}
+                </div>)}
+
+                <div className="flex justify-center  text-gray-600">
+                    Total Supply：1000
+                </div>
+                <div className="flex justify-center text-gray-600">
+                    Period：2024/03/15 - 2024/03/29
+                </div>
+                {mintInfo.fetchFormRemote && (
+                    <div className="flex justify-center mt-1 ">
+                        <Progress
+                            aria-label="Loading..."
+                            isStriped
+                            size="md"
+                            value={mintInfo.progressRate}
+                            color="success"
+                            formatOptions={{style: "percent", minimumIntegerDigits: 1, minimumFractionDigits: 1}}
+                            showValueLabel={true}
+                            className="max-w-md "
+                        />
+                    </div>)}
+
+                <div className="flex flex-col mt-3">
                     {wallet ? (
                         <>
                             {/*mint amount start*/}
