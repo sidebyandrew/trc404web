@@ -104,7 +104,7 @@ export default function Tab1Content() {
                     <div className="flex flex-grow gap-2 items-center">
                         <div className="flex flex-col">
                             <p className="text-white/80">ERC-404</p>
-                            <p className="text-tiny text-white/80">To Make NFT Flow and Fly!</p>
+                            <p className="text-tiny text-white/80 ">To Make NFT Flow and Fly!</p>
                         </div>
                     </div>
                 </CardFooter>
