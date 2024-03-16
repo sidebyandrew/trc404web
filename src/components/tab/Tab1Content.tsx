@@ -1,14 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {SendTransactionRequest} from "@tonconnect/sdk";
+import {CHAIN, SendTransactionRequest} from "@tonconnect/sdk";
 import {TonConnectButton, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 
-import {Image,} from '@nextui-org/react';
+import {Image, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure,} from '@nextui-org/react';
 import {Progress} from "@nextui-org/progress";
 import {Card, CardFooter, CardHeader} from "@nextui-org/card";
 import {Button} from "@nextui-org/button";
 import {ENDPOINT_TESTNET_RPC, t404_jetton_master_address, t404_jetton_master_address_raw} from "@/constant/trc404";
 import {Address} from "@ton/core";
 import {TonClient} from "@ton/ton";
+import {Divider} from "@nextui-org/divider";
+
 
 // 1 means 1 ton 1 T404
 // 5 means 5 ton 1 T404
@@ -60,6 +62,8 @@ export default function Tab1Content() {
 
     // mint amount
     const [mintAmount, setMintAmount] = useState(1);
+
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
     const handleIncrement = () => {
         if (mintAmount < 5) {
@@ -137,9 +141,9 @@ export default function Tab1Content() {
 
                 setMintInfo(mintInfo);
 
-                console.log('get_jetton_data freemint_current_supply:', freemint_current_supply,
-                    ',freemint_max_supply:', freemint_max_supply, ",freemint_price", freemint_price,
-                    ',freemint_flag:', freemint_flag);
+                // console.log('get_jetton_data freemint_current_supply:', freemint_current_supply,
+                //     ',freemint_max_supply:', freemint_max_supply, ",freemint_price", freemint_price,
+                //     ',freemint_flag:', freemint_flag);
 
                 console.log('convert: get_jetton_data freemint_current_supply:', mintInfo.freemintCurrentSupply,
                     ',freemint_max_supply:', mintInfo.freemintMaxSupply,
@@ -157,7 +161,7 @@ export default function Tab1Content() {
         // Only execute fetchData if running in the browser
         if (typeof window !== "undefined") {
             fetchData().catch(r => {
-                console.error("Yes, I need window." + r)
+                console.error("Sorry, I need window to run." + r)
             });
         }
     }, []);
@@ -265,11 +269,19 @@ export default function Tab1Content() {
                             {/*mint amount end*/}
 
                             <Button size='lg' color="primary" onClick={() => {
+                                console.info(wallet?.account)
+
+                                {/* TODO: to change for production 4 */
+                                }
+                                if (wallet?.account.chain == CHAIN.MAINNET) {
+                                    onOpen();
+                                    return;
+                                }
+
                                 return tonConnectUi.sendTransaction(tx);
                             }
                             }>
-                                {/* TODO: to change for production 4 */}
-                                Free Mint [Testnet Only]
+                                Free Mint
                             </Button>
 
                         </>
@@ -277,8 +289,7 @@ export default function Tab1Content() {
                         <Button size='lg' color="primary" onClick={() => {
                             return tonConnectUi.openModal();
                         }}>
-                            {/*Connect Wallet to Free Mint*/}
-                            Connect Wallet [Testnet Only]
+                            Connect Wallet to Free Mint
                         </Button>
                     )}
                 </div>
@@ -290,6 +301,65 @@ export default function Tab1Content() {
             <div className="flex w-full flex-col pb-20">&nbsp;</div>
 
             {/* FAQ   */}
+
+            {/*    Modal*/}
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">Testnet Only</ModalHeader>
+                            <ModalBody>
+                                <p>
+                                    Thank you for participating in the TRC-404 beta test, you need to connect testnet,
+                                    but you are currently
+                                    connecting to
+                                    the&nbsp;
+                                    <span className="bg-yellow-100 text-red-700">mainnet</span> wallet.
+                                </p>
+                                <p>
+                                    <h2>Mainnet</h2>
+                                    <ul className="list-disc">
+                                        <li>address start with <span className=" text-red-500">EQ</span>
+                                        </li>
+                                        <li>address start with <span className=" text-red-500">UQ</span>
+                                        </li>
+                                    </ul>
+
+                                    <h2 className="pt-2">Testnet</h2>
+                                    <ul className="list-disc">
+                                        <li>address start with <span className="bg-gray-900 text-blue-500">kQ</span>
+                                        </li>
+                                        <li>address start with <span className="bg-gray-900 text-blue-500">0Q</span>
+                                        </li>
+                                    </ul>
+                                </p>
+                                <Divider className="my-4"/>
+                                <div>
+                                    <div>Q: How to config your wallet to connect testnet?</div>
+                                    <div>A: <Link underline="always"
+                                                  href="https://answers.ton.org/question/1561527682871595008/how-do-you-change-ton-keeper-to-testnet">view
+                                        answer</Link>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>Q: How to get Toncoin at testnet?</div>
+                                    <div>A: <Link underline="always"
+                                                  href="https://t.me/testgiver_ton_bot">
+                                        Testgiver TON Bot</Link>
+                                    </div>
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+
+                                <Button color="primary" onPress={onClose}>
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            {/*    Modal*/}
 
         </div>
 
