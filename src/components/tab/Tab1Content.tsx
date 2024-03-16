@@ -247,24 +247,31 @@ export default function Tab1Content() {
                         <>
                             {/*mint amount start*/}
                             <div className="flex mb-2 items-center">
-                                <div className="mt-2 text-lg font-bold">Mint Amount :</div>
-                                <Image
-                                    alt="minus logo"
-                                    radius="sm"
-                                    src="/icon/minus-square@3x.png"
-                                    height={36}
-                                    width={36}
+                                <div className="text-lg ">Mint Amount: &nbsp;</div>
+
+                                <button
+                                    className="focus:outline-none"
                                     onClick={handleDecrement}
-                                />
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round"
+                                              d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                    </svg>
+                                </button>
                                 <div className="mx-3"> {mintAmount} </div>
-                                <Image
-                                    alt="add logo"
-                                    radius="sm"
-                                    src="/icon/add-square@3x.png"
-                                    height={36}
-                                    width={36}
+
+                                <button
+                                    className="focus:outline-none"
                                     onClick={handleIncrement}
-                                />
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round"
+                                              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                    </svg>
+
+                                </button>
                             </div>
                             {/*mint amount end*/}
 
