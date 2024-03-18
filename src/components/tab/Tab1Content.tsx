@@ -225,7 +225,8 @@ export default function Tab1Content() {
             {/*dd qqq*/}
 
             {/*TODO: to change for production */}
-            <div className="mt-8 mb-2 text-2xl">Free Mint <span className='text-yellow-600'>(Testnet)</span></div>
+            <div className="mt-4 mb-2 text-2xl">Free Mint <span className='text-yellow-600 text-xl'>(Testnet)</span>
+            </div>
             <div className="flex flex-col">
 
                 {mintInfo.fetchFormRemote && (<div className="flex justify-center text-gray-500">
@@ -316,46 +317,48 @@ export default function Tab1Content() {
             {/* FAQ   */}
 
             <div className="flex w-full flex-col pb-8">&nbsp;</div>
-            <div className=" mb-2 text-2xl">FAQ</div>
+            <div className="  text-2xl">FAQ</div>
             <Accordion isCompact>
-                <AccordionItem key="1" aria-label="Accordion 1" title="What is ERC-404?">
-                    <p className="text-gray-200">TRC-404 is an experimental, mixed Jetton & NFT implementation with
+                <AccordionItem key="1" aria-label="Accordion 1" title="What is TRC-404?">
+                    <p className="text-gray-500 indent-6">TRC-404 is an experimental, mixed Jetton & NFT implementation
+                        with
                         native liquidity and
                         fractionalization for semi-fungible tokens.</p>
 
-                    <p className="pt-2 text-gray-200">This project is inspired by ERC-404, and now is the first project
+                    <p className="pt-2 text-gray-500 indent-6">This project is inspired by ERC-404, and now is the first
+                        project
                         implemented
                         ERC-404 protocol
                         on
                         TON.</p>
 
-                    <p className="pt-2 text-gray-200">
+                    <p className="pt-2 text-gray-500 indent-6">
                         Your NFT is probably not found, but your jetton is always lying in
                         your wallet. One wallet can only instantiate five 404 NFT but can have as many 404 jettons as
                         you want.
                     </p>
                 </AccordionItem>
                 <AccordionItem key="2" aria-label="Accordion 2" title="What's the key features?">
-                    <ul>
-                        <li className="text-gray-200">1. Submit TON Enhancement Proposals (TEPs) 404 Standard</li>
-                        <li className="text-gray-200">2. Production-ready FunC code with high test coverage</li>
-                        <li className="text-gray-200">3. Fully compatible with TON ecosystem(wallet, NFT market, DEX)
+                    <ul className="px-1">
+                        <li className="text-gray-500">1. Submit TON Enhancement Proposals (TEPs) 404 Standard</li>
+                        <li className="text-gray-500">2. Production-ready FunC code with high test coverage</li>
+                        <li className="text-gray-500">3. Fully compatible with TON ecosystem(wallet, NFT market, DEX)
                         </li>
-                        <li className="text-gray-200">4. Native Telegram Bot and Mini-App with TON Connect SDK</li>
-                        <li className="text-gray-200">5. Incentive Tokenomics, visionary roadmap and future plan</li>
+                        <li className="text-gray-500">4. Native Telegram Bot and Mini-App with TON Connect SDK</li>
+                        <li className="text-gray-500">5. Incentive Tokenomics, visionary roadmap and future plan</li>
                     </ul>
                 </AccordionItem>
                 <AccordionItem key="3" aria-label="Accordion 3" title="What about Tokenomics?">
-                    <p className="pt-2 text-gray-200">Total Supply: 100 K.</p>
+                    <p className="text-gray-500">Total Supply: 100 K.</p>
 
-                    <ul>
-                        <li className="text-gray-200">1. Free Mint 1st round: 1%</li>
-                        <li className="text-gray-200">2. Airdrop 2%</li>
-                        <li className="text-gray-200">3. Free Mint 2nd round: 2%</li>
-                        <li className="text-gray-200">4. Developer Team: 20%</li>
-                        <li className="text-gray-200">5. DEX: 10%</li>
-                        <li className="text-gray-200">6. Investor: 20%</li>
-                        <li className="text-gray-200">7. Ecosystem Locked: 45%</li>
+                    <ul className="px-1">
+                        <li className="text-gray-500">1. Free Mint 1st round: 1%</li>
+                        <li className="text-gray-500">2. Airdrop 2%</li>
+                        <li className="text-gray-500">3. Free Mint 2nd round: 2%</li>
+                        <li className="text-gray-500">4. Developer Team: 20%</li>
+                        <li className="text-gray-500">5. DEX: 10%</li>
+                        <li className="text-gray-500">6. Investor: 20%</li>
+                        <li className="text-gray-500">7. Ecosystem Locked: 45%</li>
                     </ul>
                 </AccordionItem>
             </Accordion>

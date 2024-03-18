@@ -18,11 +18,11 @@ const MobileTab: React.FC<MobileTabProps> = ({onTabChange}) => {
         <>
             <div
                 className="bg-blur  fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-black border-t-1 dark:border-t-zinc-800">
-                <div className="flex items-center justify-center m-3 ">
+                <div className="flex items-center justify-center my-2 ">
                     <button
                         className={`${
                             activeTab === "tab1" ? "text-blue-300 underline" : ""
-                        } rounded px-2 py-2 font-bold text-xl`}
+                        } rounded px-2 py-2 font-bold text-xl mb-2`}
                         onClick={() => handleTabClick("tab1")}
                     >
                         Mint
@@ -41,7 +41,7 @@ const MobileTab: React.FC<MobileTabProps> = ({onTabChange}) => {
                     <button
                         className={`${
                             activeTab === "tab2" ? "text-blue-300 underline" : ""
-                        } rounded px-2 py-2 font-bold text-xl`}
+                        } rounded px-2 py-2 font-bold text-xl mb-2`}
                         onClick={() => handleTabClick("tab2")}
                     >
                         Asset
@@ -60,7 +60,7 @@ const MobileTab: React.FC<MobileTabProps> = ({onTabChange}) => {
                     <button
                         className={`${
                             activeTab === "tab3" ? "text-blue-300 underline" : ""
-                        } rounded px-2 py-2 font-bold text-xl`}
+                        } rounded px-2 py-2 font-bold text-xl mb-2`}
                         onClick={() => handleTabClick("tab3")}
                     >
                         Marketplace
@@ -79,7 +79,7 @@ const MobileTab: React.FC<MobileTabProps> = ({onTabChange}) => {
                     <button
                         className={`${
                             activeTab === "tab4" ? "text-blue-300 underline" : ""
-                        } rounded px-2 py-2 font-bold text-xl`}
+                        } rounded px-2 py-2 font-bold text-xl mb-2`}
                         onClick={() => handleTabClick("tab4")}
                     >
                         Bridge
