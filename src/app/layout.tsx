@@ -1,14 +1,20 @@
-export const runtime = 'edge' // 'nodejs' (default) | 'edge'
-
+import {cn} from "@/lib/utils";
 import type {Metadata} from "next";
-import {Inter} from "next/font/google";
+import {Inter, Inter as FontSans} from "next/font/google";
 import {Providers} from '@/app/providers';
 
 import '../styles/globals.css';
 import {ContextProps, TMAProvider} from "@/contexts/TMA";
 import {headers} from "next/headers";
 
+export const runtime = 'edge' // 'nodejs' (default) | 'edge'
+
 const inter = Inter({subsets: ["latin"]});
+
+const fontSans = FontSans({
+    subsets: ["latin"],
+    variable: "--font-sans",
+})
 
 export const metadata: Metadata = {
     title: "TRC-404",
@@ -30,12 +36,15 @@ export default function RootLayout({
     // setDebug(true);
     return (
         <html lang="en" className="dark">
-        <body className={inter.className}>
+        <body className={cn(
+            "min-h-screen bg-background font-sans antialiased",
+            fontSans.variable
+        )}>
         {/* todo remove tma */}
         <TMAProvider headers={headersForContext}>
             <Providers themeProps={{attribute: 'class', defaultTheme: 'dark'}}>
                 <div className="relative flex h-screen flex-col">
-                    <main className="container mx-auto max-w-7xl flex-grow ">
+                    <main className="">
                         {children}
                     </main>
                 </div>

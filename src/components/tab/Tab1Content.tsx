@@ -2,27 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {CHAIN, SendTransactionRequest} from "@tonconnect/sdk";
 import {TonConnectButton, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 
-import {
-    Accordion,
-    AccordionItem,
-    Image,
-    Link,
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    useDisclosure,
-} from '@nextui-org/react';
-import {Progress} from "@nextui-org/progress";
-import {Card, CardFooter, CardHeader} from "@nextui-org/card";
-import {Button} from "@nextui-org/button";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion"
 import {ENDPOINT_TESTNET_RPC, t404_jetton_master_address, t404_jetton_master_address_raw} from "@/constant/trc404";
 import {Address} from "@ton/core";
 import {TonClient} from "@ton/ton";
-import {Divider} from "@nextui-org/divider";
-
-
+import {Button} from "@/components/ui/button";
+import {Progress} from "@/components/ui/progress";
+import {Card, CardFooter,} from "@/components/ui/card"
+import Image from 'next/image'
 // 1 means 1 ton 1 T404
 // 5 means 5 ton 1 T404
 // TODO: to change for production 1
@@ -62,7 +49,6 @@ interface MintInfo {
 export default function Tab1Content() {
 
     const [mintInfo, setMintInfo] = useState<MintInfo>({fetchFormRemote: false, progressRate: 0});
-
     const [tx, setTx] = useState(buildTx(baseRate, 1));
     const wallet = useTonWallet();
     const [tonConnectUi] = useTonConnectUI();
@@ -72,8 +58,6 @@ export default function Tab1Content() {
 
     // mint amount
     const [mintAmount, setMintAmount] = useState(1);
-
-    const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
     const handleIncrement = () => {
         if (mintAmount < 5) {
@@ -184,7 +168,6 @@ export default function Tab1Content() {
                     <Image
                         alt="trc-404 logo"
                         height={40}
-                        radius="sm"
                         src="/logos/logo-transparent.png"
                         width={40}
                     />
@@ -200,27 +183,29 @@ export default function Tab1Content() {
 
 
             {/*  dd */}
-            <Card isFooterBlurred className="w-full h-[300px] col-span-12 sm:col-span-7">
-                <CardHeader className="absolute z-10 top-1 flex-col items-start">
-                    {/*<p className="text-tiny text-white/60 uppercase font-bold">Your day your way</p>*/}
-                    {/*<h4 className="text-white/90 font-medium text-xl">Your checklist for better sleep</h4>*/}
-                </CardHeader>
+            <Card className="w-full h-[300px] col-span-12 sm:col-span-7">
+                {/*<CardHeader className="absolute z-10 top-1 flex-col items-start">*/}
+                {/*</CardHeader>*/}
+                {/*<CardContent className="z-0 w-full h-full object-fill">*/}
                 <Image
-                    removeWrapper
-                    alt="Relaxing app background"
+                    alt=" app"
                     className="z-0 w-full h-full object-fill"
+                    width="300"
+                    height="300"
                     src="/logos/fancy-vivid.png"
                 />
+                {/*</CardContent>*/}
                 <CardFooter
                     className="absolute bg-black/40 bottom-0 z-10 border-t-1 border-default-600 dark:border-default-100">
-                    <div className="flex flex-grow gap-2 items-center">
-                        <div className="flex flex-col">
-                            <p className="text-white/80">ERC-404</p>
-                            <p className="text-tiny text-white/80 ">To Make NFT Flow and Fly!</p>
-                        </div>
-                    </div>
+                    {/*<div className="flex flex-grow gap-2 items-center">*/}
+                    {/*    <div className="flex flex-col">*/}
+                    {/*        <p className="text-white/80">ERC-404</p>*/}
+                    {/*        <p className="text-tiny text-white/80 ">To Make NFT Flow and Fly!</p>*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
                 </CardFooter>
             </Card>
+
 
             {/*dd qqq*/}
 
@@ -242,14 +227,7 @@ export default function Tab1Content() {
                 {mintInfo.fetchFormRemote && (
                     <div className="flex justify-center ">
                         <Progress
-                            aria-label="Loading..."
-                            isStriped
-                            size="md"
                             value={mintInfo.progressRate}
-                            color="success"
-                            formatOptions={{style: "percent", minimumIntegerDigits: 1, minimumFractionDigits: 1}}
-                            showValueLabel={true}
-                            className="max-w-md "
                         />
                     </div>)}
 
@@ -292,7 +270,17 @@ export default function Tab1Content() {
                                 {/* TODO: to change for production 4 */
                                 }
                                 if (wallet?.account.chain == CHAIN.MAINNET) {
-                                    onOpen();
+                                    // TODO
+                                    // TODO
+                                    // TODO
+                                    // TODO
+                                    // TODO
+                                    // TODO
+                                    // TODO
+                                    // TODO
+                                    // TODO
+                                    // TODO
+                                    // onOpen();
                                     return;
                                 }
 
@@ -318,48 +306,62 @@ export default function Tab1Content() {
 
             <div className="flex w-full flex-col pb-8">&nbsp;</div>
             <div className="  text-2xl">FAQ</div>
-            <Accordion isCompact>
-                <AccordionItem key="1" aria-label="Accordion 1" title="What is TRC-404?">
-                    <p className="text-gray-500 indent-6">TRC-404 is an experimental, mixed Jetton & NFT implementation
-                        with
-                        native liquidity and
-                        fractionalization for semi-fungible tokens.</p>
+            <Accordion type="single" collapsible>
+                <AccordionItem value="1">
+                    <AccordionTrigger>What is TRC-404?</AccordionTrigger>
+                    <AccordionContent>
+                        <p className="text-gray-500 indent-6">TRC-404 is an experimental, mixed Jetton & NFT
+                            implementation
+                            with
+                            native liquidity and
+                            fractionalization for semi-fungible tokens.</p>
+                        <p className="pt-2 text-gray-500 indent-6">This project is inspired by ERC-404, and now is the
+                            first
+                            project
+                            implemented
+                            ERC-404 protocol
+                            on
+                            TON.</p>
 
-                    <p className="pt-2 text-gray-500 indent-6">This project is inspired by ERC-404, and now is the first
-                        project
-                        implemented
-                        ERC-404 protocol
-                        on
-                        TON.</p>
-
-                    <p className="pt-2 text-gray-500 indent-6">
-                        Your NFT is probably not found, but your jetton is always lying in
-                        your wallet. One wallet can only instantiate five 404 NFT but can have as many 404 jettons as
-                        you want.
-                    </p>
+                        <p className="pt-2 text-gray-500 indent-6">
+                            Your NFT is probably not found, but your jetton is always lying in
+                            your wallet. One wallet can only instantiate five 404 NFT but can have as many 404 jettons
+                            as
+                            you want.
+                        </p>
+                    </AccordionContent>
                 </AccordionItem>
-                <AccordionItem key="2" aria-label="Accordion 2" title="What's the key features?">
-                    <ul className="px-1">
-                        <li className="text-gray-500">1. Submit TON Enhancement Proposals (TEPs) 404 Standard</li>
-                        <li className="text-gray-500">2. Production-ready FunC code with high test coverage</li>
-                        <li className="text-gray-500">3. Fully compatible with TON ecosystem(wallet, NFT market, DEX)
-                        </li>
-                        <li className="text-gray-500">4. Native Telegram Bot and Mini-App with TON Connect SDK</li>
-                        <li className="text-gray-500">5. Incentive Tokenomics, visionary roadmap and future plan</li>
-                    </ul>
-                </AccordionItem>
-                <AccordionItem key="3" aria-label="Accordion 3" title="What about Tokenomics?">
-                    <p className="text-gray-500">Total Supply: 100 K.</p>
+                <AccordionItem value="2">
+                    <AccordionTrigger>What is the key features?</AccordionTrigger>
+                    <AccordionContent>
+                        <ul className="px-1">
+                            <li className="text-gray-500">1. Submit TON Enhancement Proposals (TEPs) 404 Standard</li>
+                            <li className="text-gray-500">2. Production-ready FunC code with high test coverage</li>
+                            <li className="text-gray-500">3. Fully compatible with TON ecosystem(wallet, NFT market,
+                                DEX)
+                            </li>
+                            <li className="text-gray-500">4. Native Telegram Bot and Mini-App with TON Connect SDK</li>
+                            <li className="text-gray-500">5. Incentive Tokenomics, visionary roadmap and future plan
+                            </li>
+                        </ul>
+                    </AccordionContent>
 
-                    <ul className="px-1">
-                        <li className="text-gray-500">1. Free Mint 1st round: 1%</li>
-                        <li className="text-gray-500">2. Airdrop 2%</li>
-                        <li className="text-gray-500">3. Free Mint 2nd round: 2%</li>
-                        <li className="text-gray-500">4. Developer Team: 20%</li>
-                        <li className="text-gray-500">5. DEX: 10%</li>
-                        <li className="text-gray-500">6. Investor: 20%</li>
-                        <li className="text-gray-500">7. Ecosystem Locked: 45%</li>
-                    </ul>
+                </AccordionItem>
+                <AccordionItem value="3" aria-label="Accordion 3">
+                    <AccordionTrigger>What about Tokenomics?</AccordionTrigger>
+                    <AccordionContent>
+                        <p className="text-gray-500">Total Supply: 100 K.</p>
+
+                        <ul className="px-1">
+                            <li className="text-gray-500">1. Free Mint 1st round: 1%</li>
+                            <li className="text-gray-500">2. Airdrop 2%</li>
+                            <li className="text-gray-500">3. Free Mint 2nd round: 2%</li>
+                            <li className="text-gray-500">4. Developer Team: 20%</li>
+                            <li className="text-gray-500">5. DEX: 10%</li>
+                            <li className="text-gray-500">6. Investor: 20%</li>
+                            <li className="text-gray-500">7. Ecosystem Locked: 45%</li>
+                        </ul>
+                    </AccordionContent>
                 </AccordionItem>
             </Accordion>
 
@@ -367,62 +369,64 @@ export default function Tab1Content() {
             <div className="flex w-full flex-col pb-20">&nbsp;</div>
 
             {/*    Modal*/}
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex flex-col gap-1">Testnet Only</ModalHeader>
-                            <ModalBody>
-                                <p>
-                                    Thank you for participating in the TRC-404 beta test, you need to connect testnet,
-                                    but you are currently
-                                    connecting to
-                                    the&nbsp;
-                                    <span className="bg-yellow-100 text-red-700">mainnet</span> wallet.
-                                </p>
-                                <p>
-                                    <h2>Mainnet</h2>
-                                    <ul className="list-disc">
-                                        <li>address start with <span className=" text-red-500">EQ</span>
-                                        </li>
-                                        <li>address start with <span className=" text-red-500">UQ</span>
-                                        </li>
-                                    </ul>
+            {/*<Modal isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true}>*/}
+            {/*    <ModalContent>*/}
+            {/*        {(onClose) => (*/}
+            {/*            <>*/}
+            {/*                <ModalHeader className="flex flex-col gap-1">Testnet Only</ModalHeader>*/}
+            {/*                <ModalBody>*/}
+            {/*                    <p>*/}
+            {/*                        Thank you for participating in the TRC-404 beta test, you need to connect testnet,*/}
+            {/*                        but you are currently*/}
+            {/*                        connecting to*/}
+            {/*                        the&nbsp;*/}
+            {/*                        <span className="bg-yellow-100 text-red-700">mainnet</span> wallet.*/}
+            {/*                    </p>*/}
+            {/*                    <p>*/}
+            {/*                        <h2>Mainnet</h2>*/}
+            {/*                        <ul className="list-disc">*/}
+            {/*                            <li>address start with <span className=" text-red-500">EQ</span>*/}
+            {/*                            </li>*/}
+            {/*                            <li>address start with <span className=" text-red-500">UQ</span>*/}
+            {/*                            </li>*/}
+            {/*                        </ul>*/}
 
-                                    <h2 className="pt-2">Testnet</h2>
-                                    <ul className="list-disc">
-                                        <li>address start with <span className="bg-gray-900 text-blue-500">kQ</span>
-                                        </li>
-                                        <li>address start with <span className="bg-gray-900 text-blue-500">0Q</span>
-                                        </li>
-                                    </ul>
-                                </p>
-                                <Divider className="my-4"/>
-                                <div>
-                                    <div>Q: How to config your wallet to connect testnet?</div>
-                                    <div>A: <Link underline="always"
-                                                  href="https://answers.ton.org/question/1561527682871595008/how-do-you-change-ton-keeper-to-testnet">view
-                                        answer</Link>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div>Q: How to get Toncoin at testnet?</div>
-                                    <div>A: <Link underline="always"
-                                                  href="https://t.me/testgiver_ton_bot">
-                                        Testgiver TON Bot</Link>
-                                    </div>
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
+            {/*                        <h2 className="pt-2">Testnet</h2>*/}
+            {/*                        <ul className="list-disc">*/}
+            {/*                            <li>address start with <span className="bg-gray-900 text-blue-500">kQ</span>*/}
+            {/*                            </li>*/}
+            {/*                            <li>address start with <span className="bg-gray-900 text-blue-500">0Q</span>*/}
+            {/*                            </li>*/}
+            {/*                        </ul>*/}
+            {/*                    </p>*/}
+            {/*                    <Divider className="my-4"/>*/}
+            {/*                    <div>*/}
+            {/*                        <div>Q: How to config your wallet to connect testnet?</div>*/}
+            {/*                        <div>A: <Link className={"underline"}*/}
+            {/*                                      href="https://answers.ton.org/question/1561527682871595008/how-do-you-change-ton-keeper-to-testnet">view*/}
+            {/*                            answer</Link>*/}
+            {/*                        </div>*/}
+            {/*                    </div>*/}
+            {/*                    <div>*/}
+            {/*                        <div>Q: How to get Toncoin at testnet?</div>*/}
+            {/*                        <div>A: <Link className={"underline"}*/}
+            {/*                                      href="https://t.me/testgiver_ton_bot">*/}
+            {/*                            Testgiver TON Bot</Link>*/}
+            {/*                        </div>*/}
+            {/*                    </div>*/}
+            {/*                </ModalBody>*/}
+            {/*                <ModalFooter>*/}
 
-                                <Button color="primary" onPress={onClose}>
-                                    Close
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
+            {/*                    <Button color="primary" onClick={() => {*/}
+            {/*                        onClose();*/}
+            {/*                    }}>*/}
+            {/*                        Close*/}
+            {/*                    </Button>*/}
+            {/*                </ModalFooter>*/}
+            {/*            </>*/}
+            {/*        )}*/}
+            {/*    </ModalContent>*/}
+            {/*</Modal>*/}
             {/*    Modal*/}
 
         </div>

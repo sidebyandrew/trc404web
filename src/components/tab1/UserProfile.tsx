@@ -1,5 +1,4 @@
 'use client';
-import {Image} from '@nextui-org/react';
 import {TonConnectButton} from '@tonconnect/ui-react';
 import {useRouter} from 'next/navigation';
 
@@ -25,8 +24,8 @@ const UserProfile = () => {
                         TRC-404
                     </div>
                     <div className="flex items-center text-sm text-gray-500">
-                        <Image src="/icon/pop.png" height={21} width={21} alt="pop"/>
-                      
+                        {/*<Image src="/icon/pop.png" height={21} width={21} alt="pop"/>*/}
+
                     </div>
                 </div>
                 <div className="flex-item ml-auto">
