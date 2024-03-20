@@ -3,37 +3,44 @@ import {CHAIN, SendTransactionRequest} from "@tonconnect/sdk";
 import {TonConnectButton, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion"
-import {ENDPOINT_TESTNET_RPC, t404_jetton_master_address, t404_jetton_master_address_raw} from "@/constant/trc404";
 import {Address} from "@ton/core";
 import {TonClient} from "@ton/ton";
 import {Button} from "@/components/ui/button";
 import {Progress} from "@/components/ui/progress";
 import {Card, CardFooter,} from "@/components/ui/card"
 import Image from 'next/image'
-// 1 means 1 ton 1 T404
-// 5 means 5 ton 1 T404
-// TODO: to change for production 1
-const baseRate: number = 1;
-// TODO: to change for production 1
-const endpoint = ENDPOINT_TESTNET_RPC;
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
+import {useMediaQuery} from "@/hooks/use-media-query";
+import Link from "next/link";
+import {Separator} from "@/components/ui/separator";
+import {ENDPOINT_MAINNET_RPC, ENDPOINT_TESTNET_RPC} from "@/constant/trc404";
+// @ts-ignore
+let baseNanoBigInt: bigint = 1000000000n;
+let baseNanoNumber: number = 1000000000;
 
-
-function buildTx(base: number, amount: number): SendTransactionRequest {
-
-    return {
-        // TODO: to change for production 2
-        // network: CHAIN.TESTNET,
-        // The transaction is valid for 10 minutes from now, in unix epoch seconds.
-        validUntil: Math.floor(Date.now() / 1000) + 600,
-        messages: [
-            {
-                address: t404_jetton_master_address_raw,
-                amount: String(1000000000 * base * amount),
-            },
-        ],
-    };
-
+interface RuntimeEnvInfo {
+    isMainnet: boolean;
 }
+
+// =======================================================================
+// TODO: to change for production
+// 20240320 second round
+const isMainnet: boolean = false;
+export const t404_jetton_master_address: string = "EQDxhFGyEq5HrUQW_v6i8sjA4IhkQELbO0Tx0nlYho2C8Djf";
+export const t404_jetton_master_address_raw: string = '0:f18451b212ae47ad4416fefea2f2c8c0e088644042db3b44f1d27958868d82f0';
+const forceMintPrice: number = 2.15;
+const roundOffset: number = 1000;
+// TODO: to change for production
+// =======================================================================
 
 
 interface MintInfo {
@@ -46,30 +53,52 @@ interface MintInfo {
 }
 
 
+function buildTx(amount: number, mintInfo: MintInfo): SendTransactionRequest {
+
+    let mintPrice: number = forceMintPrice;
+    if (mintInfo.fetchFormRemote && mintInfo.freemintTonPrice) {
+        mintPrice = mintInfo.freemintTonPrice;
+    }
+
+    return {
+        // let mintPrice:number = mintInfo.freemintTonPrice
+        // The transaction is valid for 10 minutes from now, in unix epoch seconds.
+        validUntil: Math.floor(Date.now() / 1000) + 600,
+        messages: [
+            {
+                address: t404_jetton_master_address_raw,
+                amount: String(baseNanoNumber * mintPrice * amount),
+            },
+        ],
+    };
+
+}
+
+
 export default function Tab1Content() {
 
     const [mintInfo, setMintInfo] = useState<MintInfo>({fetchFormRemote: false, progressRate: 0});
-    const [tx, setTx] = useState(buildTx(baseRate, 1));
+    const [tx, setTx] = useState(buildTx(1, mintInfo));
     const wallet = useTonWallet();
     const [tonConnectUi] = useTonConnectUI();
-
-    // process bar number
-    const [progressNumber, setProgressNumber] = React.useState(20);
 
     // mint amount
     const [mintAmount, setMintAmount] = useState(1);
 
+    const [open, setOpen] = React.useState(false)
+    const isDesktop = useMediaQuery("(min-width: 768px)")
+
     const handleIncrement = () => {
         if (mintAmount < 5) {
             setMintAmount(mintAmount + 1);
-            setTx(buildTx(baseRate, mintAmount + 1));
+            setTx(buildTx(mintAmount + 1, mintInfo));
         }
     };
 
     const handleDecrement = () => {
         if (mintAmount >= 2) {
             setMintAmount(mintAmount - 1);
-            setTx(buildTx(baseRate, mintAmount - 1));
+            setTx(buildTx(mintAmount - 1, mintInfo));
         }
     };
 
@@ -80,27 +109,19 @@ export default function Tab1Content() {
         setMintAmount(val);
     };
 
-    React.useEffect(() => {
-        const interval = setInterval(() => {
-            setProgressNumber((v) => (v > 100 ? 100 : v + 1));
-        }, 5000);
-
-        return () => clearInterval(interval);
-    }, []);
-
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const client = new TonClient(
                     {
-                        endpoint: endpoint,
+                        endpoint: isMainnet ? ENDPOINT_MAINNET_RPC : ENDPOINT_TESTNET_RPC,
                     });
 
                 const master_tx = await client.runMethod(
                     Address.parse(t404_jetton_master_address), 'get_jetton_data');
                 // @ts-ignore
-                let baseNano: bigint = 1000000000n;
+
                 let master_result = master_tx.stack;
                 let total_supply = master_result.readBigNumber();
                 let mintable = master_result.readBoolean();
@@ -109,40 +130,38 @@ export default function Tab1Content() {
                 let jetton_wallet_code = master_result.readCell();
                 let nft_collection_address = master_result.readAddress();
 
-                //-1:true(can mint), 0:false(can not)
+                //-1:true(can mint), 0:false(can not) : BACKEND USE, not for front end
                 let freemint_flag = master_result.readNumber();
 
                 //3 000000000n 当前已经 mint 的数字
                 let freemint_current_supply = master_result.readBigNumber();
-                let freemint_current_supply_number = Number(freemint_current_supply / baseNano);
+                let freemint_current_supply_number = Number(freemint_current_supply / baseNanoBigInt) - roundOffset;
 
                 //1000 000000000n
                 let freemint_max_supply = master_result.readBigNumber();
-                let freemint_max_supply_number = Number(freemint_max_supply / baseNano);
+                let freemint_max_supply_number = Number(freemint_max_supply / baseNanoBigInt) - roundOffset;
 
                 //1 000000000n
-                let freemint_price = master_result.readBigNumber();
-
-
+                let freemint_price = Number(master_result.readBigNumber());
                 let mintInfo: MintInfo = {
                     fetchFormRemote: true,
-                    freemintIsOpen: freemint_flag == -1,
+                    freemintIsOpen: freemint_current_supply_number != freemint_max_supply_number,
                     freemintCurrentSupply: freemint_current_supply_number,
                     freemintMaxSupply: freemint_max_supply_number,
-                    freemintTonPrice: Number(freemint_price / baseNano),
-                    progressRate: 100 * freemint_current_supply_number / freemint_max_supply_number,
+                    freemintTonPrice: freemint_price / baseNanoNumber,
+                    progressRate: Number(Number(100 * freemint_current_supply_number / freemint_max_supply_number).toFixed(1)),
                 };
 
                 setMintInfo(mintInfo);
 
-                // console.log('get_jetton_data freemint_current_supply:', freemint_current_supply,
-                //     ',freemint_max_supply:', freemint_max_supply, ",freemint_price", freemint_price,
-                //     ',freemint_flag:', freemint_flag);
+                console.log('get_jetton_data freemint_current_supply:', freemint_current_supply,
+                    ',freemint_max_supply:', freemint_max_supply, ",freemint_price", freemint_price,
+                    ',freemint_flag:', freemint_flag);
 
                 console.log('convert: get_jetton_data freemint_current_supply:', mintInfo.freemintCurrentSupply,
-                    ',freemint_max_supply:', mintInfo.freemintMaxSupply,
-                    ",freemint_price", mintInfo.freemintTonPrice,
-                    ',freemint_flag:', mintInfo.freemintIsOpen,
+                    ',freemintMaxSupply:', mintInfo.freemintMaxSupply,
+                    ",freemintTonPrice", mintInfo.freemintTonPrice,
+                    ',freemintIsOpen:', mintInfo.freemintIsOpen,
                     ',progressRate:', mintInfo.progressRate,
                     ',fetchFormRemote:', mintInfo.fetchFormRemote
                 );
@@ -205,12 +224,10 @@ export default function Tab1Content() {
                     {/*</div>*/}
                 </CardFooter>
             </Card>
-
-
             {/*dd qqq*/}
 
-            {/*TODO: to change for production */}
-            <div className="mt-4 mb-2 text-2xl">Free Mint <span className='text-yellow-600 text-xl'>(Testnet)</span>
+            <div className="mt-4 mb-2 text-2xl">Fair Mint
+                {!isMainnet && <span className='text-yellow-600 text-lg'>&nbsp;Testnet 2nd Round</span>}
             </div>
             <div className="flex flex-col">
 
@@ -219,16 +236,20 @@ export default function Tab1Content() {
                 </div>)}
 
                 <div className="flex justify-center  text-gray-500">
-                    Total Supply：1000
+                    Round Supply：{mintInfo.freemintMaxSupply}
                 </div>
+                {mintInfo.fetchFormRemote && (<div className="flex justify-center text-gray-500">
+                    Round Mint Price：{mintInfo.freemintTonPrice}
+                </div>)}
                 <div className="flex justify-center text-gray-500">
                     Period：2024/03/15 - 2024/03/29
                 </div>
                 {mintInfo.fetchFormRemote && (
-                    <div className="flex justify-center ">
+                    <div className="flex items-center justify-center ">
                         <Progress
                             value={mintInfo.progressRate}
                         />
+                        <div className=" text-gray-500">&nbsp;{mintInfo.progressRate}%</div>
                     </div>)}
 
                 <div className="flex flex-col mt-3">
@@ -238,64 +259,50 @@ export default function Tab1Content() {
                             <div className="flex mb-2 items-center">
                                 <div className="text-lg ">Mint Amount: &nbsp;</div>
 
-                                <button
-                                    className="focus:outline-none"
+                                <Button
+                                    variant={"outline"}
+                                    className="focus:outline-none text-2xl"
                                     onClick={handleDecrement}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round"
-                                              d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                                    </svg>
-                                </button>
+                                    -
+                                </Button>
                                 <div className="mx-3"> {mintAmount} </div>
 
-                                <button
-                                    className="focus:outline-none"
+                                <Button
+                                    variant={"outline"}
+                                    className="focus:outline-none text-2xl"
                                     onClick={handleIncrement}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round"
-                                              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                                    </svg>
-
-                                </button>
+                                    +
+                                </Button>
                             </div>
                             {/*mint amount end*/}
 
-                            <Button size='lg' color="primary" onClick={() => {
-                                console.info(wallet?.account)
+                            <Button
+                                variant={mintInfo.freemintIsOpen ? "blue" : "outline"}
+                                disabled={!mintInfo.freemintIsOpen}
+                                onClick={() => {
+                                    if (isMainnet && wallet?.account.chain == CHAIN.TESTNET) {
+                                        setOpen(!open);
+                                        return;
+                                    }
 
-                                {/* TODO: to change for production 4 */
+                                    if (!isMainnet && wallet?.account.chain == CHAIN.MAINNET) {
+                                        setOpen(!open);
+                                        return;
+                                    }
+                                    return tonConnectUi.sendTransaction(tx);
                                 }
-                                if (wallet?.account.chain == CHAIN.MAINNET) {
-                                    // TODO
-                                    // TODO
-                                    // TODO
-                                    // TODO
-                                    // TODO
-                                    // TODO
-                                    // TODO
-                                    // TODO
-                                    // TODO
-                                    // TODO
-                                    // onOpen();
-                                    return;
-                                }
-
-                                return tonConnectUi.sendTransaction(tx);
-                            }
-                            }>
-                                Free Mint
+                                }>
+                                {mintInfo.freemintIsOpen ? "Fair Mint" : "Fair Mint Finished!"}
                             </Button>
 
                         </>
                     ) : (
-                        <Button size='lg' color="primary" onClick={() => {
+                        <Button variant={"secondary"} size='lg' color="primary" onClick={() => {
                             return tonConnectUi.openModal();
                         }}>
-                            Connect Wallet to Free Mint
+                            Connect Wallet to Fair Mint
                         </Button>
                     )}
                 </div>
@@ -350,84 +357,82 @@ export default function Tab1Content() {
                 <AccordionItem value="3" aria-label="Accordion 3">
                     <AccordionTrigger>What about Tokenomics?</AccordionTrigger>
                     <AccordionContent>
-                        <p className="text-gray-500">Total Supply: 100 K.</p>
+                        <p className="text-gray-500">Total Supply: 1,000 K.</p>
 
                         <ul className="px-1">
-                            <li className="text-gray-500">1. Free Mint 1st round: 1%</li>
+                            <li className="text-gray-500">1. Fair Mint 1st round: 1%</li>
                             <li className="text-gray-500">2. Airdrop 2%</li>
-                            <li className="text-gray-500">3. Free Mint 2nd round: 2%</li>
-                            <li className="text-gray-500">4. Developer Team: 20%</li>
+                            <li className="text-gray-500">3. Fair Mint 2nd round: 2%</li>
+                            <li className="text-gray-500">4. Developer Team: 15%</li>
                             <li className="text-gray-500">5. DEX: 10%</li>
-                            <li className="text-gray-500">6. Investor: 20%</li>
-                            <li className="text-gray-500">7. Ecosystem Locked: 45%</li>
+                            <li className="text-gray-500">6. Advisor: 5%</li>
+                            <li className="text-gray-500">7. Investor: 20%</li>
+                            <li className="text-gray-500">8. Ecosystem Locked: 45%</li>
                         </ul>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
 
+            <div>
+                <Drawer open={open} onOpenChange={setOpen}>
+                    <DrawerTrigger asChild>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                        <DrawerHeader className="text-left">
+                            <DrawerTitle>Testnet Only</DrawerTitle>
+                            <DrawerDescription>
+                                <p>
+                                    Thank you for participating in the TRC-404 beta test, you need to connect testnet,
+                                    but you are currently
+                                    connecting to
+                                    the&nbsp;
+                                    <span className="bg-yellow-100 text-red-700">mainnet</span> wallet.
+                                </p>
+                                <p>
+                                    <h2>Mainnet</h2>
+                                    <ul className="list-disc">
+                                        <li>address start with <span className=" text-red-500">EQ</span>
+                                        </li>
+                                        <li>address start with <span className=" text-red-500">UQ</span>
+                                        </li>
+                                    </ul>
+
+                                    <h2 className="pt-2">Testnet</h2>
+                                    <ul className="list-disc">
+                                        <li>address start with <span className="bg-gray-900 text-blue-500">kQ</span>
+                                        </li>
+                                        <li>address start with <span className="bg-gray-900 text-blue-500">0Q</span>
+                                        </li>
+                                    </ul>
+                                </p>
+                                <Separator className="my-4"/>
+                                <div>
+                                    <div>Q: How to config your wallet to connect testnet?</div>
+                                    <div>A: <Link className={"underline"}
+                                                  href="https://answers.ton.org/question/1561527682871595008/how-do-you-change-ton-keeper-to-testnet">view
+                                        answer</Link>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>Q: How to get Toncoin at testnet?</div>
+                                    <div>A: <Link className={"underline"}
+                                                  href="https://t.me/testgiver_ton_bot">
+                                        Testgiver TON Bot</Link>
+                                    </div>
+                                </div>
+                            </DrawerDescription>
+                        </DrawerHeader>
+                        <DrawerFooter className="pt-2">
+                            <DrawerClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                            </DrawerClose>
+                        </DrawerFooter>
+                    </DrawerContent>
+                </Drawer>
+            </div>
             {/* FAQ   */}
             <div className="flex w-full flex-col pb-20">&nbsp;</div>
 
-            {/*    Modal*/}
-            {/*<Modal isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true}>*/}
-            {/*    <ModalContent>*/}
-            {/*        {(onClose) => (*/}
-            {/*            <>*/}
-            {/*                <ModalHeader className="flex flex-col gap-1">Testnet Only</ModalHeader>*/}
-            {/*                <ModalBody>*/}
-            {/*                    <p>*/}
-            {/*                        Thank you for participating in the TRC-404 beta test, you need to connect testnet,*/}
-            {/*                        but you are currently*/}
-            {/*                        connecting to*/}
-            {/*                        the&nbsp;*/}
-            {/*                        <span className="bg-yellow-100 text-red-700">mainnet</span> wallet.*/}
-            {/*                    </p>*/}
-            {/*                    <p>*/}
-            {/*                        <h2>Mainnet</h2>*/}
-            {/*                        <ul className="list-disc">*/}
-            {/*                            <li>address start with <span className=" text-red-500">EQ</span>*/}
-            {/*                            </li>*/}
-            {/*                            <li>address start with <span className=" text-red-500">UQ</span>*/}
-            {/*                            </li>*/}
-            {/*                        </ul>*/}
-
-            {/*                        <h2 className="pt-2">Testnet</h2>*/}
-            {/*                        <ul className="list-disc">*/}
-            {/*                            <li>address start with <span className="bg-gray-900 text-blue-500">kQ</span>*/}
-            {/*                            </li>*/}
-            {/*                            <li>address start with <span className="bg-gray-900 text-blue-500">0Q</span>*/}
-            {/*                            </li>*/}
-            {/*                        </ul>*/}
-            {/*                    </p>*/}
-            {/*                    <Divider className="my-4"/>*/}
-            {/*                    <div>*/}
-            {/*                        <div>Q: How to config your wallet to connect testnet?</div>*/}
-            {/*                        <div>A: <Link className={"underline"}*/}
-            {/*                                      href="https://answers.ton.org/question/1561527682871595008/how-do-you-change-ton-keeper-to-testnet">view*/}
-            {/*                            answer</Link>*/}
-            {/*                        </div>*/}
-            {/*                    </div>*/}
-            {/*                    <div>*/}
-            {/*                        <div>Q: How to get Toncoin at testnet?</div>*/}
-            {/*                        <div>A: <Link className={"underline"}*/}
-            {/*                                      href="https://t.me/testgiver_ton_bot">*/}
-            {/*                            Testgiver TON Bot</Link>*/}
-            {/*                        </div>*/}
-            {/*                    </div>*/}
-            {/*                </ModalBody>*/}
-            {/*                <ModalFooter>*/}
-
-            {/*                    <Button color="primary" onClick={() => {*/}
-            {/*                        onClose();*/}
-            {/*                    }}>*/}
-            {/*                        Close*/}
-            {/*                    </Button>*/}
-            {/*                </ModalFooter>*/}
-            {/*            </>*/}
-            {/*        )}*/}
-            {/*    </ModalContent>*/}
-            {/*</Modal>*/}
-            {/*    Modal*/}
 
         </div>
 
