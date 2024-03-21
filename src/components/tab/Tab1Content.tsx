@@ -37,7 +37,7 @@ interface RuntimeEnvInfo {
 const isMainnet: boolean = false;
 export const t404_jetton_master_address: string = "EQCnsUPUV3xnxYHjKsPHOCKB1R8pyShsYqoDH47dkXVdm_mO";
 export const t404_jetton_master_address_raw: string = '0:a7b143d4577c67c581e32ac3c7382281d51f29c9286c62aa031f8edd91755d9b';
-const forceMintPrice: number = 2.15;
+const defaultMintPrice: number = 2.15;
 const roundOffset: number = 1000;
 // TODO: to change for production
 // =======================================================================
@@ -55,7 +55,7 @@ interface MintInfo {
 
 function buildTx(amount: number, mintInfo: MintInfo): SendTransactionRequest {
 
-    let mintPrice: number = forceMintPrice;
+    let mintPrice: number = defaultMintPrice;
     if (mintInfo.fetchFormRemote && mintInfo.freemintTonPrice) {
         mintPrice = mintInfo.freemintTonPrice;
     }
