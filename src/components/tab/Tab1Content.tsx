@@ -35,8 +35,8 @@ interface RuntimeEnvInfo {
 // TODO: to change for production
 // 20240320 second round
 const isMainnet: boolean = false;
-export const t404_jetton_master_address: string = "EQDxhFGyEq5HrUQW_v6i8sjA4IhkQELbO0Tx0nlYho2C8Djf";
-export const t404_jetton_master_address_raw: string = '0:f18451b212ae47ad4416fefea2f2c8c0e088644042db3b44f1d27958868d82f0';
+export const t404_jetton_master_address: string = "EQCnsUPUV3xnxYHjKsPHOCKB1R8pyShsYqoDH47dkXVdm_mO";
+export const t404_jetton_master_address_raw: string = '0:a7b143d4577c67c581e32ac3c7382281d51f29c9286c62aa031f8edd91755d9b';
 const forceMintPrice: number = 2.15;
 const roundOffset: number = 1000;
 // TODO: to change for production
