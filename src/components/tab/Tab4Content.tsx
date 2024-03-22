@@ -4,7 +4,7 @@ import React from "react";
 export default function Tab4Bridge() {
     return (
         <div className="p-4">
-            <div className="mb-3 text-2xl font-bold">TRC-404 Bridge</div>
+            <div className="mb-3 text-2xl font-bold">TRC-404 Ecosystem</div>
 
             <div className="mt-20 mb-3">
                 To Make NFT Flow and Fly!

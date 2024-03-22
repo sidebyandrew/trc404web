@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {CHAIN, SendTransactionRequest} from "@tonconnect/sdk";
-import {TonConnectButton, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
+import {useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion"
 import {Address} from "@ton/core";
 import {TonClient} from "@ton/ton";
 import {Button} from "@/components/ui/button";
 import {Progress} from "@/components/ui/progress";
-import {Card, CardFooter,} from "@/components/ui/card"
+import {Card,} from "@/components/ui/card"
 import Image from 'next/image'
 import {
     Drawer,
@@ -22,25 +22,17 @@ import {
 import {useMediaQuery} from "@/hooks/use-media-query";
 import Link from "next/link";
 import {Separator} from "@/components/ui/separator";
-import {ENDPOINT_MAINNET_RPC, ENDPOINT_TESTNET_RPC} from "@/constant/trc404";
-// @ts-ignore
-let baseNanoBigInt: bigint = 1000000000n;
-let baseNanoNumber: number = 1000000000;
-
-interface RuntimeEnvInfo {
-    isMainnet: boolean;
-}
-
-// =======================================================================
-// TODO: to change for production
-// 20240320 second round
-const isMainnet: boolean = false;
-export const t404_jetton_master_address: string = "EQCnsUPUV3xnxYHjKsPHOCKB1R8pyShsYqoDH47dkXVdm_mO";
-export const t404_jetton_master_address_raw: string = '0:a7b143d4577c67c581e32ac3c7382281d51f29c9286c62aa031f8edd91755d9b';
-const defaultMintPrice: number = 2.15;
-const roundOffset: number = 1000;
-// TODO: to change for production
-// =======================================================================
+import {
+    BASE_NANO_BIGINT,
+    BASE_NANO_NUMBER,
+    defaultMintPrice,
+    ENDPOINT_MAINNET_RPC,
+    ENDPOINT_TESTNET_RPC,
+    isMainnet,
+    roundAccumulatedOffset,
+    t404_jetton_master_address,
+    t404_jetton_master_address_raw
+} from "@/constant/trc404_config";
 
 
 interface MintInfo {
@@ -67,7 +59,7 @@ function buildTx(amount: number, mintInfo: MintInfo): SendTransactionRequest {
         messages: [
             {
                 address: t404_jetton_master_address_raw,
-                amount: String(baseNanoNumber * mintPrice * amount),
+                amount: String(BASE_NANO_NUMBER * mintPrice * amount),
             },
         ],
     };
@@ -135,11 +127,11 @@ export default function Tab1Content() {
 
                 //3 000000000n 当前已经 mint 的数字
                 let freemint_current_supply = master_result.readBigNumber();
-                let freemint_current_supply_number = Number(freemint_current_supply / baseNanoBigInt) - roundOffset;
+                let freemint_current_supply_number = Number(freemint_current_supply / BASE_NANO_BIGINT) - roundAccumulatedOffset;
 
                 //1000 000000000n
                 let freemint_max_supply = master_result.readBigNumber();
-                let freemint_max_supply_number = Number(freemint_max_supply / baseNanoBigInt) - roundOffset;
+                let freemint_max_supply_number = Number(freemint_max_supply / BASE_NANO_BIGINT) - roundAccumulatedOffset;
 
                 //1 000000000n
                 let freemint_price = Number(master_result.readBigNumber());
@@ -148,7 +140,7 @@ export default function Tab1Content() {
                     freemintIsOpen: freemint_current_supply_number != freemint_max_supply_number,
                     freemintCurrentSupply: freemint_current_supply_number,
                     freemintMaxSupply: freemint_max_supply_number,
-                    freemintTonPrice: freemint_price / baseNanoNumber,
+                    freemintTonPrice: freemint_price / BASE_NANO_NUMBER,
                     progressRate: Number(Number(100 * freemint_current_supply_number / freemint_max_supply_number).toFixed(1)),
                 };
 
@@ -182,30 +174,10 @@ export default function Tab1Content() {
 
     return (
         < div className="p-2">
-            <div className="flex justify-between pb-3">
-                <div className="flex gap-1">
-                    <Image
-                        alt="trc-404 logo"
-                        height={40}
-                        src="/logos/logo-transparent.png"
-                        width={40}
-                    />
-                    <div className="flex flex-col">
-                        <p className="text-md">TRC-404</p>
-                        <p className="text-small text-default-500">Probably not found</p>
-                    </div>
-                </div>
-                <div className="flex-item ml-auto">
-                    <TonConnectButton/>
-                </div>
-            </div>
 
 
             {/*  dd */}
             <Card className="w-full h-[300px] col-span-12 sm:col-span-7">
-                {/*<CardHeader className="absolute z-10 top-1 flex-col items-start">*/}
-                {/*</CardHeader>*/}
-                {/*<CardContent className="z-0 w-full h-full object-fill">*/}
                 <Image
                     alt=" app"
                     className="z-0 w-full h-full object-fill"
@@ -213,16 +185,6 @@ export default function Tab1Content() {
                     height="300"
                     src="/logos/fancy-vivid.png"
                 />
-                {/*</CardContent>*/}
-                <CardFooter
-                    className="absolute bg-black/40 bottom-0 z-10 border-t-1 border-default-600 dark:border-default-100">
-                    {/*<div className="flex flex-grow gap-2 items-center">*/}
-                    {/*    <div className="flex flex-col">*/}
-                    {/*        <p className="text-white/80">ERC-404</p>*/}
-                    {/*        <p className="text-tiny text-white/80 ">To Make NFT Flow and Fly!</p>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
-                </CardFooter>
             </Card>
             {/*dd qqq*/}
 
@@ -373,63 +335,61 @@ export default function Tab1Content() {
                 </AccordionItem>
             </Accordion>
 
-            <div>
-                <Drawer open={open} onOpenChange={setOpen}>
-                    <DrawerTrigger asChild>
-                    </DrawerTrigger>
-                    <DrawerContent>
-                        <DrawerHeader className="text-left">
-                            <DrawerTitle>Testnet Only</DrawerTitle>
-                            <DrawerDescription>
-                                <p>
-                                    Thank you for participating in the TRC-404 beta test, you need to connect testnet,
-                                    but you are currently
-                                    connecting to
-                                    the&nbsp;
-                                    <span className="bg-yellow-100 text-red-700">mainnet</span> wallet.
-                                </p>
-                                <p>
-                                    <h2>Mainnet</h2>
-                                    <ul className="list-disc">
-                                        <li>address start with <span className=" text-red-500">EQ</span>
-                                        </li>
-                                        <li>address start with <span className=" text-red-500">UQ</span>
-                                        </li>
-                                    </ul>
+            <Drawer open={open} onOpenChange={setOpen}>
+                <DrawerTrigger asChild>
+                </DrawerTrigger>
+                <DrawerContent>
+                    <DrawerHeader className="text-left">
+                        <DrawerTitle>Testnet Only</DrawerTitle>
+                        <DrawerDescription>
+                            <p>
+                                Thank you for participating in the TRC-404 beta test, you need to connect testnet,
+                                but you are currently
+                                connecting to
+                                the&nbsp;
+                                <span className="bg-yellow-100 text-red-700">mainnet</span> wallet.
+                            </p>
+                            <p>
+                                <h2>Mainnet</h2>
+                                <ul className="list-disc">
+                                    <li>address start with <span className=" text-red-500">EQ</span>
+                                    </li>
+                                    <li>address start with <span className=" text-red-500">UQ</span>
+                                    </li>
+                                </ul>
 
-                                    <h2 className="pt-2">Testnet</h2>
-                                    <ul className="list-disc">
-                                        <li>address start with <span className="bg-gray-900 text-blue-500">kQ</span>
-                                        </li>
-                                        <li>address start with <span className="bg-gray-900 text-blue-500">0Q</span>
-                                        </li>
-                                    </ul>
-                                </p>
-                                <Separator className="my-4"/>
-                                <div>
-                                    <div>Q: How to config your wallet to connect testnet?</div>
-                                    <div>A: <Link className={"underline"}
-                                                  href="https://answers.ton.org/question/1561527682871595008/how-do-you-change-ton-keeper-to-testnet">view
-                                        answer</Link>
-                                    </div>
+                                <h2 className="pt-2">Testnet</h2>
+                                <ul className="list-disc">
+                                    <li>address start with <span className="bg-gray-900 text-blue-500">kQ</span>
+                                    </li>
+                                    <li>address start with <span className="bg-gray-900 text-blue-500">0Q</span>
+                                    </li>
+                                </ul>
+                            </p>
+                            <Separator className="my-4"/>
+                            <div>
+                                <div>Q: How to config your wallet to connect testnet?</div>
+                                <div>A: <Link className={"underline"}
+                                              href="https://answers.ton.org/question/1561527682871595008/how-do-you-change-ton-keeper-to-testnet">view
+                                    answer</Link>
                                 </div>
-                                <div>
-                                    <div>Q: How to get Toncoin at testnet?</div>
-                                    <div>A: <Link className={"underline"}
-                                                  href="https://t.me/testgiver_ton_bot">
-                                        Testgiver TON Bot</Link>
-                                    </div>
+                            </div>
+                            <div>
+                                <div>Q: How to get Toncoin at testnet?</div>
+                                <div>A: <Link className={"underline"}
+                                              href="https://t.me/testgiver_ton_bot">
+                                    Testgiver TON Bot</Link>
                                 </div>
-                            </DrawerDescription>
-                        </DrawerHeader>
-                        <DrawerFooter className="pt-2">
-                            <DrawerClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                            </DrawerClose>
-                        </DrawerFooter>
-                    </DrawerContent>
-                </Drawer>
-            </div>
+                            </div>
+                        </DrawerDescription>
+                    </DrawerHeader>
+                    <DrawerFooter className="pt-2">
+                        <DrawerClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                        </DrawerClose>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
             {/* FAQ   */}
             <div className="flex w-full flex-col pb-20">&nbsp;</div>
 
