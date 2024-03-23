@@ -146,7 +146,7 @@ export default function Tab1Content() {
 
                 setMintInfo(mintInfo);
 
-                console.log('get_jetton_data freemint_current_supply:', freemint_current_supply,
+                console.log('get_jetton_data freemint_current_supply :', freemint_current_supply,
                     ',freemint_max_supply:', freemint_max_supply, ",freemint_price", freemint_price,
                     ',freemint_flag:', freemint_flag);
 
