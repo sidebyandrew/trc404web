@@ -190,9 +190,10 @@ export default function Tab1Content() {
                 {!isMainnet && <span className='text-yellow-600 text-lg'>&nbsp;Testnet 2nd Round</span>}
             </div>
             <div className="flex flex-col">
-                {mintInfo.fetchFormRemote && (<div className="flex justify-center text-gray-500">
-                    Minted Count：{mintInfo.freemintCurrentSupply}
-                </div>)}
+                {mintInfo.fetchFormRemote && mintInfo.freemintIsOpen && (
+                    <div className="flex justify-center text-gray-500">
+                        Minted Count：{mintInfo.freemintCurrentSupply}
+                    </div>)}
 
                 <div className="flex justify-center  text-gray-500">
                     Round Supply：{mintInfo.freemintMaxSupply}
