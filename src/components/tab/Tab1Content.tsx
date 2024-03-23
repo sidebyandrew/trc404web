@@ -174,9 +174,7 @@ export default function Tab1Content() {
 
     return (
         < div className="p-2">
-
-
-            {/*  dd */}
+            {/*  Main Image Fancy Vivid */}
             <Card className="w-full h-[300px] col-span-12 sm:col-span-7">
                 <Image
                     alt=" app"
@@ -186,13 +184,12 @@ export default function Tab1Content() {
                     src="/logos/fancy-vivid.png"
                 />
             </Card>
-            {/*dd qqq*/}
+            {/* Main Image Fancy Vivid end */}
 
             <div className="mt-4 mb-2 text-2xl">Fair Mint
                 {!isMainnet && <span className='text-yellow-600 text-lg'>&nbsp;Testnet 2nd Round</span>}
             </div>
             <div className="flex flex-col">
-
                 {mintInfo.fetchFormRemote && (<div className="flex justify-center text-gray-500">
                     Minted Count：{mintInfo.freemintCurrentSupply}
                 </div>)}

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {CSSProperties, useEffect, useState} from 'react';
 import {beginCell, TonClient, TupleItem} from "@ton/ton";
 import {
     BASE_NANO_NUMBER,
@@ -11,12 +11,17 @@ import {Address} from "@ton/core";
 import {useTonWallet} from "@tonconnect/ui-react";
 import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
 import Image from "next/image";
+import {BeatLoader} from "react-spinners";
 
-
+const override: CSSProperties = {
+    display: "block",
+    margin: "0 auto",
+    borderColor: "white",
+};
 export default function Tab2Asset() {
-    const [jettonBalance, setJettonBalance] = useState("-");
-
+    const [jettonBalance, setJettonBalance] = useState("");
     const wallet = useTonWallet();
+    let [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (wallet?.account) {
@@ -48,7 +53,7 @@ export default function Tab2Asset() {
                     let jettonBalance: string = Number(Number(jetton_balance_bigint) / BASE_NANO_NUMBER).toFixed(3)
                     console.info(jettonBalance);
                     setJettonBalance(jettonBalance);
-
+                    setLoading(false);
                 } catch (error) {
                     console.error('Error fetching data:', error);
                 }
@@ -87,7 +92,17 @@ export default function Tab2Asset() {
                         <TableCell className="font-medium"> <Image src="/logo-circle.png" height={36} width={36}
                                                                    alt="pop"/></TableCell>
                         <TableCell>T404</TableCell>
-                        <TableCell>{jettonBalance}</TableCell>
+                        <TableCell>
+                            <BeatLoader
+                                color={"#ffffff"}
+                                loading={loading}
+                                cssOverride={override}
+                                size={12}
+                                aria-label="Loading Spinner"
+                                data-testid="loader"
+                            />
+                            {jettonBalance}
+                        </TableCell>
                         <TableCell className="text-right">-</TableCell>
                     </TableRow>
                 </TableBody>
