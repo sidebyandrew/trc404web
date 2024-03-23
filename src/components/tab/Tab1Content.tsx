@@ -28,11 +28,13 @@ import {
     defaultMintPrice,
     ENDPOINT_MAINNET_RPC,
     ENDPOINT_TESTNET_RPC,
+    FAIR_MINT_PERIOD,
     isMainnet,
     roundAccumulatedOffset,
     t404_jetton_master_address,
     t404_jetton_master_address_raw
 } from "@/constant/trc404_config";
+import {Skeleton} from "@/components/ui/skeleton";
 
 
 interface MintInfo {
@@ -42,6 +44,12 @@ interface MintInfo {
     freemintCurrentSupply?: number;
     freemintTonPrice?: number;
     progressRate: number;
+}
+
+
+interface RpcErrorInfo {
+    isRpcError: boolean;
+    errorMsg?: string;
 }
 
 
@@ -69,6 +77,7 @@ function buildTx(amount: number, mintInfo: MintInfo): SendTransactionRequest {
 
 export default function Tab1Content() {
 
+    const [rpcErrorInfo, setRpcErrorInfo] = useState<RpcErrorInfo>({isRpcError: false, errorMsg: ""});
     const [mintInfo, setMintInfo] = useState<MintInfo>({fetchFormRemote: false, progressRate: 0});
     const [tx, setTx] = useState(buildTx(1, mintInfo));
     const wallet = useTonWallet();
@@ -159,6 +168,14 @@ export default function Tab1Content() {
                 );
 
             } catch (error) {
+                console.log('convert: get_jetton_data freemint_current_supply:', mintInfo.freemintCurrentSupply,
+                    ',freemintMaxSupply:', mintInfo.freemintMaxSupply,
+                    ",freemintTonPrice", mintInfo.freemintTonPrice,
+                    ',freemintIsOpen:', mintInfo.freemintIsOpen,
+                    ',progressRate:', mintInfo.progressRate,
+                    ',fetchFormRemote:', mintInfo.fetchFormRemote
+                );
+                setRpcErrorInfo({isRpcError: true, errorMsg: "error"});
                 console.error('Error fetching data:', error);
             }
         };
@@ -190,27 +207,46 @@ export default function Tab1Content() {
                 {!isMainnet && <span className='text-yellow-600 text-lg'>&nbsp;Testnet 2nd Round</span>}
             </div>
             <div className="flex flex-col">
-                {mintInfo.fetchFormRemote && mintInfo.freemintIsOpen && (
-                    <div className="flex justify-center text-gray-500">
-                        Minted Count：{mintInfo.freemintCurrentSupply}
-                    </div>)}
 
-                <div className="flex justify-center  text-gray-500">
-                    Round Supply：{mintInfo.freemintMaxSupply}
-                </div>
-                {mintInfo.fetchFormRemote && (<div className="flex justify-center text-gray-500">
-                    Round Mint Price：{mintInfo.freemintTonPrice}
-                </div>)}
-                <div className="flex justify-center text-gray-500">
-                    Period：2024/03/15 - 2024/03/29
-                </div>
-                {mintInfo.fetchFormRemote && (
-                    <div className="flex items-center justify-center ">
-                        <Progress
-                            value={mintInfo.progressRate}
-                        />
-                        <div className=" text-gray-500">&nbsp;{mintInfo.progressRate}%</div>
+                {rpcErrorInfo.isRpcError &&
+
+                    <div className="flex flex-col space-y-3 items-center">
+
+                        <Skeleton className="h-[125px] w-[250px] rounded-xl"/>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[250px]"/>
+                            <Skeleton className="h-4 w-[200px]"/>
+                        </div>
+                        <div className="text-red-400">TON RPC Server is busy, but you can try to mint.</div>
+                    </div>
+
+                }
+                {!rpcErrorInfo.isRpcError && <div>
+
+                    {mintInfo.fetchFormRemote && mintInfo.freemintIsOpen && (
+                        <div className="flex justify-center text-gray-500">
+                            Minted Count：{mintInfo.freemintCurrentSupply}
+                        </div>)}
+
+                    <div className="flex justify-center  text-gray-500">
+                        Round Supply：{mintInfo.freemintMaxSupply}
+                    </div>
+                    {mintInfo.fetchFormRemote && (<div className="flex justify-center text-gray-500">
+                        Round Mint Price：{mintInfo.freemintTonPrice}
                     </div>)}
+                    <div className="flex justify-center text-gray-500">
+                        Period：{FAIR_MINT_PERIOD}
+                    </div>
+                    {mintInfo.fetchFormRemote && (
+                        <div className="flex items-center justify-center ">
+                            <Progress
+                                value={mintInfo.progressRate}
+                            />
+                            <div className=" text-gray-500">&nbsp;{mintInfo.progressRate}%</div>
+                        </div>)}
+
+                </div>}
+
 
                 <div className="flex flex-col mt-3">
                     {wallet ? (
@@ -240,7 +276,7 @@ export default function Tab1Content() {
 
                             <Button
                                 variant={mintInfo.freemintIsOpen ? "blue" : "outline"}
-                                disabled={!mintInfo.freemintIsOpen}
+                                disabled={mintInfo.freemintIsOpen === false}
                                 onClick={() => {
                                     if (isMainnet && wallet?.account.chain == CHAIN.TESTNET) {
                                         setOpen(!open);
@@ -254,7 +290,7 @@ export default function Tab1Content() {
                                     return tonConnectUi.sendTransaction(tx);
                                 }
                                 }>
-                                {mintInfo.freemintIsOpen ? "Fair Mint" : "Fair Mint Finished!"}
+                                {mintInfo.freemintIsOpen === false ? "Fair Mint Finished" : "Fair Mint"}
                             </Button>
 
                         </>
@@ -267,7 +303,6 @@ export default function Tab1Content() {
                     )}
                 </div>
             </div>
-
 
             {/* FAQ   */}
 
@@ -338,11 +373,37 @@ export default function Tab1Content() {
                 </DrawerTrigger>
                 <DrawerContent>
                     <DrawerHeader className="text-left">
-                        <DrawerTitle>
-                            {isMainnet && wallet?.account.chain == CHAIN.TESTNET && "Mainnet Only"}
-                            {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && "Testnet Only"}
+                        <DrawerTitle className="text-center">
+                            {isMainnet && wallet?.account.chain == CHAIN.TESTNET && "Must Connect to Mainnet"}
+                            {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && "Must Connect to Testnet"}
                         </DrawerTitle>
                         <DrawerDescription>
+                            {isMainnet && wallet?.account.chain == CHAIN.TESTNET && <div>
+                                <p>
+                                    You need to connect
+                                    <span className=" text-red-500">&nbsp;mainnet</span> wallet.
+                                </p>
+                                <p>
+                                    <h2 className={"mt-3 "}>Mainnet</h2>
+                                    <ul className="list-disc ml-8">
+                                        <li>address start with <span className=" text-red-500">EQ</span>
+                                        </li>
+                                        <li>address start with <span className=" text-red-500">UQ</span>
+                                        </li>
+                                    </ul>
+
+                                    <h2 className="pt-2">Testnet</h2>
+                                    <ul className="list-disc  ml-8">
+                                        <li>address start with <span className="bg-gray-900 text-blue-500">kQ</span>
+                                        </li>
+                                        <li>address start with <span className="bg-gray-900 text-blue-500">0Q</span>
+                                        </li>
+                                    </ul>
+                                </p>
+                                <Separator className="my-4"/>
+
+                            </div>}
+
                             {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && <div>
                                 <p>
                                     Thank you for participating in the TRC-404 beta test, you need to connect testnet,
@@ -352,7 +413,7 @@ export default function Tab1Content() {
                                     <span className="bg-yellow-100 text-red-700">mainnet</span> wallet.
                                 </p>
                                 <p>
-                                    <h2>Mainnet</h2>
+                                    <h2 className={"mt-3 "}>Mainnet</h2>
                                     <ul className="list-disc ml-8">
                                         <li>address start with <span className=" text-red-500">EQ</span>
                                         </li>
@@ -361,7 +422,7 @@ export default function Tab1Content() {
                                     </ul>
 
                                     <h2 className="pt-2">Testnet</h2>
-                                    <ul className="list-disc">
+                                    <ul className="list-disc  ml-8">
                                         <li>address start with <span className="bg-gray-900 text-blue-500">kQ</span>
                                         </li>
                                         <li>address start with <span className="bg-gray-900 text-blue-500">0Q</span>
@@ -386,7 +447,7 @@ export default function Tab1Content() {
                             </div>}
                         </DrawerDescription>
                     </DrawerHeader>
-                    <DrawerFooter className="pt-2">
+                    <DrawerFooter className="pt-2 pb-5">
                         <DrawerClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DrawerClose>
@@ -395,8 +456,6 @@ export default function Tab1Content() {
             </Drawer>
             {/* FAQ   */}
             <div className="flex w-full flex-col pb-20">&nbsp;</div>
-
-
         </div>
 
 

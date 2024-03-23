@@ -12,6 +12,7 @@ import {useTonWallet} from "@tonconnect/ui-react";
 import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
 import Image from "next/image";
 import {BeatLoader} from "react-spinners";
+import {CHAIN} from "@tonconnect/sdk";
 
 const override: CSSProperties = {
     display: "block",
@@ -107,6 +108,13 @@ export default function Tab2Asset() {
                     </TableRow>
                 </TableBody>
             </Table>
+
+            <div className={"text-red-500"}>
+                <div className="">
+                    {isMainnet && wallet?.account.chain == CHAIN.TESTNET && "Warning: Need to Connect Mainnet."}
+                    {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && "Warning: Need to Connect Testnet."}
+                </div>
+            </div>
         </div>
     );
 };
