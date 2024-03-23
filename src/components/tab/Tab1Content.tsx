@@ -137,7 +137,7 @@ export default function Tab1Content() {
                 let freemint_price = Number(master_result.readBigNumber());
                 let mintInfo: MintInfo = {
                     fetchFormRemote: true,
-                    freemintIsOpen: freemint_current_supply_number != freemint_max_supply_number,
+                    freemintIsOpen: freemint_max_supply_number - freemint_current_supply_number < 1,
                     freemintCurrentSupply: freemint_current_supply_number,
                     freemintMaxSupply: freemint_max_supply_number,
                     freemintTonPrice: freemint_price / BASE_NANO_NUMBER,
@@ -337,47 +337,52 @@ export default function Tab1Content() {
                 </DrawerTrigger>
                 <DrawerContent>
                     <DrawerHeader className="text-left">
-                        <DrawerTitle>Testnet Only</DrawerTitle>
+                        <DrawerTitle>
+                            {isMainnet && wallet?.account.chain == CHAIN.TESTNET && "Mainnet Only"}
+                            {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && "Testnet Only"}
+                        </DrawerTitle>
                         <DrawerDescription>
-                            <p>
-                                Thank you for participating in the TRC-404 beta test, you need to connect testnet,
-                                but you are currently
-                                connecting to
-                                the&nbsp;
-                                <span className="bg-yellow-100 text-red-700">mainnet</span> wallet.
-                            </p>
-                            <p>
-                                <h2>Mainnet</h2>
-                                <ul className="list-disc">
-                                    <li>address start with <span className=" text-red-500">EQ</span>
-                                    </li>
-                                    <li>address start with <span className=" text-red-500">UQ</span>
-                                    </li>
-                                </ul>
+                            {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && <div>
+                                <p>
+                                    Thank you for participating in the TRC-404 beta test, you need to connect testnet,
+                                    but you are currently
+                                    connecting to
+                                    the&nbsp;
+                                    <span className="bg-yellow-100 text-red-700">mainnet</span> wallet.
+                                </p>
+                                <p>
+                                    <h2>Mainnet</h2>
+                                    <ul className="list-disc ml-8">
+                                        <li>address start with <span className=" text-red-500">EQ</span>
+                                        </li>
+                                        <li>address start with <span className=" text-red-500">UQ</span>
+                                        </li>
+                                    </ul>
 
-                                <h2 className="pt-2">Testnet</h2>
-                                <ul className="list-disc">
-                                    <li>address start with <span className="bg-gray-900 text-blue-500">kQ</span>
-                                    </li>
-                                    <li>address start with <span className="bg-gray-900 text-blue-500">0Q</span>
-                                    </li>
-                                </ul>
-                            </p>
-                            <Separator className="my-4"/>
-                            <div>
-                                <div>Q: How to config your wallet to connect testnet?</div>
-                                <div>A: <Link className={"underline"}
-                                              href="https://answers.ton.org/question/1561527682871595008/how-do-you-change-ton-keeper-to-testnet">view
-                                    answer</Link>
+                                    <h2 className="pt-2">Testnet</h2>
+                                    <ul className="list-disc">
+                                        <li>address start with <span className="bg-gray-900 text-blue-500">kQ</span>
+                                        </li>
+                                        <li>address start with <span className="bg-gray-900 text-blue-500">0Q</span>
+                                        </li>
+                                    </ul>
+                                </p>
+                                <Separator className="my-4"/>
+                                <div>
+                                    <div>Q: How to config your wallet to connect testnet?</div>
+                                    <div>A: <Link className={"underline"}
+                                                  href="https://answers.ton.org/question/1561527682871595008/how-do-you-change-ton-keeper-to-testnet">view
+                                        answer</Link>
+                                    </div>
                                 </div>
-                            </div>
-                            <div>
-                                <div>Q: How to get Toncoin at testnet?</div>
-                                <div>A: <Link className={"underline"}
-                                              href="https://t.me/testgiver_ton_bot">
-                                    Testgiver TON Bot</Link>
+                                <div>
+                                    <div>Q: How to get Toncoin at testnet?</div>
+                                    <div>A: <Link className={"underline"}
+                                                  href="https://t.me/testgiver_ton_bot">
+                                        Testgiver TON Bot</Link>
+                                    </div>
                                 </div>
-                            </div>
+                            </div>}
                         </DrawerDescription>
                     </DrawerHeader>
                     <DrawerFooter className="pt-2">
