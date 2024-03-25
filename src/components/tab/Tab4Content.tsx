@@ -69,7 +69,7 @@ let projectList: Project[] = [
         badge: "Partnership",
         badgeVariant: "purple",
         desc: "Ticket & TRC-404",
-        content: "Bind tickets to the 404 protocol for easy ticket purchase, refund, and randomness"
+        content: "Bind real world assets to the 404 protocol for easy ticket purchase, refund, and randomness or more"
     }, {
         title: "404 Uni DEX",
         category: "DeFi",
