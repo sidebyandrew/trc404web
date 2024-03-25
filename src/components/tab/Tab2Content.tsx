@@ -183,12 +183,6 @@ export default function Tab2Asset() {
                 </TableBody>
             </Table>
 
-            <div className={"text-red-500"}>
-                <div className="">
-                    {isMainnet && wallet?.account.chain == CHAIN.TESTNET && "Warning: Need to Connect Mainnet."}
-                    {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && "Warning: Need to Connect Testnet."}
-                </div>
-            </div>
 
             <div className="mt-6 text-xl font-bold">404 Collectibles</div>
             <Table>
@@ -233,6 +227,13 @@ export default function Tab2Asset() {
                     <PopoverContent>At some time, you need to refresh metadata manually to make Getgems index
                         updated.</PopoverContent>
                 </Popover>
+            </div>
+
+            <div className={"text-red-300 text-xl"}>
+                <div className="">
+                    {isMainnet && wallet?.account.chain == CHAIN.TESTNET && "Warning: Need to Connect Mainnet."}
+                    {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && "Warning: Need to Connect Testnet."}
+                </div>
             </div>
         </div>
     );
