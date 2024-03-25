@@ -118,7 +118,7 @@ export default function Tab2Asset() {
                     let loadDictDirect = dictSlice?.loadDictDirect(Dictionary.Keys.Int(64), Dictionary.Values.BitString(0));
                     let keys = loadDictDirect?.keys();
                     if (keys) {
-                        setNftCount("" + keys.length)
+                        setNftCount("" + keys.length);
                         setNftLoading(false);
                         for (const key of keys) {
                             // console.info(key)
@@ -145,9 +145,10 @@ export default function Tab2Asset() {
                             //        soft commit
 
                         }
+                    } else {
+                        setNftCount("-");
+                        setNftLoading(false);
                     }
-
-
                 } catch (error) {
                     setJettonBalance("-");
                     setJettonLoading(false);
