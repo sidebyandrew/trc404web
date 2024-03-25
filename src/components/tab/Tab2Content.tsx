@@ -7,6 +7,8 @@ import {
     isMainnet,
     t404_jetton_master_address
 } from "@/constant/trc404_config";
+import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
+
 import {Address} from "@ton/core";
 import {useTonWallet} from "@tonconnect/ui-react";
 import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
@@ -29,7 +31,7 @@ export default function Tab2Asset() {
     let [jettonLoading, setJettonLoading] = useState(true);
     const [nftCount, setNftCount] = useState("");
     let [nftLoading, setNftLoading] = useState(true);
-
+    const [nftCollection, setNftCollection] = useState("");
 
     const wallet = useTonWallet();
 
@@ -70,38 +72,55 @@ export default function Tab2Asset() {
                     let owned_nft_dict = jetton_wallet_result.readCellOpt();
                     let owned_nft_number = jetton_wallet_result.readBigNumber();
 
-                    console.info(
-                        "jetton_balance_bigint=", jetton_balance_bigint,
-                        "owner_address=", owner_address,
-                        "jetton_master_address=", jetton_master_address,
-                        "nft_collection_address=", nft_collection_address,
-                        "owned_nft_dict=", owned_nft_dict,
-                        "owned_nft_number=", owned_nft_number);
+                    // console.info(
+                    //     "jetton_balance_bigint=", jetton_balance_bigint,
+                    //     "owner_address=", owner_address,
+                    //     "jetton_master_address=", jetton_master_address,
+                    //     "nft_collection_address=", nft_collection_address,
+                    //     "owned_nft_dict=", owned_nft_dict,
+                    //     "owned_nft_number=", owned_nft_number);
 
                     let jettonBalance: string = Number(Number(jetton_balance_bigint) / BASE_NANO_NUMBER).toFixed(3)
-                    console.info(jettonBalance);
+                    setJettonBalance(jettonBalance);
+                    setJettonLoading(false);
+
+                    let s = nft_collection_address.toString({bounceable: true, testOnly: false});
+                    setNftCollection(s);
 
                     let dictSlice = owned_nft_dict?.beginParse();
                     let loadDictDirect = dictSlice?.loadDictDirect(Dictionary.Keys.Int(64), Dictionary.Values.BitString(0));
-                    console.info(loadDictDirect)
                     let keys = loadDictDirect?.keys();
                     if (keys) {
                         setNftCount("" + keys.length)
                         setNftLoading(false);
                         for (const key of keys) {
-                            console.info(key)
+                            // console.info(key)
 
-                            stack.push({type: 'int', value: BigInt(key)});
-                            const nft_address_query_tx = await client.runMethod(
-                                nft_collection_address, 'get_nft_address_by_index', stack);
-                            let nft_address_query_result = nft_address_query_tx.stack;
-                            let address = nft_address_query_result.readAddress();
-                            console.info(address.toString({bounceable: false, testOnly: true}))
+                            // stack.push({type: 'int', value: BigInt(key)});
+                            // const nft_address_query_tx = await client.runMethod(
+                            //     nft_collection_address, 'get_nft_address_by_index', stack);
+                            // let nft_address_query_result = nft_address_query_tx.stack;
+                            // let address1 = nft_address_query_result.readAddress();
+                            // console.info(address1.toString({bounceable: false, testOnly: true}))
+                            // //
+                            // //     soft commit
+                            // let stack2: TupleItem[] = [];
+                            // stack2.push({type: 'int', value: BigInt(key)});
+                            // const nft_address_query_tx2 = await client.runMethod(
+                            //     nft_collection_address, 'get_nft_address_by_index', stack2);
+                            // let nft_address_query_result2 = nft_address_query_tx2.stack;
+                            // let nft_item_address2 = nft_address_query_result2.readAddress();
+                            // console.log("Item_index ", key, "contract address:", nft_item_address2.toString({
+                            //     bounceable: false,
+                            //     testOnly: true
+                            // }));
+
+                            //        soft commit
+
                         }
                     }
 
-                    setJettonBalance(jettonBalance);
-                    setJettonLoading(false);
+
                 } catch (error) {
                     console.error('Error fetching data:', error);
                 }
@@ -113,11 +132,19 @@ export default function Tab2Asset() {
                     console.error("Sorry, I need window to run." + r)
                 });
             }
-
-
         }//if (wallet?.account){
     }, []);
 
+
+    function sellOnGetgems(isMainnet: boolean, wallet: string | undefined, collection: string) {
+        if (window && wallet && collection) {
+            let friendlyWalletAddress = Address.parse(wallet).toString({testOnly: false, bounceable: true});
+            let urlBase = isMainnet ? "https://getgems.io/user/" : "https://testnet.getgems.io/user/";
+            let urlTemplate = urlBase +
+                `${friendlyWalletAddress}?filter=%7B%22collections%22%3A%5B%22${collection}%22%5D%7D#collected`
+            window.open(urlTemplate);
+        }
+    }
 
     return (
         <div className="p-2">
@@ -193,11 +220,20 @@ export default function Tab2Asset() {
                             {nftCount}
                         </TableCell>
                         <TableCell className="text-right">
-                            <Button variant="outline">Sell</Button>
+                            <Button onClick={() => {
+                                sellOnGetgems(isMainnet, wallet?.account.address, nftCollection);
+                            }}>Sell</Button>
                         </TableCell>
                     </TableRow>
                 </TableBody>
             </Table>
+            <div className="flex justify-end mr-2">
+                <Popover>
+                    <PopoverTrigger className="text-gray-500">* Notes for Getgems</PopoverTrigger>
+                    <PopoverContent>At some time, you need to refresh metadata manually to make Getgems index
+                        updated.</PopoverContent>
+                </Popover>
+            </div>
         </div>
     );
 };

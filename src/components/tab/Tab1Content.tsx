@@ -155,17 +155,17 @@ export default function Tab1Content() {
 
                 setMintInfo(mintInfo);
 
-                console.log('get_jetton_data freemint_current_supply :', freemint_current_supply,
-                    ',freemint_max_supply:', freemint_max_supply, ",freemint_price", freemint_price,
-                    ',freemint_flag:', freemint_flag);
-
-                console.log('convert: get_jetton_data freemint_current_supply:', mintInfo.freemintCurrentSupply,
-                    ',freemintMaxSupply:', mintInfo.freemintMaxSupply,
-                    ",freemintTonPrice", mintInfo.freemintTonPrice,
-                    ',freemintIsOpen:', mintInfo.freemintIsOpen,
-                    ',progressRate:', mintInfo.progressRate,
-                    ',fetchFormRemote:', mintInfo.fetchFormRemote
-                );
+                // console.log('get_jetton_data freemint_current_supply :', freemint_current_supply,
+                //     ',freemint_max_supply:', freemint_max_supply, ",freemint_price", freemint_price,
+                //     ',freemint_flag:', freemint_flag);
+                //
+                // console.log('convert: get_jetton_data freemint_current_supply:', mintInfo.freemintCurrentSupply,
+                //     ',freemintMaxSupply:', mintInfo.freemintMaxSupply,
+                //     ",freemintTonPrice", mintInfo.freemintTonPrice,
+                //     ',freemintIsOpen:', mintInfo.freemintIsOpen,
+                //     ',progressRate:', mintInfo.progressRate,
+                //     ',fetchFormRemote:', mintInfo.fetchFormRemote
+                // );
 
             } catch (error) {
                 console.log('convert: get_jetton_data freemint_current_supply:', mintInfo.freemintCurrentSupply,
