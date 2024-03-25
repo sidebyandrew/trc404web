@@ -224,8 +224,9 @@ export default function Tab2Asset() {
             <div className="flex justify-end mr-2">
                 <Popover>
                     <PopoverTrigger className="text-gray-500">* Notes for Getgems</PopoverTrigger>
-                    <PopoverContent>At some time, you need to refresh metadata manually to make Getgems index
-                        updated.</PopoverContent>
+                    <PopoverContent>The index of the Getgems has a delay, at some time you need to refresh metadata
+                        manually at Getgems website.
+                    </PopoverContent>
                 </Popover>
             </div>
 
