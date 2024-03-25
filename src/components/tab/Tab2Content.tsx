@@ -187,7 +187,7 @@ export default function Tab2Asset() {
     }
 
     return (
-        <div className="p-2">
+        <div className="p-6">
             <div className=" text-xl font-bold">404 Jettons</div>
 
             <Table>

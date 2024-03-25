@@ -190,7 +190,7 @@ export default function Tab1Content() {
 
 
     return (
-        < div className="p-2">
+        < div className="p-6">
             {/*  Main Image Fancy Vivid */}
             <Card className="w-full h-[300px] col-span-12 sm:col-span-7">
                 <Image
