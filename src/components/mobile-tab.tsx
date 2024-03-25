@@ -21,8 +21,8 @@ const MobileTab: React.FC<MobileTabProps> = ({onTabChange}) => {
                 <div className="flex justify-center  gap-5">
                     <button
                         className={`${
-                            activeTab === "tab1" ? "text-blue-300 " : ""
-                        } rounded px-2 py-2 font-light mb-2`}
+                            activeTab === "tab1" ? "text-blue-400 " : ""
+                        } rounded px-2 py-2 mb-2`}
                         onClick={() => handleTabClick("tab1")}
                     >
                         <div className="flex flex-col items-center">
@@ -37,8 +37,8 @@ const MobileTab: React.FC<MobileTabProps> = ({onTabChange}) => {
                     </button>
                     <button
                         className={`${
-                            activeTab === "tab2" ? "text-blue-300 " : ""
-                        } rounded px-2 py-2 font-light mb-2`}
+                            activeTab === "tab2" ? "text-blue-400 " : ""
+                        } rounded px-2 py-2 mb-2`}
                         onClick={() => handleTabClick("tab2")}
                     >
 
@@ -55,8 +55,8 @@ const MobileTab: React.FC<MobileTabProps> = ({onTabChange}) => {
                     </button>
                     <button
                         className={`${
-                            activeTab === "tab3" ? "text-blue-300 " : ""
-                        } rounded px-2 py-2 font-light mb-2`}
+                            activeTab === "tab3" ? "text-blue-400 " : ""
+                        } rounded px-2 py-2 mb-2`}
                         onClick={() => handleTabClick("tab3")}
                     >
                         <div className="flex flex-col items-center">
@@ -73,8 +73,8 @@ const MobileTab: React.FC<MobileTabProps> = ({onTabChange}) => {
                     </button>
                     <button
                         className={`${
-                            activeTab === "tab4" ? "text-blue-300 " : ""
-                        } rounded px-2 py-2 font-light mb-2`}
+                            activeTab === "tab4" ? "text-blue-400 " : ""
+                        } rounded px-2 py-2 mb-2`}
                         onClick={() => handleTabClick("tab4")}
                     >
                         <div className="flex flex-col items-center">
