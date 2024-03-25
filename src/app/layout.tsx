@@ -6,6 +6,8 @@ import {Providers} from '@/app/providers';
 import '../styles/globals.css';
 import {ContextProps, TMAProvider} from "@/contexts/TMA";
 import {headers} from "next/headers";
+import {Toaster} from "@/components/ui/toaster";
+import React from "react";
 
 export const runtime = 'edge' // 'nodejs' (default) | 'edge'
 
@@ -47,6 +49,7 @@ export default function RootLayout({
                     <main className="">
                         {children}
                     </main>
+                    <Toaster/>
                 </div>
             </Providers>
         </TMAProvider>

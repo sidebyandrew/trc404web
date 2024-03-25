@@ -16,6 +16,8 @@ import Image from "next/image";
 import {BeatLoader} from "react-spinners";
 import {CHAIN} from "@tonconnect/sdk";
 import {Button} from "@/components/ui/button";
+import {ToastAction} from "@/components/ui/toast";
+import {useToast} from "@/components/ui/use-toast";
 
 function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -34,6 +36,7 @@ export default function Tab2Asset() {
     const [nftCollection, setNftCollection] = useState("");
 
     const wallet = useTonWallet();
+    const {toast} = useToast();
 
 
     useEffect(() => {
@@ -53,6 +56,7 @@ export default function Tab2Asset() {
                     let jetton_master_result = master_tx.stack;
                     let jettonWalletAddress = jetton_master_result.readAddress();
 
+                    console.info(jettonWalletAddress.toString({testOnly: true}))
                     const jetton_wallet_tx = await client.runMethod(
                         jettonWalletAddress, 'get_wallet_data');
                     let jetton_wallet_result = jetton_wallet_tx.stack;
@@ -122,6 +126,10 @@ export default function Tab2Asset() {
 
 
                 } catch (error) {
+                    setJettonBalance("-");
+                    setJettonLoading(false);
+                    setNftCount("-");
+                    setNftLoading(false);
                     console.error('Error fetching data:', error);
                 }
             };
@@ -141,8 +149,16 @@ export default function Tab2Asset() {
             let friendlyWalletAddress = Address.parse(wallet).toString({testOnly: false, bounceable: true});
             let urlBase = isMainnet ? "https://getgems.io/user/" : "https://testnet.getgems.io/user/";
             let urlTemplate = urlBase +
-                `${friendlyWalletAddress}?filter=%7B%22collections%22%3A%5B%22${collection}%22%5D%7D#collected`
+                `${friendlyWalletAddress}?filter=%7B%22collections%22%3A%5B%22${collection}%22%5D%7D#collected`;
             window.open(urlTemplate);
+        } else {
+            toast({
+                title: "Do you have any T404 NFT to sell? ",
+                description: "[Respect to Tonkeeper] Something happened but we don't understand what. ",
+                action: (
+                    <ToastAction altText="Goto schedule to undo">OK</ToastAction>
+                ),
+            });
         }
     }
 
@@ -214,9 +230,11 @@ export default function Tab2Asset() {
                             {nftCount}
                         </TableCell>
                         <TableCell className="text-right">
-                            <Button onClick={() => {
-                                sellOnGetgems(isMainnet, wallet?.account.address, nftCollection);
-                            }}>Sell</Button>
+                            <Button
+                                disabled={nftLoading}
+                                onClick={() => {
+                                    sellOnGetgems(isMainnet, wallet?.account.address, nftCollection);
+                                }}>Sell</Button>
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -236,6 +254,7 @@ export default function Tab2Asset() {
                     {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && "Warning: Need to Connect Testnet."}
                 </div>
             </div>
+
         </div>
     );
 };
