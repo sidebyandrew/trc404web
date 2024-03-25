@@ -224,17 +224,17 @@ export default function Tab1Content() {
                 {!rpcErrorInfo.isRpcError && <div>
 
                     {mintInfo.fetchFormRemote && mintInfo.freemintIsOpen && (
-                        <div className="flex justify-center text-gray-500">
+                        <div className="flex justify-center text-gray-400">
                             Minted Count：{mintInfo.freemintCurrentSupply}
                         </div>)}
 
-                    <div className="flex justify-center  text-gray-500">
+                    <div className="flex justify-center  text-gray-400">
                         Round Supply：{mintInfo.freemintMaxSupply}
                     </div>
-                    {mintInfo.fetchFormRemote && (<div className="flex justify-center text-gray-500">
+                    {mintInfo.fetchFormRemote && (<div className="flex justify-center text-gray-400">
                         Round Mint Price：{mintInfo.freemintTonPrice}
                     </div>)}
-                    <div className="flex justify-center text-gray-500">
+                    <div className="flex justify-center text-gray-400">
                         Period：{FAIR_MINT_PERIOD}
                     </div>
                     {mintInfo.fetchFormRemote && (
@@ -242,7 +242,7 @@ export default function Tab1Content() {
                             <Progress
                                 value={mintInfo.progressRate}
                             />
-                            <div className=" text-gray-500">&nbsp;{mintInfo.progressRate}%</div>
+                            <div className=" text-gray-400">&nbsp;{mintInfo.progressRate}%</div>
                         </div>)}
 
                 </div>}
@@ -312,12 +312,12 @@ export default function Tab1Content() {
                 <AccordionItem value="1">
                     <AccordionTrigger>What is TRC-404?</AccordionTrigger>
                     <AccordionContent>
-                        <p className="text-gray-500 indent-6">TRC-404 is an experimental, mixed Jetton & NFT
+                        <p className="text-gray-400 indent-6">TRC-404 is an experimental, mixed Jetton & NFT
                             implementation
                             with
                             native liquidity and
                             fractionalization for semi-fungible tokens.</p>
-                        <p className="pt-2 text-gray-500 indent-6">This project is inspired by ERC-404, and now is the
+                        <p className="pt-2 text-gray-400 indent-6">This project is inspired by ERC-404, and now is the
                             first
                             project
                             implemented
@@ -325,7 +325,7 @@ export default function Tab1Content() {
                             on
                             TON.</p>
 
-                        <p className="pt-2 text-gray-500 indent-6">
+                        <p className="pt-2 text-gray-400 indent-6">
                             Your NFT is probably not found, but your jetton is always lying in
                             your wallet. One wallet can only instantiate five 404 NFT but can have as many 404 jettons
                             as
@@ -337,13 +337,13 @@ export default function Tab1Content() {
                     <AccordionTrigger>What is the key features?</AccordionTrigger>
                     <AccordionContent>
                         <ul className="px-1">
-                            <li className="text-gray-500">1. Submit TON Enhancement Proposals (TEPs) 404 Standard</li>
-                            <li className="text-gray-500">2. Production-ready FunC code with high test coverage</li>
-                            <li className="text-gray-500">3. Fully compatible with TON ecosystem(wallet, NFT market,
+                            <li className="text-gray-400">1. Submit TON Enhancement Proposals (TEPs) 404 Standard</li>
+                            <li className="text-gray-400">2. Production-ready FunC code with high test coverage</li>
+                            <li className="text-gray-400">3. Fully compatible with TON ecosystem(wallet, NFT market,
                                 DEX)
                             </li>
-                            <li className="text-gray-500">4. Native Telegram Bot and Mini-App with TON Connect SDK</li>
-                            <li className="text-gray-500">5. Incentive Tokenomics, visionary roadmap and future plan
+                            <li className="text-gray-400">4. Native Telegram Bot and Mini-App with TON Connect SDK</li>
+                            <li className="text-gray-400">5. Incentive Tokenomics, visionary roadmap and future plan
                             </li>
                         </ul>
                     </AccordionContent>
@@ -352,17 +352,17 @@ export default function Tab1Content() {
                 <AccordionItem value="3" aria-label="Accordion 3">
                     <AccordionTrigger>What about Tokenomics?</AccordionTrigger>
                     <AccordionContent>
-                        <p className="text-gray-500">Total Supply: 1,000 K.</p>
+                        <p className="text-gray-400">Total Supply: 1,000 K.</p>
 
                         <ul className="px-1">
-                            <li className="text-gray-500">1. Fair Mint 1st round: 1%</li>
-                            <li className="text-gray-500">2. Airdrop 2%</li>
-                            <li className="text-gray-500">3. Fair Mint 2nd round: 2%</li>
-                            <li className="text-gray-500">4. Developer Team: 15%</li>
-                            <li className="text-gray-500">5. DEX: 10%</li>
-                            <li className="text-gray-500">6. Advisor: 5%</li>
-                            <li className="text-gray-500">7. Investor: 20%</li>
-                            <li className="text-gray-500">8. Ecosystem Locked: 45%</li>
+                            <li className="text-gray-400">1. Fair Mint 1st round: 1%</li>
+                            <li className="text-gray-400">2. Airdrop 2%</li>
+                            <li className="text-gray-400">3. Fair Mint 2nd round: 2%</li>
+                            <li className="text-gray-400">4. Developer Team: 15%</li>
+                            <li className="text-gray-400">5. DEX: 10%</li>
+                            <li className="text-gray-400">6. Advisor: 5%</li>
+                            <li className="text-gray-400">7. Investor: 20%</li>
+                            <li className="text-gray-400">8. Ecosystem Locked: 45%</li>
                         </ul>
                     </AccordionContent>
                 </AccordionItem>
