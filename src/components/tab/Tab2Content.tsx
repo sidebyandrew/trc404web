@@ -40,7 +40,30 @@ export default function Tab2Asset() {
 
 
     useEffect(() => {
+
         if (wallet?.account) {
+            if (isMainnet && wallet?.account.chain == CHAIN.TESTNET) {
+                toast({
+                    title: "Warning",
+                    description: "You need to connect mainnet!",
+                    action: (
+                        <ToastAction altText="Goto schedule to undo">OK</ToastAction>
+                    ),
+                });
+                return;
+            }
+
+            if (!isMainnet && wallet?.account.chain == CHAIN.MAINNET) {
+                toast({
+                    title: "Warning",
+                    description: "You need to connect testnet!",
+                    action: (
+                        <ToastAction altText="Goto schedule to undo">OK</ToastAction>
+                    ),
+                });
+                return;
+            }
+
             const fetchData = async () => {
                 try {
                     const client = new TonClient(
@@ -248,12 +271,12 @@ export default function Tab2Asset() {
                 </Popover>
             </div>
 
-            <div className={"text-red-300 text-xl"}>
-                <div className="">
-                    {isMainnet && wallet?.account.chain == CHAIN.TESTNET && "Warning: Need to Connect Mainnet."}
-                    {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && "Warning: Need to Connect Testnet."}
-                </div>
-            </div>
+            {/*<div className={"text-yellow-500 text-xl"}>*/}
+            {/*    <div className=" text-center pt-10">*/}
+            {/*        {isMainnet && wallet?.account.chain == CHAIN.TESTNET && "Warning: Need to Connect Mainnet."}*/}
+            {/*        {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && "Warning: Need to Connect Testnet."}*/}
+            {/*    </div>*/}
+            {/*</div>*/}
 
         </div>
     );
