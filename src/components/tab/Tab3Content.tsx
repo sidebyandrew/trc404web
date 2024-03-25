@@ -4,7 +4,7 @@ import React from "react";
 export default function Tab3Marketplace() {
 
     return (
-        <div className="p-4">
+        <div className="p-6">
             <div className="mb-3 text-2xl font-bold">TRC-404 Marketplace</div>
 
             <div className="mt-20 mb-10">

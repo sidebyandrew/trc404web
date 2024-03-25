@@ -83,7 +83,7 @@ let projectList: Project[] = [
 export default function Tab4Bridge() {
 
     return (
-        <div className="p-4">
+        <div className="p-6">
             <div className="mb-3 text-2xl font-bold">TRC-404 Ecosystem</div>
             <div className="mt-5">
                 {projectList.map((project, index) => {
