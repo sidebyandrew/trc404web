@@ -7,15 +7,17 @@ export const runtime = 'edge'
 export async function GET(request: NextRequest) {
     try {
         // If you did not use `DB` as your binding name, change it here
+        // @ts-ignore
         const {results} = await db404().prepare(
             "SELECT * FROM Customers WHERE CompanyName = ?"
         )
             .bind("Bs Beverages")
             .all();
+        
         return Response.json(results);
     } catch (error) {
         console.info(error)
-        return new Response("What?");
+        return Response.json(error);
     }
 }
 

@@ -28,7 +28,12 @@ export function uuid404(): string {
 
 
 export function db404() {
-    return getRequestContext().env.DB;
+    if (process.env.NODE_ENV === "development") {
+        const {env} = getRequestContext();
+        return env.DB;
+    }
+    // Production
+    return process.env.DB;
 }
 
 
@@ -38,9 +43,8 @@ export async function queryUser(tgId: string): Promise<Result404> {
         code: '',
         msg: '',
     };
-    let d1Response = await db404().prepare(
-        'select * from TrcUser where tgId=?')
-        .bind(tgId).all()
+    // @ts-ignore
+    let d1Response = await db404().prepare('select * from TrcUser where tgId=?').bind(tgId).all();
     if (d1Response.success) {
         result.success = d1Response.success;
         if (d1Response.results.length >= 1) {
@@ -58,6 +62,7 @@ export async function queryUserByRefCode(refCode: string): Promise<Result404> {
         code: '',
         msg: '',
     };
+    // @ts-ignore
     let d1Response = await db404().prepare(
         'select * from TrcUser where refCode=?')
         .bind(refCode).all()
@@ -83,6 +88,7 @@ export async function createUser(tgId: string, refByTgId?: string): Promise<Resu
     let current = Date.now();
 
     if (refByTgId) {
+        // @ts-ignore
         let d1Response: D1Response = await db404().prepare(
             'INSERT INTO TrcUser (userId, tgId, refCode, refByTgId, createBy,createDt) VALUES (?, ?,?, ?, ?, ?)')
             .bind(userId, tgId, refCode, refByTgId, tgId, current).run();
@@ -90,6 +96,7 @@ export async function createUser(tgId: string, refByTgId?: string): Promise<Resu
         result.code = ` new user with ref by ${refByTgId}`;
         result.msg = `tgId:${tgId}, refCode:${refCode}`;
     } else {
+        // @ts-ignore
         let d1Response: D1Response = await db404().prepare(
             'INSERT INTO TrcUser (userId, tgId, refCode, createBy,createDt) VALUES (?, ?, ?, ?, ?)')
             .bind(userId, tgId, refCode, tgId, current).run();
@@ -104,6 +111,7 @@ export async function createUser(tgId: string, refByTgId?: string): Promise<Resu
 
 export async function log2db(tgId: string, opCode: string, logs: string) {
     try {
+        // @ts-ignore
         const {results} = await db404().prepare(
             "SELECT * FROM Customers WHERE CompanyName = ?"
         )
