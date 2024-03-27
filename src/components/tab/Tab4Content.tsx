@@ -89,25 +89,27 @@ export default function Tab4Bridge() {
                 {projectList.map((project, index) => {
                     let variant = project.badge === 'Building' ? 'green' : project.badge === 'Planning' ? 'blue' : project.badge === 'Partnership' ? "purple" : "gray";
                     return <>
-                        <Card className="w-[350px] mb-2">
-                            <CardHeader className="p-3 pt-2">
-                                <CardTitle>
-                                    <div className={"flex"}>
-                                        <div>{project.title} <span
-                                            className="text-gray-500 text-sm font-extralight">#{project.category}</span>
-                                        </div>
-                                        <div className={" ml-auto"}>
+                        <div key={project.title}>
+                            <Card className="w-[350px] mb-2" key={project.title}>
+                                <CardHeader className="p-3 pt-2">
+                                    <CardTitle>
+                                        <div className={"flex"}>
+                                            <div>{project.title} <span
+                                                className="text-gray-500 text-sm font-extralight">#{project.category}</span>
+                                            </div>
+                                            <div className={" ml-auto"}>
 
-                                            <Badge
-                                                variant={variant as any}>{project.badge}</Badge></div>
-                                    </div>
-                                </CardTitle>
-                                <CardDescription>{project.desc} </CardDescription>
-                            </CardHeader>
-                            <CardContent className="p-3 pb-2">
-                                {project.content}
-                            </CardContent>
-                        </Card>
+                                                <Badge
+                                                    variant={variant as any}>{project.badge}</Badge></div>
+                                        </div>
+                                    </CardTitle>
+                                    <CardDescription>{project.desc} </CardDescription>
+                                </CardHeader>
+                                <CardContent className="p-3 pb-2">
+                                    {project.content}
+                                </CardContent>
+                            </Card>
+                        </div>
                     </>;
                 })}
 
