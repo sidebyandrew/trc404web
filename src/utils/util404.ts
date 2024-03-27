@@ -3,22 +3,19 @@ import {v4 as uuidv4} from 'uuid';
 
 export const USER_FOUND = 'USER_FOUND';
 
+
+export interface User404 {
+    tgId: string;
+    tgUsername: string;
+    refCode: string;
+}
+
+
 export interface Result404 {
     success: boolean;
     code?: string;
     msg?: string;
     result?: any;
-}
-
-
-export interface LoginInfo {
-    tgId: string;
-}
-
-
-export interface RefInfo {
-    tgId: string;
-    refCode: string;
 }
 
 
@@ -62,22 +59,27 @@ export async function queryUserByRefCode(refCode: string): Promise<Result404> {
         code: '',
         msg: '',
     };
+    if (!refCode || refCode.length < 3) {
+        return result;
+    }
+
     // @ts-ignore
     let d1Response = await db404().prepare(
         'select * from TrcUser where refCode=?')
-        .bind(refCode).all()
+        .bind(refCode).all();
     if (d1Response.success) {
         result.success = d1Response.success;
         if (d1Response.results.length >= 1) {
             result.code = USER_FOUND;
-            result.result = d1Response.results[0]["tgId"] as string;
+            let {tgId, tgUsername} = d1Response.results[0];
+            result.result = {tgId, tgUsername} as User404;
         }
     }
     return result;
 }
 
-export async function createUser(tgId: string, refByTgId?: string): Promise<Result404> {
-    console.info("createUser", tgId, refByTgId);
+export async function createUser(tgId: string, tgUsername: string, ref?: User404): Promise<Result404> {
+
     let result: Result404 = {
         success: false,
         code: '',
@@ -87,13 +89,13 @@ export async function createUser(tgId: string, refByTgId?: string): Promise<Resu
     let refCode = generateRefCode(tgId);
     let current = Date.now();
 
-    if (refByTgId) {
+    if (ref) {
         // @ts-ignore
         let d1Response: D1Response = await db404().prepare(
-            'INSERT INTO TrcUser (userId, tgId, refCode, refByTgId, createBy,createDt) VALUES (?, ?,?, ?, ?, ?)')
-            .bind(userId, tgId, refCode, refByTgId, tgId, current).run();
+            'INSERT INTO TrcUser (userId, tgId, tgUsername, refCode, refTgId, refTgUsername,createBy,createDt) VALUES (?, ?,?,?,?, ?, ?, ?)')
+            .bind(userId, tgId, tgUsername, refCode, ref.tgId, ref.tgUsername, tgId, current).run();
         result.success = d1Response.success;
-        result.code = ` new user with ref by ${refByTgId}`;
+        result.code = ` new user with ref by ${ref.tgUsername}`;
         result.msg = `tgId:${tgId}, refCode:${refCode}`;
     } else {
         // @ts-ignore

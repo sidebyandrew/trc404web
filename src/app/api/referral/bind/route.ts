@@ -1,5 +1,5 @@
 import type {NextRequest} from 'next/server'
-import {createUser, queryUser, queryUserByRefCode, RefInfo, Result404, USER_FOUND} from "@/utils/util404";
+import {createUser, queryUser, queryUserByRefCode, Result404, User404, USER_FOUND} from "@/utils/util404";
 
 export const runtime = 'edge'
 
@@ -7,12 +7,12 @@ export const runtime = 'edge'
 export async function POST(request: NextRequest) {
     let result: Result404 = {success: false, code: '', msg: '',};
     try {
-        let requestJson = await request.json<RefInfo>();
+        let requestJson = await request.json<User404>();
         let tgId = requestJson.tgId;
+        let tgUsername = requestJson.tgUsername;
         let refCode = requestJson.refCode;
-        if (tgId && refCode) {
+        if (tgId && tgUsername) {
             let queryResult = await queryUser(tgId);
-
             if (queryResult.success && USER_FOUND == queryResult.code) {
                 result.success = true;
                 result.code = 'USER_EXISTED';
@@ -20,12 +20,11 @@ export async function POST(request: NextRequest) {
             } else {
                 let refUserResult = await queryUserByRefCode(refCode);
                 if (refUserResult.success && USER_FOUND == refUserResult.code) {
-                    console.info(refUserResult.result)
-                    result = await createUser(tgId, refUserResult.result);
+                    result = await createUser(tgId, tgUsername, refUserResult.result as User404);
                     result.code = 'REF_SUCCESS';
                     result.msg = "referral bound.";
                 } else {
-                    result = await createUser(tgId);
+                    result = await createUser(tgId, tgUsername);
                 }
             }
         } else {

@@ -1,5 +1,5 @@
 import type {NextRequest} from 'next/server'
-import {createUser, LoginInfo, queryUser, Result404, USER_FOUND} from "@/utils/util404";
+import {createUser, queryUser, Result404, User404, USER_FOUND} from "@/utils/util404";
 
 export const runtime = 'edge'
 
@@ -11,16 +11,17 @@ export async function POST(request: NextRequest) {
         msg: '',
     };
     try {
-        let requestJson = await request.json<LoginInfo>();
+        let requestJson = await request.json<User404>();
         let tgId = requestJson.tgId;
-        if (tgId) {
+        let tgUsername = requestJson.tgUsername;
+        if (tgId && tgUsername) {
             let queryRes = await queryUser(tgId);
             if (queryRes.success && USER_FOUND == queryRes.code) {
                 result.success = true;
                 result.code = 'login with existing user'
                 result.msg = `tgId ${tgId} founded.`;
             } else {
-                result = await createUser(tgId);
+                result = await createUser(tgId, tgUsername);
             }
         } else {
             result.code = 'login error'

@@ -4,8 +4,10 @@ CREATE TABLE IF NOT EXISTS TrcUser
 (
     userId TEXT PRIMARY KEY,
     tgId  TEXT,
+    tgUsername  TEXT,
     refCode TEXT,
-    refByTgId TEXT,
+    refTgId TEXT,
+    refTgUsername TEXT,
     totalRefPoint INTEGER,
     totalActionPoint INTEGER,
     extInfo   TEXT,
@@ -16,8 +18,9 @@ CREATE TABLE IF NOT EXISTS TrcUser
     modifyDt INTEGER
 );
 CREATE INDEX IF NOT EXISTS idx_trc_user_tg_id ON TrcUser(tgId);
+CREATE INDEX IF NOT EXISTS idx_trc_user_tg_username ON TrcUser(tgUsername);
 CREATE INDEX IF NOT EXISTS idx_trc_user_ref_code ON TrcUser(refCode);
-CREATE INDEX IF NOT EXISTS idx_trc_ref_by_tg_id ON TrcUser(refByTgId);
+CREATE INDEX IF NOT EXISTS idx_trc_ref_by_tg_id ON TrcUser(refTgId);
 
 
 
