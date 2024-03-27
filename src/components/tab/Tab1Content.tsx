@@ -312,7 +312,7 @@ export default function Tab1Content() {
                 <AccordionItem value="1">
                     <AccordionTrigger>What is TRC-404?</AccordionTrigger>
                     <AccordionContent>
-                        <p className="text-gray-400 indent-6">TRC-404 is an experimental, mixed Jetton & NFT
+                        <p className="text-gray-400 indent-6">TRC-404 is an creative, mixed Jetton & NFT
                             implementation
                             with
                             native liquidity and
