@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/drawer";
 import {Separator} from "@/components/ui/separator";
 import Link from "next/link";
-import {Carousel, CarouselContent, CarouselItem,} from "@/components/ui/carousel"
+import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious,} from "@/components/ui/carousel"
 import {Card, CardContent} from "@/components/ui/card";
 
 interface MintInfo {
@@ -211,7 +211,7 @@ export default function Tab1Content() {
                                 <Card className={"flex justify-center border-0 h-[280px] w-[280px]"}>
                                     <Image
                                         alt=" app"
-                                        className=" w-full h-full object-fill"
+                                        className="w-full h-full object-fill"
                                         width="180"
                                         height="180"
                                         src={'/diamonds/' + diamond}
@@ -220,8 +220,8 @@ export default function Tab1Content() {
                             </CardContent>
                         </CarouselItem>))}
                 </CarouselContent>
-                {/*<CarouselPrevious/>*/}
-                {/*<CarouselNext/>*/}
+                <CarouselPrevious/>
+                <CarouselNext/>
             </Carousel>
 
             {/* Carousel End*/}
