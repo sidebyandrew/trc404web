@@ -8,6 +8,8 @@ export interface User404 {
     tgId: string;
     tgUsername: string;
     refCode: string;
+    refTgId: string;
+    refTgUsername: string;
 }
 
 
@@ -86,7 +88,7 @@ export async function createUser(tgId: string, tgUsername: string, ref?: User404
         msg: '',
     };
     let userId = uuid404();
-    let refCode = generateRefCode(tgId);
+    let refCode = generateRefCode(tgUsername);
     let current = Date.now();
 
     if (ref) {
@@ -95,16 +97,22 @@ export async function createUser(tgId: string, tgUsername: string, ref?: User404
             'INSERT INTO TrcUser (userId, tgId, tgUsername, refCode, refTgId, refTgUsername,createBy,createDt) VALUES (?, ?,?,?,?, ?, ?, ?)')
             .bind(userId, tgId, tgUsername, refCode, ref.tgId, ref.tgUsername, tgId, current).run();
         result.success = d1Response.success;
-        result.code = ` new user with ref by ${ref.tgUsername}`;
-        result.msg = `tgId:${tgId}, refCode:${refCode}`;
+        result.code = `USER_CREATED_WITH_REF`;
+        result.result = {
+            tgId,
+            tgUsername,
+            refCode,
+            refTgId: ref.tgId,
+            refTgUsername: ref.tgUsername,
+        } as User404;
     } else {
         // @ts-ignore
         let d1Response: D1Response = await db404().prepare(
-            'INSERT INTO TrcUser (userId, tgId, refCode, createBy,createDt) VALUES (?, ?, ?, ?, ?)')
-            .bind(userId, tgId, refCode, tgId, current).run();
+            'INSERT INTO TrcUser (userId, tgId, tgUsername, refCode, createBy,createDt) VALUES (?, ?,?, ?, ?, ?)')
+            .bind(userId, tgId, tgUsername, refCode, tgId, current).run();
         result.success = d1Response.success;
-        result.code = 'new user';
-        result.msg = `tgId:${tgId}, refCode:${refCode}`;
+        result.code = "USER_CREATED";
+        result.result = {tgId, tgUsername, refCode} as User404;
     }
 
 
