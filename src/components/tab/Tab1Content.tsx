@@ -7,21 +7,9 @@ import {Address} from "@ton/core";
 import {TonClient} from "@ton/ton";
 import {Button} from "@/components/ui/button";
 import {Progress} from "@/components/ui/progress";
-import {Card,} from "@/components/ui/card"
 import Image from 'next/image'
-import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from "@/components/ui/drawer"
 import {useMediaQuery} from "@/hooks/use-media-query";
-import Link from "next/link";
-import {Separator} from "@/components/ui/separator";
+import Autoplay from "embla-carousel-autoplay";
 import {
     BASE_NANO_BIGINT,
     BASE_NANO_NUMBER,
@@ -35,6 +23,20 @@ import {
     t404_jetton_master_address_raw
 } from "@/constant/trc404_config";
 import {Skeleton} from "@/components/ui/skeleton";
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger
+} from "@/components/ui/drawer";
+import {Separator} from "@/components/ui/separator";
+import Link from "next/link";
+import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious,} from "@/components/ui/carousel"
+import {Card, CardContent} from "@/components/ui/card";
 
 
 interface MintInfo {
@@ -76,6 +78,12 @@ function buildTx(amount: number, mintInfo: MintInfo): SendTransactionRequest {
 
 
 export default function Tab1Content() {
+
+    let diamonds = [
+        "diamond-night.png",
+        "diamond-blue.png",
+        "diamond-original.png",
+        "fancy-vivid.png",];
 
     const [rpcErrorInfo, setRpcErrorInfo] = useState<RpcErrorInfo>({isRpcError: false, errorMsg: ""});
     const [mintInfo, setMintInfo] = useState<MintInfo>({fetchFormRemote: false, progressRate: 0});
@@ -190,17 +198,44 @@ export default function Tab1Content() {
 
 
     return (
-        < div className="p-6">
+        < div className="px-4 justify-center items-center">
+            {/* Carousel*/}
+            <Carousel className="  px-1 justify-center items-center" plugins={[
+                Autoplay({
+                    delay: 6000,
+                }),
+            ]}>
+                <CarouselContent>
+                    {diamonds.map((diamond, index) => (
+                        <CarouselItem key={index}>
+                            <CardContent className="flex items-center justify-center p-0">
+                                <Card className={"flex justify-center border-0 h-[280px] w-[280px]"}>
+                                    <Image
+                                        alt=" app"
+                                        className="w-full h-full object-fill"
+                                        width="180"
+                                        height="180"
+                                        src={'/diamonds/' + diamond}
+                                    />
+                                </Card>
+                            </CardContent>
+                        </CarouselItem>))}
+                </CarouselContent>
+                <CarouselPrevious/>
+                <CarouselNext/>
+            </Carousel>
+
+            {/* Carousel End*/}
             {/*  Main Image Fancy Vivid */}
-            <Card className="w-full h-[300px] col-span-12 sm:col-span-7">
-                <Image
-                    alt=" app"
-                    className="z-0 w-full h-full object-fill"
-                    width="300"
-                    height="300"
-                    src="/logos/fancy-vivid.png"
-                />
-            </Card>
+            {/*<Card className="w-full h-[300px] col-span-12 sm:col-span-7">*/}
+            {/*    <Image*/}
+            {/*        alt=" app"*/}
+            {/*        className="z-0 w-full h-full object-fill"*/}
+            {/*        width="300"*/}
+            {/*        height="300"*/}
+            {/*        src="/logos/fancy-vivid.png"*/}
+            {/*    />*/}
+            {/*</Card>*/}
             {/* Main Image Fancy Vivid end */}
 
             <div className="mt-4 mb-2 text-2xl">Fair Mint
@@ -275,6 +310,7 @@ export default function Tab1Content() {
                             {/*mint amount end*/}
 
                             <Button
+                                size={"lg"}
                                 variant={mintInfo.freemintIsOpen ? "blue" : "outline"}
                                 disabled={mintInfo.freemintIsOpen === false}
                                 onClick={() => {
@@ -304,8 +340,45 @@ export default function Tab1Content() {
                 </div>
             </div>
 
-            {/* FAQ   */}
+            {/* Referral  */}
+            {/*<div className="flex w-full flex-col pb-2">&nbsp;</div>*/}
+            {/*<div className="  text-2xl">Referral</div>*/}
+            {/*<div className="flex flex-col">*/}
+            {/*    <div className="flex mx-auto">*/}
+            {/*        <div>*/}
+            {/*            <Card className="border-0  border-gray-600 mx-2">*/}
+            {/*                <CardHeader>*/}
+            {/*                    <CardTitle>Your Friends</CardTitle>*/}
+            {/*                </CardHeader>*/}
+            {/*                <CardContent>*/}
+            {/*                    <div>*/}
+            {/*                        <span className={"text-2xl"}>10</span>*/}
+            {/*                        <span className={"pl-1  text-gray-300"}>people</span>*/}
+            {/*                    </div>*/}
+            {/*                </CardContent>*/}
+            {/*            </Card>*/}
+            {/*        </div>*/}
+            {/*        /!*<div>*!/*/}
+            {/*        /!*    <Card className="border-1 border border-gray-600  mx-2">*!/*/}
+            {/*        /!*        <CardHeader>*!/*/}
+            {/*        /!*            <CardTitle>Your Rewards</CardTitle>*!/*/}
+            {/*        /!*        </CardHeader>*!/*/}
+            {/*        /!*        <CardContent>*!/*/}
+            {/*        /!*            <div>*!/*/}
+            {/*        /!*                <span className={"text-2xl"}>10</span>*!/*/}
+            {/*        /!*                <span className={"pl-1  text-gray-300"}>points</span>*!/*/}
+            {/*        /!*            </div>*!/*/}
+            {/*        /!*        </CardContent>*!/*/}
+            {/*        /!*    </Card>*!/*/}
+            {/*        /!*</div>*!/*/}
+            {/*    </div>*/}
+            {/*    <div>Your Referral Link</div>*/}
+            {/*</div>*/}
 
+            {/* Referral End */}
+
+
+            {/* FAQ   */}
             <div className="flex w-full flex-col pb-8">&nbsp;</div>
             <div className="  text-2xl">FAQ</div>
             <Accordion type="single" collapsible>
@@ -367,7 +440,10 @@ export default function Tab1Content() {
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
+            {/* FAQ   */}
 
+
+            {/* Drawer */}
             <Drawer open={open} onOpenChange={setOpen}>
                 <DrawerTrigger asChild>
                 </DrawerTrigger>
@@ -454,7 +530,7 @@ export default function Tab1Content() {
                     </DrawerFooter>
                 </DrawerContent>
             </Drawer>
-            {/* FAQ   */}
+            {/* Drawer End */}
             <div className="flex w-full flex-col pb-20">&nbsp;</div>
         </div>
 
