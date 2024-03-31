@@ -1,5 +1,6 @@
 import type {NextRequest} from 'next/server'
-import {createUser, queryUser, queryUserByRefCode, Result404, User404, USER_FOUND} from "@/utils/util404";
+import {createUser, queryUser, queryUserByRefCode,} from "@/utils/util404";
+import {Result404, User404, USER_FOUND} from "@/utils/static404";
 
 export const runtime = 'edge'
 

@@ -18,6 +18,8 @@ import {CHAIN} from "@tonconnect/sdk";
 import {Button} from "@/components/ui/button";
 import {ToastAction} from "@/components/ui/toast";
 import {useToast} from "@/components/ui/use-toast";
+import {useInitData} from "@tma.js/sdk-react";
+import {REF_USER_LIST_FOUND, Result404} from "@/utils/static404";
 
 function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -35,9 +37,42 @@ export default function Tab2Asset() {
     let [nftLoading, setNftLoading] = useState(true);
     const [nftCollection, setNftCollection] = useState("");
 
+    const [userData, setUserData] = useState(null);
+
+
     const wallet = useTonWallet();
     const {toast} = useToast();
 
+    /* todo remove tma */
+    // useBackButtonEasy();
+    const tgInitData = useInitData();
+
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                let tgId = tgInitData?.user?.id;
+                let tgUsername = tgInitData?.user?.username;
+                let url = "https://staging.trc404web.pages.dev";
+                const response = await fetch(`${url}/api/user?tgId=${tgId}&tgUsername=${tgUsername}&access404=error_code_404`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const responseData = await response.json<Result404>();
+                // {"success":true,"code":"REF_USER_LIST_FOUND","msg":"Cannot destructure property 'refCode' of 'd.result' as it is undefined."}
+                if (responseData.success && responseData.code == REF_USER_LIST_FOUND) {
+
+                    let {count} = responseData.result;
+                    setUserData(count);
+                }
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        fetchData();
+    }, []);
 
     useEffect(() => {
 
@@ -199,7 +234,7 @@ export default function Tab2Asset() {
                         </TableHead>
                         <TableHead>Token</TableHead>
                         <TableHead>Balance</TableHead>
-                        <TableHead className="text-right">Price</TableHead>
+                        <TableHead className="text-center">Price</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -218,7 +253,7 @@ export default function Tab2Asset() {
                             />
                             {jettonBalance}
                         </TableCell>
-                        <TableCell className="text-right">-</TableCell>
+                        <TableCell className="text-center">-</TableCell>
                     </TableRow>
                 </TableBody>
             </Table>
@@ -234,7 +269,7 @@ export default function Tab2Asset() {
                         </TableHead>
                         <TableHead>NFT</TableHead>
                         <TableHead>Count</TableHead>
-                        <TableHead className="text-right">Action</TableHead>
+                        <TableHead className="text-center">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -253,7 +288,7 @@ export default function Tab2Asset() {
                             />
                             {nftCount}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-center">
                             <Button
                                 variant={"outline"}
                                 disabled={nftLoading}
@@ -291,26 +326,20 @@ export default function Tab2Asset() {
                         </TableHead>
                         <TableHead>Points</TableHead>
                         <TableHead>Invited Friends</TableHead>
-                        <TableHead className="text-right">Action</TableHead>
+                        <TableHead className="text-center">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     <TableRow>
-                        <TableCell className="font-medium"> <Image src="/icon/best-icon.jpg" height={36} width={36}
-                                                                   alt="pop"/></TableCell>
-                        <TableCell>404</TableCell>
-                        <TableCell>
-                            <BeatLoader
-                                color={"#ffffff"}
-                                loading={nftLoading}
-                                cssOverride={override}
-                                size={12}
-                                aria-label="Loading Spinner"
-                                data-testid="loader"
-                            />
-                            100
+                        <TableCell className="font-medium">
+                            <Image src="/icon/best-icon.jpg" height={36} width={36}
+                                   alt="pop"/>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="font-extralight">calculating</TableCell>
+                        <TableCell>
+                            {userData ? userData : "0"}
+                        </TableCell>
+                        <TableCell className="text-center">
                             <Button
                                 variant={"outline"}
                                 disabled={true}
@@ -325,7 +354,7 @@ export default function Tab2Asset() {
                 </TableBody>
             </Table>
             {/*  Points End */}
-
+            <div className="mt-20 mb-20 text-gray-600 text-center">It takes money to make money....</div>
         </div>
     );
 };

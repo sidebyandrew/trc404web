@@ -1,28 +1,7 @@
 import {getRequestContext} from '@cloudflare/next-on-pages'
 import {v4 as uuidv4} from 'uuid';
-
-export const USER_FOUND = "USER_FOUND";
-export const USER_NOT_FOUND = "USER_NOT_FOUND";
-export const REF_USER_LIST_FOUND = "REF_USER_LIST_FOUND";
-export const USER_CREATED = "USER_CREATED";
-export const USER_CREATED_WITH_REF = "USER_CREATED_WITH_REF";
-
-
-export interface User404 {
-    tgId: string;
-    tgUsername: string;
-    refCode: string;
-    refTgId: string;
-    refTgUsername: string;
-}
-
-
-export interface Result404 {
-    success: boolean;
-    code?: string;
-    msg?: string;
-    result?: any;
-}
+import {REF_USER_LIST_FOUND, Result404, User404, USER_CREATED, USER_CREATED_WITH_REF} from './static404';
+import {USER_FOUND} from "@/utils/static404";
 
 
 export function uuid404(): string {
