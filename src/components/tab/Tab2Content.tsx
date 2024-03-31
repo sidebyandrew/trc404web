@@ -255,6 +255,7 @@ export default function Tab2Asset() {
                         </TableCell>
                         <TableCell className="text-right">
                             <Button
+                                variant={"outline"}
                                 disabled={nftLoading}
                                 onClick={() => {
                                     sellOnGetgems(isMainnet, wallet?.account.address, nftCollection);
@@ -278,6 +279,52 @@ export default function Tab2Asset() {
             {/*        {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && "Warning: Need to Connect Testnet."}*/}
             {/*    </div>*/}
             {/*</div>*/}
+
+            {/*  Points  */}
+            <div className="mt-6 text-xl font-bold">404 Honor Points</div>
+            <Table>
+                <TableCaption></TableCaption>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="">
+                            #
+                        </TableHead>
+                        <TableHead>Points</TableHead>
+                        <TableHead>Invited Friends</TableHead>
+                        <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    <TableRow>
+                        <TableCell className="font-medium"> <Image src="/icon/best-icon.jpg" height={36} width={36}
+                                                                   alt="pop"/></TableCell>
+                        <TableCell>404</TableCell>
+                        <TableCell>
+                            <BeatLoader
+                                color={"#ffffff"}
+                                loading={nftLoading}
+                                cssOverride={override}
+                                size={12}
+                                aria-label="Loading Spinner"
+                                data-testid="loader"
+                            />
+                            100
+                        </TableCell>
+                        <TableCell className="text-right">
+                            <Button
+                                variant={"outline"}
+                                disabled={true}
+                                // onClick={() => {
+                                //     sellOnGetgems(isMainnet, wallet?.account.address, nftCollection);
+                                // }}
+                            >
+                                View
+                            </Button>
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+            {/*  Points End */}
 
         </div>
     );

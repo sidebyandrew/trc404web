@@ -38,6 +38,7 @@ import Link from "next/link";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious,} from "@/components/ui/carousel"
 import {Card, CardContent} from "@/components/ui/card";
 
+
 interface MintInfo {
     fetchFormRemote: boolean;
     freemintIsOpen?: boolean;
@@ -201,7 +202,7 @@ export default function Tab1Content() {
             {/* Carousel*/}
             <Carousel className="  px-1 justify-center items-center" plugins={[
                 Autoplay({
-                    delay: 3000,
+                    delay: 6000,
                 }),
             ]}>
                 <CarouselContent>
@@ -309,6 +310,7 @@ export default function Tab1Content() {
                             {/*mint amount end*/}
 
                             <Button
+                                size={"lg"}
                                 variant={mintInfo.freemintIsOpen ? "blue" : "outline"}
                                 disabled={mintInfo.freemintIsOpen === false}
                                 onClick={() => {
@@ -339,8 +341,40 @@ export default function Tab1Content() {
             </div>
 
             {/* Referral  */}
-            <div className="flex w-full flex-col pb-2">&nbsp;</div>
-            <div className="  text-2xl">Referral</div>
+            {/*<div className="flex w-full flex-col pb-2">&nbsp;</div>*/}
+            {/*<div className="  text-2xl">Referral</div>*/}
+            {/*<div className="flex flex-col">*/}
+            {/*    <div className="flex mx-auto">*/}
+            {/*        <div>*/}
+            {/*            <Card className="border-0  border-gray-600 mx-2">*/}
+            {/*                <CardHeader>*/}
+            {/*                    <CardTitle>Your Friends</CardTitle>*/}
+            {/*                </CardHeader>*/}
+            {/*                <CardContent>*/}
+            {/*                    <div>*/}
+            {/*                        <span className={"text-2xl"}>10</span>*/}
+            {/*                        <span className={"pl-1  text-gray-300"}>people</span>*/}
+            {/*                    </div>*/}
+            {/*                </CardContent>*/}
+            {/*            </Card>*/}
+            {/*        </div>*/}
+            {/*        /!*<div>*!/*/}
+            {/*        /!*    <Card className="border-1 border border-gray-600  mx-2">*!/*/}
+            {/*        /!*        <CardHeader>*!/*/}
+            {/*        /!*            <CardTitle>Your Rewards</CardTitle>*!/*/}
+            {/*        /!*        </CardHeader>*!/*/}
+            {/*        /!*        <CardContent>*!/*/}
+            {/*        /!*            <div>*!/*/}
+            {/*        /!*                <span className={"text-2xl"}>10</span>*!/*/}
+            {/*        /!*                <span className={"pl-1  text-gray-300"}>points</span>*!/*/}
+            {/*        /!*            </div>*!/*/}
+            {/*        /!*        </CardContent>*!/*/}
+            {/*        /!*    </Card>*!/*/}
+            {/*        /!*</div>*!/*/}
+            {/*    </div>*/}
+            {/*    <div>Your Referral Link</div>*/}
+            {/*</div>*/}
+
             {/* Referral End */}
 
 

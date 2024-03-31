@@ -1,7 +1,11 @@
 import {getRequestContext} from '@cloudflare/next-on-pages'
 import {v4 as uuidv4} from 'uuid';
 
-export const USER_FOUND = 'USER_FOUND';
+export const USER_FOUND = "USER_FOUND";
+export const USER_NOT_FOUND = "USER_NOT_FOUND";
+export const REF_USER_LIST_FOUND = "REF_USER_LIST_FOUND";
+export const USER_CREATED = "USER_CREATED";
+export const USER_CREATED_WITH_REF = "USER_CREATED_WITH_REF";
 
 
 export interface User404 {
@@ -48,7 +52,8 @@ export async function queryUser(tgId: string): Promise<Result404> {
         result.success = d1Response.success;
         if (d1Response.results.length >= 1) {
             result.code = USER_FOUND;
-            result.msg = `tgId:${tgId}`;
+            let {tgId, tgUsername, refCode} = d1Response.results[0];
+            result.result = {tgId, tgUsername, refCode} as User404;
         }
     }
     return result;
@@ -80,6 +85,40 @@ export async function queryUserByRefCode(refCode: string): Promise<Result404> {
     return result;
 }
 
+export async function queryUserListByRefTgId(
+    refTgId: string,
+): Promise<Result404> {
+    let result: Result404 = {
+        success: false,
+        code: "",
+        msg: "",
+    };
+    if (!refTgId || refTgId.length < 3) {
+        return result;
+    }
+
+    // @ts-ignore
+    let d1Response = await db404()
+        .prepare(
+            "select * from TrcUser where refTgId=? order by createDt desc limit 10",
+        )
+        .bind(refTgId)
+        .all();
+    if (d1Response.success) {
+        result.success = d1Response.success;
+        if (d1Response.results.length >= 1) {
+            result.code = REF_USER_LIST_FOUND;
+            let user404List: User404[] = [];
+            for (const record of d1Response.results) {
+                let {tgId, tgUsername} = record;
+                user404List.push({tgId, tgUsername} as User404);
+            }
+            result.result = user404List;
+        }
+    }
+    return result;
+}
+
 export async function createUser(tgId: string, tgUsername: string, ref?: User404): Promise<Result404> {
 
     let result: Result404 = {
@@ -97,7 +136,7 @@ export async function createUser(tgId: string, tgUsername: string, ref?: User404
             'INSERT INTO TrcUser (userId, tgId, tgUsername, refCode, refTgId, refTgUsername,createBy,createDt) VALUES (?, ?,?,?,?, ?, ?, ?)')
             .bind(userId, tgId, tgUsername, refCode, ref.tgId, ref.tgUsername, tgId, current).run();
         result.success = d1Response.success;
-        result.code = `USER_CREATED_WITH_REF`;
+        result.code = USER_CREATED_WITH_REF;
         result.result = {
             tgId,
             tgUsername,
@@ -111,7 +150,7 @@ export async function createUser(tgId: string, tgUsername: string, ref?: User404
             'INSERT INTO TrcUser (userId, tgId, tgUsername, refCode, createBy,createDt) VALUES (?, ?,?, ?, ?, ?)')
             .bind(userId, tgId, tgUsername, refCode, tgId, current).run();
         result.success = d1Response.success;
-        result.code = "USER_CREATED";
+        result.code = USER_CREATED;
         result.result = {tgId, tgUsername, refCode} as User404;
     }
 

@@ -14,6 +14,9 @@ export async function POST(request: NextRequest) {
         let requestJson = await request.json<User404>();
         let tgId = requestJson.tgId;
         let tgUsername = requestJson.tgUsername;
+        if (!tgUsername) {
+            tgUsername = tgId;
+        }
         if (tgId && tgUsername) {
             let queryRes = await queryUser(tgId);
             if (queryRes.success && USER_FOUND == queryRes.code) {
@@ -24,7 +27,7 @@ export async function POST(request: NextRequest) {
                 result = await createUser(tgId, tgUsername);
             }
         } else {
-            result.code = 'login error'
+            result.code = 'login error';
             result.msg = "tgId not found.";
         }
     } catch (error) {
