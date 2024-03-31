@@ -38,6 +38,7 @@ export default function Tab2Asset() {
     const [nftCollection, setNftCollection] = useState("");
 
     const [userData, setUserData] = useState(null);
+    const [logMsg404, setLogMsg404] = useState("");
 
 
     const wallet = useTonWallet();
@@ -53,20 +54,22 @@ export default function Tab2Asset() {
             try {
                 let tgId = tgInitData?.user?.id;
                 let tgUsername = tgInitData?.user?.username;
-                let url = "https://staging.trc404web.pages.dev";
+                let url = "https://trc404web.pages.dev";
                 const response = await fetch(`${url}/api/user?tgId=${tgId}&tgUsername=${tgUsername}&access404=error_code_404`);
                 if (!response.ok) {
+                    setLogMsg404(logMsg404 + "Network response was not ok");
                     throw new Error('Network response was not ok');
                 }
                 const responseData = await response.json<Result404>();
                 // {"success":true,"code":"REF_USER_LIST_FOUND","msg":"Cannot destructure property 'refCode' of 'd.result' as it is undefined."}
                 if (responseData.success && responseData.code == REF_USER_LIST_FOUND) {
-
                     let {count} = responseData.result;
                     setUserData(count);
                 }
-
             } catch (error) {
+                if (error instanceof Error) {
+                    setLogMsg404(" , " + logMsg404 + error.message + " , ");
+                }
                 console.error('Error fetching data:', error);
             }
         }
@@ -223,6 +226,46 @@ export default function Tab2Asset() {
 
     return (
         <div className="p-6">
+            {/*  Points  */}
+            <div className="mt-2 text-xl font-bold">404 Honor Points</div>
+            <Table>
+                <TableCaption></TableCaption>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="">
+                            #
+                        </TableHead>
+                        <TableHead>Points</TableHead>
+                        <TableHead>Invited Friends</TableHead>
+                        <TableHead className="text-center">Action</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    <TableRow>
+                        <TableCell className="font-medium">
+                            <Image src="/icon/best-icon.jpg" height={36} width={36}
+                                   alt="pop"/>
+                        </TableCell>
+                        <TableCell className="font-extralight">calculating</TableCell>
+                        <TableCell>
+                            {userData ? userData : "0"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                            <Button
+                                variant={"outline"}
+                                disabled={true}
+                                // onClick={() => {
+                                //     sellOnGetgems(isMainnet, wallet?.account.address, nftCollection);
+                                // }}
+                            >
+                                View
+                            </Button>
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+            {/*  Points End */}
+
             <div className=" text-xl font-bold">404 Jettons</div>
 
             <Table>
@@ -259,7 +302,7 @@ export default function Tab2Asset() {
             </Table>
 
 
-            <div className="mt-6 text-xl font-bold">404 Collectibles</div>
+            <div className="mt-3 text-xl font-bold">404 Collectibles</div>
             <Table>
                 <TableCaption></TableCaption>
                 <TableHeader>
@@ -315,46 +358,14 @@ export default function Tab2Asset() {
             {/*    </div>*/}
             {/*</div>*/}
 
-            {/*  Points  */}
-            <div className="mt-6 text-xl font-bold">404 Honor Points</div>
-            <Table>
-                <TableCaption></TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="">
-                            #
-                        </TableHead>
-                        <TableHead>Points</TableHead>
-                        <TableHead>Invited Friends</TableHead>
-                        <TableHead className="text-center">Action</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    <TableRow>
-                        <TableCell className="font-medium">
-                            <Image src="/icon/best-icon.jpg" height={36} width={36}
-                                   alt="pop"/>
-                        </TableCell>
-                        <TableCell className="font-extralight">calculating</TableCell>
-                        <TableCell>
-                            {userData ? userData : "0"}
-                        </TableCell>
-                        <TableCell className="text-center">
-                            <Button
-                                variant={"outline"}
-                                disabled={true}
-                                // onClick={() => {
-                                //     sellOnGetgems(isMainnet, wallet?.account.address, nftCollection);
-                                // }}
-                            >
-                                View
-                            </Button>
-                        </TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
-            {/*  Points End */}
-            <div className="mt-20 mb-20 text-gray-600 text-center">It takes money to make money....</div>
+            <div className="mt-20 mb-20 text-gray-600 text-center">
+                <Popover>
+                    <PopoverTrigger className="text-gray-400">It takes money to make money....</PopoverTrigger>
+                    <PopoverContent>{logMsg404}
+                    </PopoverContent>
+                </Popover>
+
+            </div>
         </div>
     );
 };
