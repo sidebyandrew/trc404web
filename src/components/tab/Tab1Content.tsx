@@ -37,6 +37,7 @@ import {Separator} from "@/components/ui/separator";
 import Link from "next/link";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious,} from "@/components/ui/carousel"
 import {Card, CardContent} from "@/components/ui/card";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 
 
 interface MintInfo {
@@ -96,6 +97,14 @@ export default function Tab1Content() {
 
     const [open, setOpen] = React.useState(false)
     const isDesktop = useMediaQuery("(min-width: 768px)")
+    const [logMsg404, setLogMsg404] = useState("");
+
+    function log404(msg: any) {
+        try {
+            setLogMsg404(logMsg404 + " ," + JSON.stringify(msg));
+        } catch (err) {
+        }
+    }
 
     const handleIncrement = () => {
         if (mintAmount < 5) {
@@ -132,36 +141,55 @@ export default function Tab1Content() {
                 // @ts-ignore
 
                 let master_result = master_tx.stack;
-                let total_supply = master_result.readBigNumber();
+                // let total_supply = master_result.readBigNumber();
+                // let mintable = master_result.readBoolean();
+                // let owner = master_result.readAddress();
+                // let content = master_result.readCell();
+                // let jetton_wallet_code = master_result.readCell();
+                // let nft_collection_address = master_result.readAddress();
+
+                //-1:true(can mint), 0:false(can not) : BACKEND USE, not for front end
+                // let freemint_flag = master_result.readNumber();
+
+                //3 000000000n 当前已经 mint 的数字
+                // let freemint_current_supply = master_result.readBigNumber();
+                // let freemint_current_supply_number = Number(freemint_current_supply / BASE_NANO_BIGINT) - roundAccumulatedOffset;
+
+                //1000 000000000n
+                // let freemint_max_supply = master_result.readBigNumber();
+                // let freemint_max_supply_number = Number(freemint_max_supply / BASE_NANO_BIGINT) - roundAccumulatedOffset;
+
+
+                let max_supply = master_result.readBigNumber();
                 let mintable = master_result.readBoolean();
                 let owner = master_result.readAddress();
                 let content = master_result.readCell();
                 let jetton_wallet_code = master_result.readCell();
+                let nft_item_code = master_result.readCell();
                 let nft_collection_address = master_result.readAddress();
-
-                //-1:true(can mint), 0:false(can not) : BACKEND USE, not for front end
                 let freemint_flag = master_result.readNumber();
-
-                //3 000000000n 当前已经 mint 的数字
                 let freemint_current_supply = master_result.readBigNumber();
-                let freemint_current_supply_number = Number(freemint_current_supply / BASE_NANO_BIGINT) - roundAccumulatedOffset;
-
-                //1000 000000000n
                 let freemint_max_supply = master_result.readBigNumber();
+                let freemint_price = master_result.readBigNumber();
+                let total_supply = master_result.readBigNumber();
+
+                let freemint_current_supply_number = Number(freemint_current_supply / BASE_NANO_BIGINT) - roundAccumulatedOffset;
                 let freemint_max_supply_number = Number(freemint_max_supply / BASE_NANO_BIGINT) - roundAccumulatedOffset;
 
+
                 //1 000000000n
-                let freemint_price = Number(master_result.readBigNumber());
+                let freemint_price_number = Number(freemint_price);
                 let mintInfo: MintInfo = {
                     fetchFormRemote: true,
-                    freemintIsOpen: freemint_max_supply_number - freemint_current_supply_number < 1,
+                    freemintIsOpen: freemint_max_supply_number - freemint_current_supply_number > 1,
                     freemintCurrentSupply: freemint_current_supply_number,
                     freemintMaxSupply: freemint_max_supply_number,
-                    freemintTonPrice: freemint_price / BASE_NANO_NUMBER,
+                    freemintTonPrice: freemint_price_number / BASE_NANO_NUMBER,
                     progressRate: Number(Number(100 * freemint_current_supply_number / freemint_max_supply_number).toFixed(1)),
                 };
 
                 setMintInfo(mintInfo);
+                log404(mintInfo);
 
                 // console.log('get_jetton_data freemint_current_supply :', freemint_current_supply,
                 //     ',freemint_max_supply:', freemint_max_supply, ",freemint_price", freemint_price,
@@ -183,14 +211,16 @@ export default function Tab1Content() {
                     ',progressRate:', mintInfo.progressRate,
                     ',fetchFormRemote:', mintInfo.fetchFormRemote
                 );
+                log404(error);
+                log404(mintInfo);
                 setRpcErrorInfo({isRpcError: true, errorMsg: "error"});
-                console.error('Error fetching data:', error);
             }
         };
 
         // Only execute fetchData if running in the browser
         if (typeof window !== "undefined") {
             fetchData().catch(r => {
+                log404("Sorry, I need window to run." + r);
                 console.error("Sorry, I need window to run." + r)
             });
         }
@@ -225,21 +255,9 @@ export default function Tab1Content() {
                 <CarouselNext/>
             </Carousel>
 
-            {/* Carousel End*/}
-            {/*  Main Image Fancy Vivid */}
-            {/*<Card className="w-full h-[300px] col-span-12 sm:col-span-7">*/}
-            {/*    <Image*/}
-            {/*        alt=" app"*/}
-            {/*        className="z-0 w-full h-full object-fill"*/}
-            {/*        width="300"*/}
-            {/*        height="300"*/}
-            {/*        src="/logos/fancy-vivid.png"*/}
-            {/*    />*/}
-            {/*</Card>*/}
-            {/* Main Image Fancy Vivid end */}
 
             <div className="mt-4 mb-2 text-2xl">Fair Mint
-                {!isMainnet && <span className='text-yellow-600 text-lg'>&nbsp;Testnet 2nd Round</span>}
+                {!isMainnet && <span className='text-yellow-600 text-lg'>&nbsp;Testnet 3rd Round</span>}
             </div>
             <div className="flex flex-col">
 
@@ -284,7 +302,7 @@ export default function Tab1Content() {
 
 
                 <div className="flex flex-col mt-3">
-                    {wallet ? (
+                    {wallet?.account?.address &&
                         <>
                             {/*mint amount start*/}
                             <div className="flex mb-2 items-center">
@@ -329,53 +347,20 @@ export default function Tab1Content() {
                                 {mintInfo.freemintIsOpen === false ? "Fair Mint Finished" : "Fair Mint"}
                             </Button>
 
-                        </>
-                    ) : (
+                        </>}
+                    {!wallet?.account?.address &&
                         <Button variant={"secondary"} size='lg' color="primary" onClick={() => {
-                            return tonConnectUi.openModal();
+                            if (!tonConnectUi.connected) {
+                                return tonConnectUi.openModal();
+                            } else {
+                                return tonConnectUi.sendTransaction(tx);
+                            }
                         }}>
                             Connect Wallet to Fair Mint
                         </Button>
-                    )}
+                    }
                 </div>
             </div>
-
-            {/* Referral  */}
-            {/*<div className="flex w-full flex-col pb-2">&nbsp;</div>*/}
-            {/*<div className="  text-2xl">Referral</div>*/}
-            {/*<div className="flex flex-col">*/}
-            {/*    <div className="flex mx-auto">*/}
-            {/*        <div>*/}
-            {/*            <Card className="border-0  border-gray-600 mx-2">*/}
-            {/*                <CardHeader>*/}
-            {/*                    <CardTitle>Your Friends</CardTitle>*/}
-            {/*                </CardHeader>*/}
-            {/*                <CardContent>*/}
-            {/*                    <div>*/}
-            {/*                        <span className={"text-2xl"}>10</span>*/}
-            {/*                        <span className={"pl-1  text-gray-300"}>people</span>*/}
-            {/*                    </div>*/}
-            {/*                </CardContent>*/}
-            {/*            </Card>*/}
-            {/*        </div>*/}
-            {/*        /!*<div>*!/*/}
-            {/*        /!*    <Card className="border-1 border border-gray-600  mx-2">*!/*/}
-            {/*        /!*        <CardHeader>*!/*/}
-            {/*        /!*            <CardTitle>Your Rewards</CardTitle>*!/*/}
-            {/*        /!*        </CardHeader>*!/*/}
-            {/*        /!*        <CardContent>*!/*/}
-            {/*        /!*            <div>*!/*/}
-            {/*        /!*                <span className={"text-2xl"}>10</span>*!/*/}
-            {/*        /!*                <span className={"pl-1  text-gray-300"}>points</span>*!/*/}
-            {/*        /!*            </div>*!/*/}
-            {/*        /!*        </CardContent>*!/*/}
-            {/*        /!*    </Card>*!/*/}
-            {/*        /!*</div>*!/*/}
-            {/*    </div>*/}
-            {/*    <div>Your Referral Link</div>*/}
-            {/*</div>*/}
-
-            {/* Referral End */}
 
 
             {/* FAQ   */}
@@ -532,6 +517,15 @@ export default function Tab1Content() {
             </Drawer>
             {/* Drawer End */}
             <div className="flex w-full flex-col pb-20">&nbsp;</div>
+            <div className="mt-20 mb-20 text-gray-600 text-center">
+                <Popover>
+                    <PopoverTrigger className="text-gray-400">Diamonds are forever.</PopoverTrigger>
+                    <PopoverContent
+                        className={"w-[300px] break-all"}>
+                        <div className={"break-all"}>{logMsg404}</div>
+                    </PopoverContent>
+                </Popover>
+            </div>
         </div>
 
 

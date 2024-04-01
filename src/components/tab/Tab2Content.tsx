@@ -18,7 +18,6 @@ import {CHAIN} from "@tonconnect/sdk";
 import {Button} from "@/components/ui/button";
 import {ToastAction} from "@/components/ui/toast";
 import {useToast} from "@/components/ui/use-toast";
-import {useInitData} from "@tma.js/sdk-react";
 import {REF_USER_LIST_FOUND, Result404} from "@/utils/static404";
 
 function delay(ms: number) {
@@ -46,29 +45,37 @@ export default function Tab2Asset() {
 
     /* todo remove tma */
     // useBackButtonEasy();
-    const tgInitData = useInitData();
+    // const tgInitData = useInitData();
+    const tgInitData = {user: {id: 5499157826, username: "", firstName: 'Andy', lastName: 'Block'}};
 
+    function log404(msg: any) {
+        try {
+            setLogMsg404(logMsg404 + " ," + JSON.stringify(msg));
+        } catch (err) {
+        }
+    }
 
     useEffect(() => {
         async function fetchData() {
             try {
                 let tgId = tgInitData?.user?.id;
                 let tgUsername = tgInitData?.user?.username;
-                let url = "https://trc404web.pages.dev";
-                const response = await fetch(`${url}/api/user?tgId=${tgId}&tgUsername=${tgUsername}&access404=error_code_404`);
+                let urlBase = "https://trc404web.pages.dev";
+                // let url = "https://trc404web.pages.dev";
+                let urlWithParams = `${urlBase}/api/user?tgId=${tgId}&tgUsername=${tgUsername}&access404=error_code_404`;
+                const response = await fetch(urlWithParams);
                 if (!response.ok) {
-                    setLogMsg404(logMsg404 + "Network response was not ok");
-                    throw new Error('Network response was not ok');
+                    log404("fetch API, network response was not ok" + urlWithParams);
+                    return;
                 }
                 const responseData = await response.json<Result404>();
-                // {"success":true,"code":"REF_USER_LIST_FOUND","msg":"Cannot destructure property 'refCode' of 'd.result' as it is undefined."}
                 if (responseData.success && responseData.code == REF_USER_LIST_FOUND) {
                     let {count} = responseData.result;
                     setUserData(count);
                 }
             } catch (error) {
                 if (error instanceof Error) {
-                    setLogMsg404(" , " + logMsg404 + error.message + " , ");
+                    log404(error.message);
                 }
                 console.error('Error fetching data:', error);
             }
@@ -78,7 +85,6 @@ export default function Tab2Asset() {
     }, []);
 
     useEffect(() => {
-
         if (wallet?.account) {
             if (isMainnet && wallet?.account.chain == CHAIN.TESTNET) {
                 toast({
@@ -129,13 +135,38 @@ export default function Tab2Asset() {
                     // ds~load_msg_addr(),   ;;nft_collection_address
                     // ds~load_dict(),        ;;owned_nft_dict
                     // ds~load_uint(64)         ;;owned_nft_number
+                    // let jetton_balance_bigint = jetton_wallet_result.readBigNumber();
+                    // let owner_address = jetton_wallet_result.readAddress();
+                    // let jetton_master_address = jetton_wallet_result.readAddress();
+                    // let jetton_wallet_code = jetton_wallet_result.readCell();
+                    // let nft_collection_address = jetton_wallet_result.readAddress();
+                    // let owned_nft_dict = jetton_wallet_result.readCellOpt();
+                    // let owned_nft_number = jetton_wallet_result.readBigNumber();
+
+
+                    //
+                    // ds~load_coins(),    ;; jetton_balance
+                    // ds~load_msg_addr(),    ;; owner_address
+                    // ds~load_msg_addr(),    ;;jetton_master_address
+                    // ds~load_ref(),         ;; jetton_wallet_code   Jetton wallet standard end
                     let jetton_balance_bigint = jetton_wallet_result.readBigNumber();
                     let owner_address = jetton_wallet_result.readAddress();
                     let jetton_master_address = jetton_wallet_result.readAddress();
                     let jetton_wallet_code = jetton_wallet_result.readCell();
+
+                    // ds~load_ref(),       ;; nft_item_code
+                    let nft_item_code = jetton_wallet_result.readCell();
+                    // ds~load_msg_addr(),   ;;nft_collection_address
                     let nft_collection_address = jetton_wallet_result.readAddress();
+                    // ds~load_dict(),       ;;owned_nft_dict
                     let owned_nft_dict = jetton_wallet_result.readCellOpt();
-                    let owned_nft_number = jetton_wallet_result.readBigNumber();
+                    // ds~load_int(item_index_length() + 1),         ;;owned_nft_number
+                    // ds~load_uint(item_index_length()),       ;;next_item_index
+                    // ds~load_uint(userid_prefix_length()),       ;;user_id  ,because getgems.io only support up to 54 bits for nft_item_index
+                    //     ds~load_uint(item_index_length()),         ;;owned_nft_limit
+                    // ds~load_coins(),       ;; pending_reduce_ jetton_balance
+                    // ds~load_dict() );      ;; pending_burn_nft_queue
+
 
                     // console.info(
                     //     "jetton_balance_bigint=", jetton_balance_bigint,
@@ -158,31 +189,31 @@ export default function Tab2Asset() {
                     if (keys) {
                         setNftCount("" + keys.length);
                         setNftLoading(false);
-                        for (const key of keys) {
-                            // console.info(key)
+                        // for (const key of keys) {
+                        // console.info(key)
 
-                            // stack.push({type: 'int', value: BigInt(key)});
-                            // const nft_address_query_tx = await client.runMethod(
-                            //     nft_collection_address, 'get_nft_address_by_index', stack);
-                            // let nft_address_query_result = nft_address_query_tx.stack;
-                            // let address1 = nft_address_query_result.readAddress();
-                            // console.info(address1.toString({bounceable: false, testOnly: true}))
-                            // //
-                            // //     soft commit
-                            // let stack2: TupleItem[] = [];
-                            // stack2.push({type: 'int', value: BigInt(key)});
-                            // const nft_address_query_tx2 = await client.runMethod(
-                            //     nft_collection_address, 'get_nft_address_by_index', stack2);
-                            // let nft_address_query_result2 = nft_address_query_tx2.stack;
-                            // let nft_item_address2 = nft_address_query_result2.readAddress();
-                            // console.log("Item_index ", key, "contract address:", nft_item_address2.toString({
-                            //     bounceable: false,
-                            //     testOnly: true
-                            // }));
+                        // stack.push({type: 'int', value: BigInt(key)});
+                        // const nft_address_query_tx = await client.runMethod(
+                        //     nft_collection_address, 'get_nft_address_by_index', stack);
+                        // let nft_address_query_result = nft_address_query_tx.stack;
+                        // let address1 = nft_address_query_result.readAddress();
+                        // console.info(address1.toString({bounceable: false, testOnly: true}))
+                        // //
+                        // //     soft commit
+                        // let stack2: TupleItem[] = [];
+                        // stack2.push({type: 'int', value: BigInt(key)});
+                        // const nft_address_query_tx2 = await client.runMethod(
+                        //     nft_collection_address, 'get_nft_address_by_index', stack2);
+                        // let nft_address_query_result2 = nft_address_query_tx2.stack;
+                        // let nft_item_address2 = nft_address_query_result2.readAddress();
+                        // console.log("Item_index ", key, "contract address:", nft_item_address2.toString({
+                        //     bounceable: false,
+                        //     testOnly: true
+                        // }));
 
-                            //        soft commit
+                        //        soft commit
 
-                        }
+                        // }
                     } else {
                         setNftCount("-");
                         setNftLoading(false);
@@ -192,6 +223,7 @@ export default function Tab2Asset() {
                     setJettonLoading(false);
                     setNftCount("-");
                     setNftLoading(false);
+                    log404(error)
                     console.error('Error fetching data:', error);
                 }
             };
@@ -248,7 +280,7 @@ export default function Tab2Asset() {
                         </TableCell>
                         <TableCell className="font-extralight">calculating</TableCell>
                         <TableCell>
-                            {userData ? userData : "0"}
+                            {userData ? userData : "-"}
                         </TableCell>
                         <TableCell className="text-center">
                             <Button
