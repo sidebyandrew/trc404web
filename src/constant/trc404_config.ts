@@ -14,7 +14,7 @@ export const BASE_NANO_NUMBER: number = 1000000000;
 export const isMainnet: boolean = false;
 export const defaultMintPrice: number = 2.15;
 export const roundAccumulatedOffset: number = 0;
-export const FAIR_MINT_PERIOD: string = "2024/03/31 - 2024/04/06";
-export const t404_jetton_master_address: string = "EQCE5hfJQ89yWlUIC7AY545-Dosnf6ZQObIvLHJttx7Uqdip";
-export const t404_jetton_master_address_raw: string = '0:84e617c943cf725a55080bb018e78e7e0e8b277fa65039b22f2c726db71ed4a9';
+export const FAIR_MINT_PERIOD: string = "2024/03/31 - 2024/04/08";
+export const t404_jetton_master_address: string = "kQCNsIRwQbseTCxjj272LT8jih3fFCSWWjubJOMlufATGuTO";
+export const t404_jetton_master_address_raw: string = '0:8db0847041bb1e4c2c638f6ef62d3f238a1ddf1424965a3b9b24e325b9f0131a';
 // =======================================================================

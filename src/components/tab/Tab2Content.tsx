@@ -1,5 +1,5 @@
 import React, {CSSProperties, useEffect, useState} from 'react';
-import {beginCell, Dictionary, TonClient, TupleItem} from "@ton/ton";
+import {beginCell, TonClient, TupleItem} from "@ton/ton";
 import {
     BASE_NANO_NUMBER,
     ENDPOINT_MAINNET_RPC,
@@ -152,23 +152,35 @@ export default function Tab2Asset() {
                     // ds~load_msg_addr(),    ;; owner_address
                     // ds~load_msg_addr(),    ;;jetton_master_address
                     // ds~load_ref(),         ;; jetton_wallet_code   Jetton wallet standard end
-                    let jetton_balance_bigint = jetton_wallet_result.readBigNumber();
-                    let owner_address = jetton_wallet_result.readAddress();
-                    let jetton_master_address = jetton_wallet_result.readAddress();
-                    let jetton_wallet_code = jetton_wallet_result.readCell();
+                    // let jetton_balance_bigint = jetton_wallet_result.readBigNumber();
+                    // let owner_address = jetton_wallet_result.readAddress();
+                    // let jetton_master_address = jetton_wallet_result.readAddress();
+                    // let jetton_wallet_code = jetton_wallet_result.readCell();
 
                     // ds~load_ref(),       ;; nft_item_code
-                    let nft_item_code = jetton_wallet_result.readCell();
+                    // let nft_item_code = jetton_wallet_result.readCell();
                     // ds~load_msg_addr(),   ;;nft_collection_address
-                    let nft_collection_address = jetton_wallet_result.readAddress();
+                    // let nft_collection_address = jetton_wallet_result.readAddress();
                     // ds~load_dict(),       ;;owned_nft_dict
-                    let owned_nft_dict = jetton_wallet_result.readCellOpt();
+                    // let owned_nft_dict = jetton_wallet_result.readCellOpt();
                     // ds~load_int(item_index_length() + 1),         ;;owned_nft_number
                     // ds~load_uint(item_index_length()),       ;;next_item_index
                     // ds~load_uint(userid_prefix_length()),       ;;user_id  ,because getgems.io only support up to 54 bits for nft_item_index
                     //     ds~load_uint(item_index_length()),         ;;owned_nft_limit
                     // ds~load_coins(),       ;; pending_reduce_ jetton_balance
                     // ds~load_dict() );      ;; pending_burn_nft_queue
+
+                    let jetton_balance_bigint = jetton_wallet_result.readBigNumber();
+                    let owner_address = jetton_wallet_result.readAddress();
+                    let jetton_master_address = jetton_wallet_result.readAddress();
+                    let jetton_wallet_code = jetton_wallet_result.readCell();
+                    let nft_item_code = jetton_wallet_result.readCell();
+                    let nft_collection_address = jetton_wallet_result.readAddress();
+                    let owned_nft_dict = jetton_wallet_result.readCellOpt();
+                    let owned_nft_number = jetton_wallet_result.readBigNumber();
+                    let owned_nft_limit = jetton_wallet_result.readBigNumber();
+                    let pending_reduce_jetton_balance = jetton_wallet_result.readBigNumber();
+                    let pending_burn_nft_queue = jetton_wallet_result.readCellOpt();
 
 
                     // console.info(
@@ -183,51 +195,19 @@ export default function Tab2Asset() {
                     setJettonBalance(jettonBalance);
                     setJettonLoading(false);
 
-                    let s = nft_collection_address.toString({bounceable: true, testOnly: false});
-                    setNftCollection(s);
+                    setNftCount("" + owned_nft_number);
+                    setNftLoading(false);
 
-                    let dictSlice = owned_nft_dict?.beginParse();
-                    let loadDictDirect = dictSlice?.loadDictDirect(Dictionary.Keys.Int(64), Dictionary.Values.BitString(0));
-                    let keys = loadDictDirect?.keys();
-                    if (keys) {
-                        setNftCount("" + keys.length);
-                        setNftLoading(false);
-                        // for (const key of keys) {
-                        // console.info(key)
+                    let nftCollAddress = nft_collection_address.toString({bounceable: true, testOnly: false});
+                    setNftCollection(nftCollAddress);
 
-                        // stack.push({type: 'int', value: BigInt(key)});
-                        // const nft_address_query_tx = await client.runMethod(
-                        //     nft_collection_address, 'get_nft_address_by_index', stack);
-                        // let nft_address_query_result = nft_address_query_tx.stack;
-                        // let address1 = nft_address_query_result.readAddress();
-                        // console.info(address1.toString({bounceable: false, testOnly: true}))
-                        // //
-                        // //     soft commit
-                        // let stack2: TupleItem[] = [];
-                        // stack2.push({type: 'int', value: BigInt(key)});
-                        // const nft_address_query_tx2 = await client.runMethod(
-                        //     nft_collection_address, 'get_nft_address_by_index', stack2);
-                        // let nft_address_query_result2 = nft_address_query_tx2.stack;
-                        // let nft_item_address2 = nft_address_query_result2.readAddress();
-                        // console.log("Item_index ", key, "contract address:", nft_item_address2.toString({
-                        //     bounceable: false,
-                        //     testOnly: true
-                        // }));
-
-                        //        soft commit
-
-                        // }
-                    } else {
-                        setNftCount("-");
-                        setNftLoading(false);
-                    }
                 } catch (error) {
                     setJettonBalance("-");
                     setJettonLoading(false);
                     setNftCount("-");
                     setNftLoading(false);
-                    log404(error)
-                    console.error('Error fetching data:', error);
+                    log404("Error fetching data:")
+                    console.error('Error: Fail to fetch data from TON RPC.');
                 }
             };
 
@@ -289,9 +269,7 @@ export default function Tab2Asset() {
                             <Button
                                 variant={"outline"}
                                 disabled={true}
-                                // onClick={() => {
-                                //     sellOnGetgems(isMainnet, wallet?.account.address, nftCollection);
-                                // }}
+
                             >
                                 View
                             </Button>
