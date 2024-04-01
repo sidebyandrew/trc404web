@@ -19,6 +19,7 @@ import {Button} from "@/components/ui/button";
 import {ToastAction} from "@/components/ui/toast";
 import {useToast} from "@/components/ui/use-toast";
 import {REF_USER_LIST_FOUND, Result404} from "@/utils/static404";
+import {useInitData} from "@tma.js/sdk-react";
 
 function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -44,9 +45,9 @@ export default function Tab2Asset() {
     const {toast} = useToast();
 
     /* todo remove tma */
-    // useBackButtonEasy();
-    // const tgInitData = useInitData();
-    const tgInitData = {user: {id: 5499157826, username: "", firstName: 'Andy', lastName: 'Block'}};
+    const tgInitData = useInitData();
+
+    // const tgInitData = {user: {id: 5499157826, username: ""}};
 
     function log404(msg: any) {
         try {
@@ -57,12 +58,14 @@ export default function Tab2Asset() {
 
     useEffect(() => {
         async function fetchData() {
+            let logUrl;
             try {
                 let tgId = tgInitData?.user?.id;
                 let tgUsername = tgInitData?.user?.username;
                 let urlBase = "https://trc404web.pages.dev";
                 // let url = "https://trc404web.pages.dev";
                 let urlWithParams = `${urlBase}/api/user?tgId=${tgId}&tgUsername=${tgUsername}&access404=error_code_404`;
+                logUrl = urlWithParams;
                 const response = await fetch(urlWithParams);
                 if (!response.ok) {
                     log404("fetch API, network response was not ok" + urlWithParams);
@@ -75,7 +78,7 @@ export default function Tab2Asset() {
                 }
             } catch (error) {
                 if (error instanceof Error) {
-                    log404(error.message);
+                    log404(logUrl + "" + error.message);
                 }
                 console.error('Error fetching data:', error);
             }
@@ -369,7 +372,14 @@ export default function Tab2Asset() {
                                 disabled={nftLoading}
                                 onClick={() => {
                                     sellOnGetgems(isMainnet, wallet?.account.address, nftCollection);
-                                }}>Sell</Button>
+                                }}>
+                                <svg className="mr-2 h-4 w-4" width="24" height="24" viewBox="0 0 36 36" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path fillRule="evenodd" clipRule="evenodd"
+                                          d="M18 2c0 8.837-7.163 16-16 16C2 9.163 9.163 2 18 2zm0 32C9.163 34 2 26.837 2 18c8.837 0 16 7.163 16 16zm16-16c0 8.837-7.163 16-16 16 0-8.837 7.163-16 16-16zM32 4c0 6.627-5.373 12-12 12 0-6.627 5.373-12 12-12z"
+                                          fill="currentColor"></path>
+                                </svg>
+                                Sell</Button>
                         </TableCell>
                     </TableRow>
                 </TableBody>
