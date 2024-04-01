@@ -189,6 +189,7 @@ export default function Tab1Content() {
                 };
 
                 setMintInfo(mintInfo);
+                setTx(buildTx(1, mintInfo));
                 log404(mintInfo);
 
                 // console.log('get_jetton_data freemint_current_supply :', freemint_current_supply,
