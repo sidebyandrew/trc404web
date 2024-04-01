@@ -15,6 +15,6 @@ export const isMainnet: boolean = false;
 export const defaultMintPrice: number = 2.15;
 export const roundAccumulatedOffset: number = 0;
 export const FAIR_MINT_PERIOD: string = "2024/03/31 - 2024/04/08";
-export const t404_jetton_master_address: string = "kQCNsIRwQbseTCxjj272LT8jih3fFCSWWjubJOMlufATGuTO";
-export const t404_jetton_master_address_raw: string = '0:8db0847041bb1e4c2c638f6ef62d3f238a1ddf1424965a3b9b24e325b9f0131a';
+export const t404_jetton_master_address: string = "EQCJghHCKVfqBvFv0oZsoJ5qIcmVyRUFi4QrHzvA7vkzs1iJ";
+export const t404_jetton_master_address_raw: string = '0:898211c22957ea06f16fd2866ca09e6a21c995c915058b842b1f3bc0eef933b3';
 // =======================================================================
