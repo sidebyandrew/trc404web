@@ -50,9 +50,10 @@ export default function Tab2Asset() {
     // const tgInitData = {user: {id: 5499157826, username: ""}};
 
     function log404(msg: any) {
-        try {
+        if (logMsg404) {
             setLogMsg404(logMsg404 + " ," + JSON.stringify(msg));
-        } catch (err) {
+        } else {
+            setLogMsg404(JSON.stringify(msg));
         }
     }
 
@@ -68,7 +69,9 @@ export default function Tab2Asset() {
                 logUrl = urlWithParams;
                 const response = await fetch(urlWithParams);
                 if (!response.ok) {
-                    log404("fetch API, network response was not ok" + urlWithParams);
+                    log404(urlBase);
+                    log404(tgId);
+                    log404(tgUsername);
                     return;
                 }
                 const responseData = await response.json<Result404>();

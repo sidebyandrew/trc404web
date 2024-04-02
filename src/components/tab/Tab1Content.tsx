@@ -19,8 +19,7 @@ import {
     FAIR_MINT_PERIOD,
     isMainnet,
     roundAccumulatedOffset,
-    t404_jetton_master_address,
-    t404_jetton_master_address_raw
+    t404_jetton_master_address
 } from "@/constant/trc404_config";
 import {Skeleton} from "@/components/ui/skeleton";
 import {
@@ -69,7 +68,7 @@ function buildTx(amount: number, mintInfo: MintInfo): SendTransactionRequest {
         validUntil: Math.floor(Date.now() / 1000) + 600,
         messages: [
             {
-                address: t404_jetton_master_address_raw,
+                address: t404_jetton_master_address,
                 amount: String(BASE_NANO_NUMBER * mintPrice * amount),
             },
         ],
@@ -101,7 +100,11 @@ export default function Tab1Content() {
 
     function log404(msg: any) {
         try {
-            setLogMsg404(logMsg404 + " ," + JSON.stringify(msg));
+            if (logMsg404) {
+                setLogMsg404(logMsg404 + " ," + JSON.stringify(msg));
+            } else {
+                setLogMsg404(JSON.stringify(msg));
+            }
         } catch (err) {
         }
     }
@@ -371,7 +374,7 @@ export default function Tab1Content() {
                 <AccordionItem value="1">
                     <AccordionTrigger>What is TRC-404?</AccordionTrigger>
                     <AccordionContent>
-                        <p className="text-gray-400 indent-6">TRC-404 is an creative, mixed Jetton & NFT
+                        <p className="text-gray-400 indent-6">TRC-404 is an innovative, mixed Jetton & NFT
                             implementation
                             with
                             native liquidity and
