@@ -232,7 +232,7 @@ export default function Tab1Content() {
 
 
     return (
-        < div className="px-4 justify-center items-center">
+        < div className="px-3 justify-center items-center">
             {/* Carousel*/}
             <Carousel className="  px-1 justify-center items-center" plugins={[
                 Autoplay({

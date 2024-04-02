@@ -2,6 +2,7 @@ import React, {CSSProperties, useEffect, useState} from 'react';
 import {beginCell, TonClient, TupleItem} from "@ton/ton";
 import {
     BASE_NANO_NUMBER,
+    BASE_URL,
     ENDPOINT_MAINNET_RPC,
     ENDPOINT_TESTNET_RPC,
     isMainnet,
@@ -11,7 +12,16 @@ import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
 
 import {Address} from "@ton/core";
 import {useTonWallet} from "@tonconnect/ui-react";
-import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 import Image from "next/image";
 import {BeatLoader} from "react-spinners";
 import {CHAIN} from "@tonconnect/sdk";
@@ -63,8 +73,7 @@ export default function Tab2Asset() {
             try {
                 let tgId = tgInitData?.user?.id;
                 let tgUsername = tgInitData?.user?.username;
-                let urlBase = "https://trc404web.pages.dev";
-                // let url = "https://trc404web.pages.dev";
+                let urlBase = BASE_URL;
                 let urlWithParams = `${urlBase}/api/user?tgId=${tgId}&tgUsername=${tgUsername}&access404=error_code_404`;
                 logUrl = urlWithParams;
                 const response = await fetch(urlWithParams);
@@ -75,6 +84,7 @@ export default function Tab2Asset() {
                     return;
                 }
                 const responseData = await response.json<Result404>();
+                log404(responseData.success + "-" + responseData.code);
                 if (responseData.success && responseData.code == REF_USER_LIST_FOUND) {
                     let {count} = responseData.result;
                     setUserData(count);
@@ -128,8 +138,6 @@ export default function Tab2Asset() {
                         Address.parse(t404_jetton_master_address), 'get_wallet_address', stack);
                     let jetton_master_result = master_tx.stack;
                     let jettonWalletAddress = jetton_master_result.readAddress();
-
-                    console.info(jettonWalletAddress.toString({testOnly: true}))
                     const jetton_wallet_tx = await client.runMethod(
                         jettonWalletAddress, 'get_wallet_data');
                     let jetton_wallet_result = jetton_wallet_tx.stack;
@@ -179,6 +187,7 @@ export default function Tab2Asset() {
                     let nftCollAddress = nft_collection_address.toString({bounceable: true, testOnly: false});
                     setNftCollection(nftCollAddress);
 
+                    log404("jetton:" + jettonBalance + ",NFT:" + owned_nft_number);
                 } catch (error) {
                     setJettonBalance("-");
                     setJettonLoading(false);
@@ -218,7 +227,7 @@ export default function Tab2Asset() {
     }
 
     return (
-        <div className="p-6">
+        <div className="p-3">
             {/*  Points  */}
             <div className="mt-2 text-xl font-bold">404 Honor Points</div>
             <Table>
@@ -254,6 +263,11 @@ export default function Tab2Asset() {
                         </TableCell>
                     </TableRow>
                 </TableBody>
+                <TableFooter>
+                    <TableRow>
+                        <TableCell colSpan={4}></TableCell>
+                    </TableRow>
+                </TableFooter>
             </Table>
             {/*  Points End */}
 
@@ -290,6 +304,11 @@ export default function Tab2Asset() {
                         <TableCell className="text-center">-</TableCell>
                     </TableRow>
                 </TableBody>
+                <TableFooter>
+                    <TableRow>
+                        <TableCell colSpan={4}></TableCell>
+                    </TableRow>
+                </TableFooter>
             </Table>
 
 
@@ -339,6 +358,11 @@ export default function Tab2Asset() {
                         </TableCell>
                     </TableRow>
                 </TableBody>
+                <TableFooter>
+                    <TableRow>
+                        <TableCell colSpan={4}></TableCell>
+                    </TableRow>
+                </TableFooter>
             </Table>
             <div className="flex justify-end mr-2">
                 <Popover>
