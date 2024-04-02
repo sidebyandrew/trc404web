@@ -1,10 +1,21 @@
 "use client";
 import React, {useState} from "react";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
-import {Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {useToast} from "@/components/ui/use-toast";
+import {ToastAction} from "@/components/ui/toast";
 
 const orders = [
     {
@@ -38,7 +49,9 @@ const orders = [
 ]
 
 export default function Tab3Marketplace() {
+
     const [logMsg404, setLogMsg404] = useState("");
+    const {toast} = useToast();
 
     function log404(msg: any) {
         if (logMsg404) {
@@ -61,12 +74,23 @@ export default function Tab3Marketplace() {
                 </TabsList>
                 <TabsContent value="listed" className="">
                     <div className="  ">
-                        <Button variant="blue" className="flex ml-auto">New Order</Button>
+                        <Button variant="blue" className="flex ml-auto"
+
+                                onClick={() => {
+                                    toast({
+                                        title: "Building ",
+                                        description: "This feature is under construction, stay tuned!",
+                                        action: (
+                                            <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+                                        ),
+                                    })
+                                }}
+                        >New Order</Button>
                     </div>
 
                     {/*  orders  */}
                     <Table>
-
+                        <TableCaption>Building, under construction...</TableCaption>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>#</TableHead>
@@ -88,6 +112,15 @@ export default function Tab3Marketplace() {
                                     <TableCell className="ml-auto">
                                         <Button
                                             variant={"outline"}
+                                            onClick={() => {
+                                                toast({
+                                                    title: "Building ",
+                                                    description: "This feature is under construction, stay tuned!",
+                                                    action: (
+                                                        <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+                                                    ),
+                                                })
+                                            }}
                                         >
                                             Buy</Button>
                                     </TableCell>
@@ -106,6 +139,7 @@ export default function Tab3Marketplace() {
                 </TabsContent>
                 <TabsContent value="myOrders">
                     <Table>
+                        <TableCaption>Building, under construction...</TableCaption>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>#</TableHead>
@@ -125,6 +159,15 @@ export default function Tab3Marketplace() {
                                     <TableCell className="">
                                         <Button
                                             variant={"outline"}
+                                            onClick={() => {
+                                                toast({
+                                                    title: "Building ",
+                                                    description: "This feature is under construction, stay tuned!",
+                                                    action: (
+                                                        <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+                                                    ),
+                                                })
+                                            }}
                                         >
                                             Cancel</Button>
                                     </TableCell>
@@ -142,6 +185,7 @@ export default function Tab3Marketplace() {
                 </TabsContent>
                 <TabsContent value="history">
                     <Table>
+                        <TableCaption>Building, under construction...</TableCaption>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>#</TableHead>
