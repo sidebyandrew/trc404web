@@ -79,7 +79,7 @@ export async function queryUserListByRefTgId(
     // @ts-ignore
     let d1Response = await db404()
         .prepare(
-            "select * from TrcUser where refTgId=? order by createDt desc limit 10",
+            "select * from TrcUser where refTgId=?",
         )
         .bind(refTgId)
         .all();
