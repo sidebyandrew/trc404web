@@ -134,23 +134,7 @@ export default function Tab2Asset() {
                         jettonWalletAddress, 'get_wallet_data');
                     let jetton_wallet_result = jetton_wallet_tx.stack;
 
-                    // ds~load_coins(),      ;; jetton_balance
-                    // ds~load_msg_addr(),    ;; owner_address
-                    // ds~load_msg_addr(),    ;;jetton_master_address
-                    // ds~load_ref(),        ;; jetton_wallet_code
-                    // ds~load_msg_addr(),   ;;nft_collection_address
-                    // ds~load_dict(),        ;;owned_nft_dict
-                    // ds~load_uint(64)         ;;owned_nft_number
-                    // let jetton_balance_bigint = jetton_wallet_result.readBigNumber();
-                    // let owner_address = jetton_wallet_result.readAddress();
-                    // let jetton_master_address = jetton_wallet_result.readAddress();
-                    // let jetton_wallet_code = jetton_wallet_result.readCell();
-                    // let nft_collection_address = jetton_wallet_result.readAddress();
-                    // let owned_nft_dict = jetton_wallet_result.readCellOpt();
-                    // let owned_nft_number = jetton_wallet_result.readBigNumber();
 
-
-                    //
                     // ds~load_coins(),    ;; jetton_balance
                     // ds~load_msg_addr(),    ;; owner_address
                     // ds~load_msg_addr(),    ;;jetton_master_address
@@ -159,7 +143,6 @@ export default function Tab2Asset() {
                     // let owner_address = jetton_wallet_result.readAddress();
                     // let jetton_master_address = jetton_wallet_result.readAddress();
                     // let jetton_wallet_code = jetton_wallet_result.readCell();
-
                     // ds~load_ref(),       ;; nft_item_code
                     // let nft_item_code = jetton_wallet_result.readCell();
                     // ds~load_msg_addr(),   ;;nft_collection_address
@@ -185,14 +168,6 @@ export default function Tab2Asset() {
                     let pending_reduce_jetton_balance = jetton_wallet_result.readBigNumber();
                     let pending_burn_nft_queue = jetton_wallet_result.readCellOpt();
 
-
-                    // console.info(
-                    //     "jetton_balance_bigint=", jetton_balance_bigint,
-                    //     "owner_address=", owner_address,
-                    //     "jetton_master_address=", jetton_master_address,
-                    //     "nft_collection_address=", nft_collection_address,
-                    //     "owned_nft_dict=", owned_nft_dict,
-                    //     "owned_nft_number=", owned_nft_number);
 
                     let jettonBalance: string = Number(Number(jetton_balance_bigint) / BASE_NANO_NUMBER).toFixed(3)
                     setJettonBalance(jettonBalance);
@@ -374,20 +349,14 @@ export default function Tab2Asset() {
                 </Popover>
             </div>
 
-            {/*<div className={"text-yellow-500 text-xl"}>*/}
-            {/*    <div className=" text-center pt-10">*/}
-            {/*        {isMainnet && wallet?.account.chain == CHAIN.TESTNET && "Warning: Need to Connect Mainnet."}*/}
-            {/*        {!isMainnet && wallet?.account.chain == CHAIN.MAINNET && "Warning: Need to Connect Testnet."}*/}
-            {/*    </div>*/}
-            {/*</div>*/}
 
+            <div className="flex w-full flex-col pb-20">&nbsp;</div>
             <div className="mt-20 mb-20 text-gray-600 text-center">
                 <Popover>
                     <PopoverTrigger className="text-gray-400">It takes money to make money....</PopoverTrigger>
                     <PopoverContent>{logMsg404}
                     </PopoverContent>
                 </Popover>
-
             </div>
         </div>
     );
