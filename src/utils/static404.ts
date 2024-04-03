@@ -1,4 +1,5 @@
 export const USER_FOUND = "USER_FOUND";
+export const USER_COUNT_FOUND = "USER_COUNT_FOUND";
 export const USER_NOT_FOUND = "USER_NOT_FOUND";
 export const REF_USER_LIST_FOUND = "REF_USER_LIST_FOUND";
 export const USER_CREATED = "USER_CREATED";
