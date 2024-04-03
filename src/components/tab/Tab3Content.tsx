@@ -81,7 +81,7 @@ export default function Tab3Marketplace() {
                                         title: "Building ",
                                         description: "This feature is under construction, stay tuned!",
                                         action: (
-                                            <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+                                            <ToastAction altText="Goto schedule to undo">OK</ToastAction>
                                         ),
                                     })
                                 }}
@@ -117,7 +117,7 @@ export default function Tab3Marketplace() {
                                                     title: "Building ",
                                                     description: "This feature is under construction, stay tuned!",
                                                     action: (
-                                                        <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+                                                        <ToastAction altText="Goto schedule to undo">OK</ToastAction>
                                                     ),
                                                 })
                                             }}
@@ -164,7 +164,7 @@ export default function Tab3Marketplace() {
                                                     title: "Building ",
                                                     description: "This feature is under construction, stay tuned!",
                                                     action: (
-                                                        <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+                                                        <ToastAction altText="Goto schedule to undo">OK</ToastAction>
                                                     ),
                                                 })
                                             }}
