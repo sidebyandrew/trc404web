@@ -1,6 +1,13 @@
 import {getRequestContext} from '@cloudflare/next-on-pages'
 import {v4 as uuidv4} from 'uuid';
-import {REF_USER_LIST_FOUND, Result404, User404, USER_CREATED, USER_CREATED_WITH_REF} from './static404';
+import {
+    REF_USER_LIST_FOUND,
+    Result404,
+    User404,
+    USER_COUNT_FOUND,
+    USER_CREATED,
+    USER_CREATED_WITH_REF
+} from './static404';
 import {USER_FOUND} from "@/utils/static404";
 
 
@@ -38,6 +45,25 @@ export async function queryUser(tgId: string): Promise<Result404> {
     return result;
 }
 
+
+export async function queryUserCount(): Promise<Result404> {
+    let result: Result404 = {
+        success: false,
+        code: '',
+        msg: '',
+    };
+    // @ts-ignore
+    let d1Response = await db404().prepare('select count(tgId) as userCount from TrcUser').bind(tgId).all();
+    if (d1Response.success) {
+        result.success = d1Response.success;
+        if (d1Response.results.length >= 1) {
+            result.code = USER_COUNT_FOUND;
+            let {userCount} = d1Response.results[0];
+            result.result = userCount as number;
+        }
+    }
+    return result;
+}
 
 export async function queryUserByRefCode(refCode: string): Promise<Result404> {
     let result: Result404 = {

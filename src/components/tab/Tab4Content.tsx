@@ -1,7 +1,10 @@
 "use client";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card"
 import {Badge} from "@/components/ui/badge";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {BASE_URL} from "@/constant/trc404_config";
+import {Result404, USER_COUNT_FOUND} from "@/utils/static404";
 
 interface Project {
     title: string;
@@ -81,6 +84,44 @@ let projectList: Project[] = [
 ]
 
 export default function Tab4Bridge() {
+    const [logMsg404, setLogMsg404] = useState("");
+    const [userData, setUserData] = useState(null);
+    useEffect(() => {
+        async function fetchData() {
+            let logUrl;
+            try {
+                let urlBase = BASE_URL;
+                let urlWithParams = `${urlBase}/api/user/count?access404=error_code_404`;
+                logUrl = urlWithParams;
+                const response = await fetch(urlWithParams);
+                if (!response.ok) {
+                    log404(urlBase);
+                    return;
+                }
+                const responseData = await response.json<Result404>();
+                log404(responseData.success + "-" + responseData.code);
+                if (responseData.success && responseData.code == USER_COUNT_FOUND) {
+                    let {count} = responseData.result;
+                    setUserData(count);
+                }
+            } catch (error) {
+                if (error instanceof Error) {
+                    log404(logUrl + "" + error.message);
+                }
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        fetchData();
+    }, []);
+
+    function log404(msg: any) {
+        if (logMsg404) {
+            setLogMsg404(logMsg404 + " ," + JSON.stringify(msg));
+        } else {
+            setLogMsg404(JSON.stringify(msg));
+        }
+    }
 
     return (
         <div className="p-3">
@@ -115,7 +156,17 @@ export default function Tab4Bridge() {
 
             </div>
 
-            <div className="mt-20 mb-20 text-gray-600 text-center">Endless...</div>
+            <div className="mt-20 mb-20 text-gray-600 text-center">&nbsp;</div>
+            <div className="mt-20  text-gray-600 text-center">
+                <Popover>
+                    <PopoverTrigger className="text-gray-400">Endless...</PopoverTrigger>
+                    <PopoverContent
+                        className={"w-[300px] break-all"}>
+                        <div className={"break-all"}>{logMsg404}</div>
+                    </PopoverContent>
+                </Popover>
+            </div>
+            <div className="flex w-full flex-col pb-10">&nbsp;</div>
         </div>
     );
 };
