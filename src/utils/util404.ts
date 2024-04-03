@@ -53,7 +53,7 @@ export async function queryUserCount(): Promise<Result404> {
         msg: '',
     };
     // @ts-ignore
-    let d1Response = await db404().prepare('select count(tgId) as userCount from TrcUser').bind(tgId).all();
+    let d1Response = await db404().prepare('select count(tgId) as userCount from TrcUser').all();
     if (d1Response.success) {
         result.success = d1Response.success;
         if (d1Response.results.length >= 1) {

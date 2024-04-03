@@ -99,7 +99,7 @@ export default function Tab4Bridge() {
                     return;
                 }
                 const responseData = await response.json<Result404>();
-                log404(responseData.success + "-" + responseData.code);
+                log404(responseData.success + "-");
                 if (responseData.success && responseData.code == USER_COUNT_FOUND) {
                     let {count} = responseData.result;
                     setUserData(count);
@@ -162,7 +162,7 @@ export default function Tab4Bridge() {
                     <PopoverTrigger className="text-gray-400">Endless...</PopoverTrigger>
                     <PopoverContent
                         className={"w-[300px] break-all"}>
-                        <div className={"break-all"}>{logMsg404}</div>
+                        <div className={"break-all"}>{logMsg404}{userData}</div>
                     </PopoverContent>
                 </Popover>
             </div>
