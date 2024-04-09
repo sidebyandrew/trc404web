@@ -16,6 +16,7 @@ import {Badge} from "@/components/ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {useToast} from "@/components/ui/use-toast";
 import {ToastAction} from "@/components/ui/toast";
+import {useRouter} from "next/navigation";
 
 const orders = [
     {
@@ -49,6 +50,7 @@ const orders = [
 ]
 
 export default function Tab3Marketplace() {
+    const router = useRouter();
 
     const [logMsg404, setLogMsg404] = useState("");
     const {toast} = useToast();
@@ -75,15 +77,8 @@ export default function Tab3Marketplace() {
                 <TabsContent value="listed" className="">
                     <div className="  ">
                         <Button variant="blue" className="flex ml-auto"
-
                                 onClick={() => {
-                                    toast({
-                                        title: "Building ",
-                                        description: "This feature is under construction, stay tuned!",
-                                        action: (
-                                            <ToastAction altText="Goto schedule to undo">OK</ToastAction>
-                                        ),
-                                    })
+                                    router.push('/pink/');
                                 }}
                         >New Order</Button>
                     </div>

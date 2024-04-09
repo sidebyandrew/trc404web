@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS PinkSellOrder
     pinkMarketAddress  TEXT,
     totalAmount INTEGER,
     unitPriceInTon INTEGER,
+    feeNumerator INTEGER,
+    feeDenominator INTEGER,
     orderType TEXT,
     orderMode TEXT,
     status    TEXT,
@@ -48,8 +50,8 @@ CREATE TABLE IF NOT EXISTS PinkBuyOrder(
     modifyBy  TEXT,
     modifyDt INTEGER
 );
-CREATE INDEX IF NOT EXISTS idx_pink_buy_order_ext_id ON PinkSellOrder(extBizId);
-CREATE INDEX IF NOT EXISTS idx_pink_buy_order_sell_id ON PinkSellOrder(sellOrderId);
-CREATE INDEX IF NOT EXISTS idx_pink_buy_order_buyer_id ON PinkSellOrder(buyerTgId);
-CREATE INDEX IF NOT EXISTS idx_pink_buy_order_buyer_add_id ON PinkSellOrder(buyerTgId,buyerAddress);
-CREATE INDEX IF NOT EXISTS idx_pink_buy_order_buyer_status ON PinkSellOrder(status);
+CREATE INDEX IF NOT EXISTS idx_pink_buy_order_ext_id ON PinkBuyOrder(extBizId);
+CREATE INDEX IF NOT EXISTS idx_pink_buy_order_sell_id ON PinkBuyOrder(sellOrderId);
+CREATE INDEX IF NOT EXISTS idx_pink_buy_order_buyer_id ON PinkBuyOrder(buyerTgId);
+CREATE INDEX IF NOT EXISTS idx_pink_buy_order_buyer_add_id ON PinkBuyOrder(buyerTgId,buyerAddress);
+CREATE INDEX IF NOT EXISTS idx_pink_buy_order_buyer_status ON PinkBuyOrder(status);
