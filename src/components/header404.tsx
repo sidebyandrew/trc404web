@@ -1,10 +1,14 @@
 import Image from 'next/image';
 import {TonConnectButton} from "@tonconnect/ui-react";
 import React from "react";
+import {useRouter} from "next/navigation";
 
 export default function Header404() {
+    const router = useRouter();
     return (
-        <div className="flex justify-between p-2 ">
+        <div className="flex justify-between p-2" onClick={() => {
+            router.push('/');
+        }}>
             <div className="flex gap-1">
                 <Image
                     alt="trc-404 logo"
