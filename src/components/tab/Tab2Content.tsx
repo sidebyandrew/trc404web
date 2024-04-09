@@ -29,11 +29,7 @@ import {Button} from "@/components/ui/button";
 import {ToastAction} from "@/components/ui/toast";
 import {useToast} from "@/components/ui/use-toast";
 import {REF_USER_LIST_FOUND, Result404} from "@/utils/static404";
-import {useInitData} from "@tma.js/sdk-react";
 
-function delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 const override: CSSProperties = {
     display: "block",

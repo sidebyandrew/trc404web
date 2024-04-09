@@ -1,5 +1,4 @@
 import type {NextRequest} from 'next/server'
-import {db404} from "@/utils/util404";
 
 export const runtime = 'edge'
 
@@ -8,13 +7,8 @@ export async function GET(request: NextRequest) {
     try {
         // If you did not use `DB` as your binding name, change it here
         // @ts-ignore
-        const {results} = await db404().prepare(
-            "SELECT * FROM Customers WHERE CompanyName = ?"
-        )
-            .bind("Bs Beverages")
-            .all();
-        
-        return Response.json(results);
+
+        return Response.json({});
     } catch (error) {
         console.info(error)
         return Response.json(error);

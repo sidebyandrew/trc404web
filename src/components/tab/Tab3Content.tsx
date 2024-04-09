@@ -78,7 +78,7 @@ export default function Tab3Marketplace() {
                     <div className="  ">
                         <Button variant="blue" className="flex ml-auto"
                                 onClick={() => {
-                                    router.push('/pink/');
+                                    router.push('/pink/order_form');
                                 }}
                         >New Order</Button>
                     </div>

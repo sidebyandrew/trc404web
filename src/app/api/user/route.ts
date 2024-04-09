@@ -1,5 +1,5 @@
 import {REF_USER_LIST_FOUND, Result404, User404, USER_CREATED, USER_FOUND, USER_NOT_FOUND} from '@/utils/static404';
-import {createUser, queryUser, queryUserListByRefTgId,} from '@/utils/util404';
+import {createUser, queryUser, queryUserListByRefTgId,} from '@/utils/db404';
 
 export const runtime = 'edge'
 
