@@ -37,6 +37,7 @@ import Link from "next/link";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious,} from "@/components/ui/carousel"
 import {Card, CardContent} from "@/components/ui/card";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {log404} from "@/utils/util404";
 
 
 interface MintInfo {
@@ -98,16 +99,6 @@ export default function Tab1Content() {
     const isDesktop = useMediaQuery("(min-width: 768px)")
     const [logMsg404, setLogMsg404] = useState("");
 
-    function log404(msg: any) {
-        try {
-            if (logMsg404) {
-                setLogMsg404(logMsg404 + " ," + JSON.stringify(msg));
-            } else {
-                setLogMsg404(JSON.stringify(msg));
-            }
-        } catch (err) {
-        }
-    }
 
     const handleIncrement = () => {
         if (mintAmount < 5) {
@@ -193,7 +184,7 @@ export default function Tab1Content() {
 
                 setMintInfo(mintInfo);
                 setTx(buildTx(1, mintInfo));
-                log404(mintInfo);
+                log404(mintInfo, logMsg404, setLogMsg404);
 
                 // console.log('get_jetton_data freemint_current_supply :', freemint_current_supply,
                 //     ',freemint_max_supply:', freemint_max_supply, ",freemint_price", freemint_price,
@@ -215,8 +206,8 @@ export default function Tab1Content() {
                     ',progressRate:', mintInfo.progressRate,
                     ',fetchFormRemote:', mintInfo.fetchFormRemote
                 );
-                log404(error);
-                log404(mintInfo);
+                log404(error, logMsg404, setLogMsg404);
+                log404(mintInfo, logMsg404, setLogMsg404);
                 setRpcErrorInfo({isRpcError: true, errorMsg: "error"});
             }
         };
@@ -224,7 +215,7 @@ export default function Tab1Content() {
         // Only execute fetchData if running in the browser
         if (typeof window !== "undefined") {
             fetchData().catch(r => {
-                log404("Sorry, I need window to run." + r);
+                log404("Sorry, I need window to run." + r, logMsg404, setLogMsg404);
                 console.error("Sorry, I need window to run." + r)
             });
         }

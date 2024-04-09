@@ -55,13 +55,6 @@ export default function Tab3Marketplace() {
     const [logMsg404, setLogMsg404] = useState("");
     const {toast} = useToast();
 
-    function log404(msg: any) {
-        if (logMsg404) {
-            setLogMsg404(logMsg404 + " ," + JSON.stringify(msg));
-        } else {
-            setLogMsg404(JSON.stringify(msg));
-        }
-    }
 
     return (
         <div className="p-3">

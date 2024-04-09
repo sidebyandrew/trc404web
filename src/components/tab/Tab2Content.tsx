@@ -29,6 +29,7 @@ import {Button} from "@/components/ui/button";
 import {ToastAction} from "@/components/ui/toast";
 import {useToast} from "@/components/ui/use-toast";
 import {REF_USER_LIST_FOUND, Result404} from "@/utils/static404";
+import {log404} from "@/utils/util404";
 
 
 const override: CSSProperties = {
@@ -55,13 +56,6 @@ export default function Tab2Asset() {
 
     // const tgInitData = {user: {id: 5499157826, username: ""}};
 
-    function log404(msg: any) {
-        if (logMsg404) {
-            setLogMsg404(logMsg404 + " ," + JSON.stringify(msg));
-        } else {
-            setLogMsg404(JSON.stringify(msg));
-        }
-    }
 
     useEffect(() => {
         async function fetchData() {
@@ -74,20 +68,20 @@ export default function Tab2Asset() {
                 logUrl = urlWithParams;
                 const response = await fetch(urlWithParams);
                 if (!response.ok) {
-                    log404(urlBase);
-                    log404(tgId);
-                    log404(tgUsername);
+                    log404(urlBase, logMsg404, setLogMsg404);
+                    log404(tgId, logMsg404, setLogMsg404);
+                    log404(tgUsername, logMsg404, setLogMsg404);
                     return;
                 }
                 const responseData = await response.json<Result404>();
-                log404(responseData.success + "-" + responseData.code);
+                log404(responseData.success + "-" + responseData.code, logMsg404, setLogMsg404);
                 if (responseData.success && responseData.code == REF_USER_LIST_FOUND) {
                     let {count} = responseData.result;
                     setUserData(count);
                 }
             } catch (error) {
                 if (error instanceof Error) {
-                    log404(logUrl + "" + error.message);
+                    log404(logUrl + "" + error.message, logMsg404, setLogMsg404);
                 }
                 console.error('Error fetching data:', error);
             }
@@ -183,13 +177,13 @@ export default function Tab2Asset() {
                     let nftCollAddress = nft_collection_address.toString({bounceable: true, testOnly: false});
                     setNftCollection(nftCollAddress);
 
-                    log404("jetton:" + jettonBalance + ",NFT:" + owned_nft_number);
+                    log404("jetton:" + jettonBalance + ",NFT:" + owned_nft_number, logMsg404, setLogMsg404);
                 } catch (error) {
                     setJettonBalance("-");
                     setJettonLoading(false);
                     setNftCount("-");
                     setNftLoading(false);
-                    log404("Error fetching data:")
+                    log404("Error fetching data:", logMsg404, setLogMsg404)
                     console.error('Error: Fail to fetch data from TON RPC.');
                 }
             };

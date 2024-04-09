@@ -5,6 +5,7 @@ import {Badge} from "@/components/ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {BASE_URL} from "@/constant/trc404_config";
 import {Result404, USER_COUNT_FOUND} from "@/utils/static404";
+import {log404} from "@/utils/util404";
 
 interface Project {
     title: string;
@@ -95,18 +96,18 @@ export default function Tab4Bridge() {
                 logUrl = urlWithParams;
                 const response = await fetch(urlWithParams);
                 if (!response.ok) {
-                    log404(urlBase);
+                    log404(urlBase, logMsg404, setLogMsg404);
                     return;
                 }
                 const responseData = await response.json<Result404>();
-                log404(responseData.success + "-");
+                log404(responseData.success + "-", logMsg404, setLogMsg404);
                 if (responseData.success && responseData.code == USER_COUNT_FOUND) {
                     let {count} = responseData.result;
                     setUserData(count);
                 }
             } catch (error) {
                 if (error instanceof Error) {
-                    log404(logUrl + "" + error.message);
+                    log404(logUrl + "" + error.message, logMsg404, setLogMsg404);
                 }
                 console.error('Error fetching data:', error);
             }
@@ -115,13 +116,6 @@ export default function Tab4Bridge() {
         fetchData();
     }, []);
 
-    function log404(msg: any) {
-        if (logMsg404) {
-            setLogMsg404(logMsg404 + " ," + JSON.stringify(msg));
-        } else {
-            setLogMsg404(JSON.stringify(msg));
-        }
-    }
 
     return (
         <div className="p-3">
