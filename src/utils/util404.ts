@@ -34,3 +34,31 @@ export function generateRefCode(username: string): string {
 
     return "T404_" + refCode;
 }
+
+
+export function addressTrim(str: any): string {
+    if (!str) {
+        return "";
+    }
+    if (str.length <= 8) {
+        return str;
+    } else {
+        const start = str.substring(0, 4);
+        const end = str.substring(str.length - 4);
+        return `${start}...${end}`;
+    }
+}
+
+
+export function calculateTotal(amount: any, unit: any): string {
+    if (!amount || !unit) {
+        return "";
+    }
+
+    if (typeof amount == "number" && typeof unit == "number") {
+        const result = amount * unit;
+        return parseFloat(result.toFixed(2)) + "";
+    } else {
+        return "";
+    }
+}

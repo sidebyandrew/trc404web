@@ -1,6 +1,7 @@
 import {getRequestContext} from '@cloudflare/next-on-pages'
 import {
     PINK_SELL_ORDER_CREATE,
+    PINK_SELL_ORDER_LIST_FOUND,
     REF_USER_LIST_FOUND,
     USER_COUNT_FOUND,
     USER_CREATED,
@@ -189,9 +190,33 @@ export async function createSellOrder(order: SellOrderInfo): Promise<Result404> 
 
     let d1Response: D1Response = await db404().prepare(
         'INSERT INTO PinkSellOrder (sellOrderId,extBizId,sellerTgId,sellerAddress,sellerT404Address,pinkMarketAddress,pinkOrderSaleAddress,sellAmount,unitPriceInTon,feeNumerator,feeDenominator,orderType,orderMode,status,createBy,createDt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
-        .bind(sellOrderId, order.extBizId, order.sellerTgId, order.sellerWalletAddress, order.sellerT404WalletAddress, order.pinkMarketAddress, order.pinkOrderSaleAddress, order.sellT404Amount, order.sellUnitPrice, order.feeNumerator, order.feeDenominator, orderType, orderMode, status, order.sellerTgId, current).run();
+        .bind(sellOrderId, order.extBizId, order.sellerTgId, order.sellerAddress, order.sellerT404Address, order.pinkMarketAddress, order.pinkOrderSaleAddress, order.sellAmount, order.unitPriceInTon, order.feeNumerator, order.feeDenominator, orderType, orderMode, status, order.sellerTgId, current).run();
     result.success = d1Response.success;
     result.code = PINK_SELL_ORDER_CREATE;
+    return result;
+}
+
+
+export async function queryListedSellOrder(): Promise<Result404> {
+    let result: Result404 = {success: false, code: "", msg: "",};
+
+    // @ts-ignore
+    let d1Response = await db404()
+        .prepare(
+            "select * from PinkSellOrder order by unitPriceInTon limit 20",
+        )
+        .all();
+    if (d1Response.success) {
+        result.success = d1Response.success;
+        if (d1Response.results.length >= 1) {
+            result.code = PINK_SELL_ORDER_LIST_FOUND;
+            let user404List: SellOrderInfo[] = [];
+            for (const record of d1Response.results) {
+                user404List.push(record as SellOrderInfo);
+            }
+            result.result = user404List;
+        }
+    }
     return result;
 }
 

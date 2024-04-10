@@ -23,6 +23,7 @@ import {
 import {v4 as uuidv4} from "uuid";
 import {log404} from "@/utils/util404";
 import {SellOrderInfo} from "@/utils/interface404";
+import {useRouter} from "next/navigation";
 
 function generateUnique64BitInteger(): string {
     // 生成 UUID，并去除横杠
@@ -38,27 +39,26 @@ function buildTx(order: SellOrderInfo): SendTransactionRequest {
     let op_deploy_pink_order_sale = 0x86c24f54;
     let forward_amount = "0.085";
 
-    if (order.isFullData
-        && order.sellUnitPrice
+    if (
+        order.unitPriceInTon
         && order.extBizId
-        && order.sellT404Amount
-        && order.sellerT404WalletAddress
-        && order.orderGasFee
+        && order.sellAmount
+        && order.sellerT404Address
         && order.pinkMarketAddress
-        && order.sellerWalletAddress
+        && order.sellerAddress
     ) {
         let forward_payload = beginCell()
             .storeUint(op_deploy_pink_order_sale, 32)
-            .storeCoins(toNano(order.sellUnitPrice)) //token_price
+            .storeCoins(toNano(order.unitPriceInTon)) //token_price
             .storeUint(BigInt(order.extBizId), 64) //必须确保 external_order_id 全局唯一
             .endCell().beginParse();
 
         let body = beginCell()
             .storeUint(op_transfer_ft, 32)  //op_code
             .storeUint(BigInt(order.extBizId), 64)  //query_id
-            .storeCoins(toNano(order.sellT404Amount)) // the T404 jetton_amount you want to transfer
+            .storeCoins(toNano(order.sellAmount)) // the T404 jetton_amount you want to transfer
             .storeAddress(Address.parse(order.pinkMarketAddress))    //to_address, pink_market_address
-            .storeAddress(Address.parse(order.sellerWalletAddress))  //response_destination
+            .storeAddress(Address.parse(order.sellerAddress))  //response_destination
             .storeBit(false)    //no custom payload
             .storeCoins(toNano(forward_amount))    //forward amount 0.085
             .storeSlice(forward_payload)   // forward payload
@@ -71,8 +71,8 @@ function buildTx(order: SellOrderInfo): SendTransactionRequest {
             validUntil: Math.floor(Date.now() / 1000) + 600,
             messages: [
                 {
-                    address: order.sellerT404WalletAddress,
-                    amount: "" + toNano(order.orderGasFee),
+                    address: order.sellerT404Address,
+                    amount: "" + toNano(pink_mkt_create_sell_order_gas_fee),
                     payload: bodyBase64,
                 },
             ],
@@ -83,19 +83,18 @@ function buildTx(order: SellOrderInfo): SendTransactionRequest {
             messages: [],
         };
     }
-
-
 }
 
 
 export default function Page({params}: { params: { lang: string } }) {
+    const router = useRouter();
 
     /* todo remove tma */
     // const tgInitData = useInitData();
     //
     const tgInitData = {user: {id: 5499157826, username: ""}};
 
-    let initOrder: SellOrderInfo = {isFullData: false};
+    let initOrder: SellOrderInfo = {};
     const [sellOrderInfo, setSellOrderInfo] = useState<SellOrderInfo>(initOrder);
     const [tx, setTx] = useState(buildTx(sellOrderInfo));
     const wallet = useTonWallet();
@@ -148,14 +147,14 @@ export default function Page({params}: { params: { lang: string } }) {
 
 
                 console.info("1", loginWalletAddress)
-                let initOrder: SellOrderInfo = {isFullData: true};
+                let initOrder: SellOrderInfo = {};
                 initOrder.pinkMarketAddress = pink_market_address;
-                initOrder.sellerWalletAddress = Address.parse(loginWalletAddress).toString();
+                initOrder.sellerAddress = Address.parse(loginWalletAddress).toString();
 
-                initOrder.sellerT404WalletAddress = jettonWalletAddress.toString();
-                initOrder.orderGasFee = pink_mkt_create_sell_order_gas_fee;
-                initOrder.sellT404Amount = values.sellAmount;
-                initOrder.sellUnitPrice = values.unitPrice;
+                initOrder.sellerT404Address = jettonWalletAddress.toString();
+
+                initOrder.sellAmount = values.sellAmount;
+                initOrder.unitPriceInTon = values.unitPrice;
                 let extBizId = generateUnique64BitInteger();
                 console.info("extBizId", extBizId)
                 initOrder.extBizId = extBizId;
@@ -163,7 +162,7 @@ export default function Page({params}: { params: { lang: string } }) {
                 // pink order sale address
                 let order_sale_init_data = beginCell()
                     .storeAddress(Address.parse(initOrder.pinkMarketAddress)) // ;;marketplace_address
-                    .storeAddress(Address.parse(initOrder.sellerWalletAddress)) //;; owner_address
+                    .storeAddress(Address.parse(initOrder.sellerAddress)) //;; owner_address
                     .storeUint(BigInt(initOrder.extBizId), 64) //;; order_id
                     .endCell();
                 let pink_order_sale = Cell.fromBase64(pink_order_sale_code_base64);
@@ -206,7 +205,7 @@ export default function Page({params}: { params: { lang: string } }) {
                 let sendTransactionRequest = buildTx(initOrder);
                 setTx(sendTransactionRequest);
                 tonConnectUi.sendTransaction(sendTransactionRequest).catch(e => {
-                    console.error(e)
+                    setLogMsg404(e);
                 });
             } else {
                 if (!tonConnectUi.connected) {
@@ -259,7 +258,13 @@ export default function Page({params}: { params: { lang: string } }) {
                             </FormItem>
                         )}
                     />
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit" variant={'blue'}>Submit</Button>
+                    <Button variant={'outline'} className="ml-3" type="button"
+                            onClick={() => {
+                                router.back()
+                            }}
+                    >
+                        Back</Button>
                 </form>
             </Form>
         </div>

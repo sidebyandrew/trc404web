@@ -68,12 +68,11 @@ export default function Tab2Asset() {
                     tgUsername = "" + tgId;
                 }
 
-                let urlBase = BASE_URL;
-                let urlWithParams = `${urlBase}/api/user?tgId=${tgId}&tgUsername=${tgUsername}&access404=error_code_404`;
+                let urlWithParams = `${BASE_URL}/api/user?tgId=${tgId}&tgUsername=${tgUsername}&access404=error_code_404`;
                 logUrl = urlWithParams;
                 const response = await fetch(urlWithParams);
                 if (!response.ok) {
-                    log404(urlBase, logMsg404, setLogMsg404);
+                    log404(BASE_URL, logMsg404, setLogMsg404);
                     log404(tgId, logMsg404, setLogMsg404);
                     log404(tgUsername, logMsg404, setLogMsg404);
                     return;

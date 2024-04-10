@@ -15,19 +15,27 @@ export interface Result404 {
     result?: any;
 }
 
-
 export interface SellOrderInfo {
-    isFullData: boolean;
+    sellOrderId?: string;
     pinkMarketAddress?: string;
-    sellerWalletAddress?: string;
-    sellerT404WalletAddress?: string;
+    sellerAddress?: string;
+    sellerT404Address?: string;
     pinkOrderSaleAddress?: string;
-    orderGasFee?: number;
-    sellT404Amount?: number;
-    sellUnitPrice?: number;
+    
+    sellAmount?: number;
+    unitPriceInTon?: number;
     extBizId?: string;
     sellerTgId?: string;
     sellerTgUsername?: string;
     feeNumerator?: number;
     feeDenominator?: number;
+    orderType?: string;
+    orderMode?: string;
+    status?: string;
+    extInfo?: string;
+    traceId?: string;
+    createBy?: string;
+    createDt?: number;
+    modifyBy?: string;
+    modifyDt?: number;
 }

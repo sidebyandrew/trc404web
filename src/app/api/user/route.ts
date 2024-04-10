@@ -12,7 +12,8 @@ export async function GET(request: Request) {
         let tgUsername = searchParams.get('tgUsername');
         let access404 = searchParams.get('access404');
         if (access404 != "error_code_404") {
-            throw new Error("access denied.");
+            result404.code = "ERROR: 404";
+            return Response.json(result404);
         }
         if (!tgUsername) {
             tgUsername = tgId;
