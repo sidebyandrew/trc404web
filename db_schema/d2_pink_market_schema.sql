@@ -3,12 +3,13 @@ DROP TABLE IF EXISTS PinkSellOrder;
 CREATE TABLE IF NOT EXISTS PinkSellOrder
 (
     sellOrderId TEXT PRIMARY KEY,
-    extBizId  INTEGER,
+    extBizId  TEXT,
     sellerTgId  TEXT,
     sellerAddress  TEXT,
     sellerT404Address  TEXT,
     pinkMarketAddress  TEXT,
-    totalAmount INTEGER,
+    pinkOrderSaleAddress TEXT,
+    sellAmount INTEGER,
     unitPriceInTon INTEGER,
     feeNumerator INTEGER,
     feeDenominator INTEGER,

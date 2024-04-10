@@ -4,8 +4,9 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/comp
 import {Badge} from "@/components/ui/badge";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {BASE_URL} from "@/constant/trc404_config";
-import {Result404, USER_COUNT_FOUND} from "@/utils/static404";
+import {USER_COUNT_FOUND} from "@/utils/static404";
 import {log404} from "@/utils/util404";
+import {Result404} from "@/utils/interface404";
 
 interface Project {
     title: string;

@@ -1,5 +1,5 @@
 import type {NextRequest} from 'next/server'
-import {Result404} from "@/utils/static404";
+import {Result404} from "@/utils/interface404";
 
 export const runtime = 'edge'
 

@@ -8,26 +8,29 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import {Input} from "@/components/ui/input"
 import {useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 import {SendTransactionRequest} from "@tonconnect/sdk";
-import {Address, toNano,} from "@ton/core";
+import {Address, Cell, contractAddress, toNano,} from "@ton/core";
 import {beginCell, TonClient, TupleItem} from "@ton/ton";
 import {
+    BASE_URL,
     ENDPOINT_MAINNET_RPC,
     ENDPOINT_TESTNET_RPC,
     isMainnet,
     pink_market_address,
     pink_mkt_create_sell_order_gas_fee,
+    pink_order_sale_code_base64,
     t404_jetton_master_address
 } from "@/constant/trc404_config";
 import {v4 as uuidv4} from "uuid";
 import {log404} from "@/utils/util404";
+import {SellOrderInfo} from "@/utils/interface404";
 
-function generateUnique64BitInteger(): bigint {
+function generateUnique64BitInteger(): string {
     // 生成 UUID，并去除横杠
     const uuid: string = uuidv4().replace(/-/g, '');
     // 取 UUID 的前 64 位
     const uuid64Bit: string = uuid.substr(0, 16);
-    // 将 16 进制字符串转换为 BigInt
-    return BigInt('0x' + uuid64Bit);
+    // 将 16 进制字符串转换为 BigInt 字符串
+    return BigInt('0x' + uuid64Bit).toString();
 }
 
 function buildTx(order: SellOrderInfo): SendTransactionRequest {
@@ -41,19 +44,21 @@ function buildTx(order: SellOrderInfo): SendTransactionRequest {
         && order.sellT404Amount
         && order.sellerT404WalletAddress
         && order.orderGasFee
+        && order.pinkMarketAddress
+        && order.sellerWalletAddress
     ) {
         let forward_payload = beginCell()
             .storeUint(op_deploy_pink_order_sale, 32)
             .storeCoins(toNano(order.sellUnitPrice)) //token_price
-            .storeUint(order.extBizId, 64) //必须确保 external_order_id 全局唯一
+            .storeUint(BigInt(order.extBizId), 64) //必须确保 external_order_id 全局唯一
             .endCell().beginParse();
 
         let body = beginCell()
             .storeUint(op_transfer_ft, 32)  //op_code
-            .storeUint(order.extBizId, 64)  //query_id
+            .storeUint(BigInt(order.extBizId), 64)  //query_id
             .storeCoins(toNano(order.sellT404Amount)) // the T404 jetton_amount you want to transfer
-            .storeAddress(order.pinkMarketAddress)    //to_address, pink_market_address
-            .storeAddress(order.sellerWalletAddress)  //response_destination
+            .storeAddress(Address.parse(order.pinkMarketAddress))    //to_address, pink_market_address
+            .storeAddress(Address.parse(order.sellerWalletAddress))  //response_destination
             .storeBit(false)    //no custom payload
             .storeCoins(toNano(forward_amount))    //forward amount 0.085
             .storeSlice(forward_payload)   // forward payload
@@ -82,18 +87,13 @@ function buildTx(order: SellOrderInfo): SendTransactionRequest {
 
 }
 
-interface SellOrderInfo {
-    isFullData: boolean;
-    pinkMarketAddress?: Address;
-    sellerWalletAddress?: Address;
-    sellerT404WalletAddress?: string;
-    orderGasFee?: number;
-    sellT404Amount?: number;
-    sellUnitPrice?: number;
-    extBizId?: bigint;
-}
 
 export default function Page({params}: { params: { lang: string } }) {
+
+    /* todo remove tma */
+    // const tgInitData = useInitData();
+    //
+    const tgInitData = {user: {id: 5499157826, username: ""}};
 
     let initOrder: SellOrderInfo = {isFullData: false};
     const [sellOrderInfo, setSellOrderInfo] = useState<SellOrderInfo>(initOrder);
@@ -126,8 +126,9 @@ export default function Page({params}: { params: { lang: string } }) {
         try {
             let loginWalletAddress = wallet?.account?.address;
             console.info("0 loginWalletAddress=", loginWalletAddress)
-            console.info("0 loginWalletAddress=", Address.parseRaw(loginWalletAddress + "").toString())
+
             if (loginWalletAddress) {
+                console.info("loginWalletAddress=", Address.parseRaw(loginWalletAddress + "").toString())
 
                 // get T404 wallet address
                 const client = new TonClient(
@@ -145,26 +146,62 @@ export default function Page({params}: { params: { lang: string } }) {
                 console.info("jettonWalletAddress", jettonWalletAddress.toString())
                 // get T404 wallet address end
 
-                // save to DB
-
-
-                // save to DB end
-
 
                 console.info("1", loginWalletAddress)
                 let initOrder: SellOrderInfo = {isFullData: true};
-                initOrder.pinkMarketAddress = Address.parse(pink_market_address);
-                initOrder.sellerWalletAddress = Address.parse(loginWalletAddress);
+                initOrder.pinkMarketAddress = pink_market_address;
+                initOrder.sellerWalletAddress = Address.parse(loginWalletAddress).toString();
+
                 initOrder.sellerT404WalletAddress = jettonWalletAddress.toString();
                 initOrder.orderGasFee = pink_mkt_create_sell_order_gas_fee;
                 initOrder.sellT404Amount = values.sellAmount;
                 initOrder.sellUnitPrice = values.unitPrice;
                 let extBizId = generateUnique64BitInteger();
                 console.info("extBizId", extBizId)
-                console.info("extBizId", extBizId)
-                console.info("extBizId", extBizId)
-                console.info("extBizId", extBizId)
                 initOrder.extBizId = extBizId;
+
+                // pink order sale address
+                let order_sale_init_data = beginCell()
+                    .storeAddress(Address.parse(initOrder.pinkMarketAddress)) // ;;marketplace_address
+                    .storeAddress(Address.parse(initOrder.sellerWalletAddress)) //;; owner_address
+                    .storeUint(BigInt(initOrder.extBizId), 64) //;; order_id
+                    .endCell();
+                let pink_order_sale = Cell.fromBase64(pink_order_sale_code_base64);
+                let state_init = {code: pink_order_sale, data: order_sale_init_data};
+                let pinkOrderSaleAddress = contractAddress(0, state_init);
+                initOrder.pinkOrderSaleAddress = pinkOrderSaleAddress.toString();
+                // pink order sale address end
+
+                // ==================== save to DB ====================
+                let tgId = tgInitData?.user?.id;
+                let tgUsername = tgInitData?.user?.username;
+                if (!tgUsername) {
+                    tgUsername = "" + tgId;
+                }
+                initOrder.sellerTgId = "" + tgId;
+                initOrder.sellerTgUsername = tgUsername;
+                initOrder.feeNumerator = 5;
+                initOrder.feeDenominator = 1000;
+
+                // let result404 = await createSellOrder(initOrder);
+                // console.log(result404)
+
+                const res = await fetch(BASE_URL + '/api/pink/sell', {
+                    method: 'POST',
+                    body: JSON.stringify(initOrder),
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                })
+                console.log(res)
+                if (res.ok) {
+                    console.log("Yeai! Call API Success.")
+                } else {
+                    console.log("Oops! Something is wrong when call API.")
+                }
+
+                // ==================== save to DB end ====================
+
 
                 let sendTransactionRequest = buildTx(initOrder);
                 setTx(sendTransactionRequest);

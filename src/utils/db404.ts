@@ -1,17 +1,17 @@
 import {getRequestContext} from '@cloudflare/next-on-pages'
 import {
+    PINK_SELL_ORDER_CREATE,
     REF_USER_LIST_FOUND,
-    Result404,
-    User404,
     USER_COUNT_FOUND,
     USER_CREATED,
     USER_CREATED_WITH_REF
 } from './static404';
 import {USER_FOUND} from "@/utils/static404";
 import {generateRefCode, uuid404} from "@/utils/util404";
+import {Result404, SellOrderInfo, User404} from "@/utils/interface404";
 
 
-export function db404() {
+function db404() {
     if (process.env.NODE_ENV === "development") {
         const {env} = getRequestContext();
         return env.DB;
@@ -171,4 +171,28 @@ export async function log2db(tgId: string, opCode: string, logs: string) {
 }
 
 
+// ================  Pink Market  =========================
 
+
+export async function createSellOrder(order: SellOrderInfo): Promise<Result404> {
+    let result: Result404 = {
+        success: false,
+        code: '',
+        msg: '',
+    };
+
+    let sellOrderId = uuid404();
+    let current = Date.now();
+    let orderType = "SEPARABLE"; //SEPARABLE, INSEPARABLE
+    let orderMode = "FREE";//FREE, CUTOFF
+    let status = "INIT"; // INIT, SUBMITTED, PENDING, ONSALE, SOLD, CANCEL
+
+    let d1Response: D1Response = await db404().prepare(
+        'INSERT INTO PinkSellOrder (sellOrderId,extBizId,sellerTgId,sellerAddress,sellerT404Address,pinkMarketAddress,pinkOrderSaleAddress,sellAmount,unitPriceInTon,feeNumerator,feeDenominator,orderType,orderMode,status,createBy,createDt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+        .bind(sellOrderId, order.extBizId, order.sellerTgId, order.sellerWalletAddress, order.sellerT404WalletAddress, order.pinkMarketAddress, order.pinkOrderSaleAddress, order.sellT404Amount, order.sellUnitPrice, order.feeNumerator, order.feeDenominator, orderType, orderMode, status, order.sellerTgId, current).run();
+    result.success = d1Response.success;
+    result.code = PINK_SELL_ORDER_CREATE;
+    return result;
+}
+
+// ================  Pink Market End  =====================

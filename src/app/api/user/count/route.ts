@@ -1,5 +1,6 @@
-import {Result404, USER_COUNT_FOUND} from '@/utils/static404';
+import {USER_COUNT_FOUND} from '@/utils/static404';
 import {queryUserCount,} from '@/utils/db404';
+import {Result404} from "@/utils/interface404";
 
 export const runtime = 'edge'
 

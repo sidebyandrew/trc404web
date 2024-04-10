@@ -5,7 +5,7 @@ npx wrangler d1 create d1-trc404-prod
 # 2.1 Local
 npx wrangler d1 execute d1-trc404-prod --local --file=./ignore_schema.sql
 npx wrangler d1 execute d1-trc404-prod --local --file=./db_schema/d2_pink_market_schema.sql
-npx wrangler d1 execute d1-trc404-prod --local --command="SELECT * FROM TrcUser"
+npx wrangler d1 execute d1-trc404-prod --local --command="SELECT * FROM PinkSellOrder"
 
 
 

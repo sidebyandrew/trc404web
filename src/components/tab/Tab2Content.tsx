@@ -28,8 +28,9 @@ import {CHAIN} from "@tonconnect/sdk";
 import {Button} from "@/components/ui/button";
 import {ToastAction} from "@/components/ui/toast";
 import {useToast} from "@/components/ui/use-toast";
-import {REF_USER_LIST_FOUND, Result404} from "@/utils/static404";
+import {REF_USER_LIST_FOUND} from "@/utils/static404";
 import {log404} from "@/utils/util404";
+import {Result404} from "@/utils/interface404";
 
 
 const override: CSSProperties = {
@@ -52,9 +53,9 @@ export default function Tab2Asset() {
     const {toast} = useToast();
 
     /* todo remove tma */
-    const tgInitData = useInitData();
-
-    // const tgInitData = {user: {id: 5499157826, username: ""}};
+    // const tgInitData = useInitData();
+    //
+    const tgInitData = {user: {id: 5499157826, username: ""}};
 
 
     useEffect(() => {
@@ -63,6 +64,10 @@ export default function Tab2Asset() {
             try {
                 let tgId = tgInitData?.user?.id;
                 let tgUsername = tgInitData?.user?.username;
+                if (!tgUsername) {
+                    tgUsername = "" + tgId;
+                }
+
                 let urlBase = BASE_URL;
                 let urlWithParams = `${urlBase}/api/user?tgId=${tgId}&tgUsername=${tgUsername}&access404=error_code_404`;
                 logUrl = urlWithParams;
