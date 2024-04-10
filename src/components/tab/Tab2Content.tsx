@@ -31,6 +31,7 @@ import {useToast} from "@/components/ui/use-toast";
 import {REF_USER_LIST_FOUND} from "@/utils/static404";
 import {log404} from "@/utils/util404";
 import {Result404} from "@/utils/interface404";
+import {useInitData} from "@tma.js/sdk-react";
 
 
 const override: CSSProperties = {
@@ -53,9 +54,9 @@ export default function Tab2Asset() {
     const {toast} = useToast();
 
     /* todo remove tma */
-    // const tgInitData = useInitData();
-    //
-    const tgInitData = {user: {id: 5499157826, username: ""}};
+    const tgInitData = useInitData();
+
+    // const tgInitData = {user: {id: 5499157826, username: ""}};
 
 
     useEffect(() => {

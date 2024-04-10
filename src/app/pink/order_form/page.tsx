@@ -6,7 +6,7 @@ import {useForm} from "react-hook-form"
 import {Button} from "@/components/ui/button"
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {Input} from "@/components/ui/input"
-import {useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
+import {SendTransactionResponse, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 import {SendTransactionRequest} from "@tonconnect/sdk";
 import {Address, Cell, contractAddress, toNano,} from "@ton/core";
 import {beginCell, TonClient, TupleItem} from "@ton/ton";
@@ -24,6 +24,7 @@ import {v4 as uuidv4} from "uuid";
 import {log404} from "@/utils/util404";
 import {SellOrderInfo} from "@/utils/interface404";
 import {useRouter} from "next/navigation";
+import {useInitData} from "@tma.js/sdk-react";
 
 function generateUnique64BitInteger(): string {
     // 生成 UUID，并去除横杠
@@ -90,9 +91,9 @@ export default function Page({params}: { params: { lang: string } }) {
     const router = useRouter();
 
     /* todo remove tma */
-    // const tgInitData = useInitData();
-    //
-    const tgInitData = {user: {id: 5499157826, username: ""}};
+    const tgInitData = useInitData();
+
+    // const tgInitData = {user: {id: 5499157826, username: ""}};
 
     let initOrder: SellOrderInfo = {};
     const [sellOrderInfo, setSellOrderInfo] = useState<SellOrderInfo>(initOrder);
@@ -147,28 +148,28 @@ export default function Page({params}: { params: { lang: string } }) {
 
 
                 console.info("1", loginWalletAddress)
-                let initOrder: SellOrderInfo = {};
-                initOrder.pinkMarketAddress = pink_market_address;
-                initOrder.sellerAddress = Address.parse(loginWalletAddress).toString();
+                let order: SellOrderInfo = {};
+                order.pinkMarketAddress = pink_market_address;
+                order.sellerAddress = Address.parse(loginWalletAddress).toString();
 
-                initOrder.sellerT404Address = jettonWalletAddress.toString();
+                order.sellerT404Address = jettonWalletAddress.toString();
 
-                initOrder.sellAmount = values.sellAmount;
-                initOrder.unitPriceInTon = values.unitPrice;
+                order.sellAmount = values.sellAmount;
+                order.unitPriceInTon = values.unitPrice;
                 let extBizId = generateUnique64BitInteger();
                 console.info("extBizId", extBizId)
-                initOrder.extBizId = extBizId;
+                order.extBizId = extBizId;
 
                 // pink order sale address
                 let order_sale_init_data = beginCell()
-                    .storeAddress(Address.parse(initOrder.pinkMarketAddress)) // ;;marketplace_address
-                    .storeAddress(Address.parse(initOrder.sellerAddress)) //;; owner_address
-                    .storeUint(BigInt(initOrder.extBizId), 64) //;; order_id
+                    .storeAddress(Address.parse(order.pinkMarketAddress)) // ;;marketplace_address
+                    .storeAddress(Address.parse(order.sellerAddress)) //;; owner_address
+                    .storeUint(BigInt(order.extBizId), 64) //;; order_id
                     .endCell();
                 let pink_order_sale = Cell.fromBase64(pink_order_sale_code_base64);
                 let state_init = {code: pink_order_sale, data: order_sale_init_data};
                 let pinkOrderSaleAddress = contractAddress(0, state_init);
-                initOrder.pinkOrderSaleAddress = pinkOrderSaleAddress.toString();
+                order.pinkOrderSaleAddress = pinkOrderSaleAddress.toString();
                 // pink order sale address end
 
                 // ==================== save to DB ====================
@@ -177,17 +178,14 @@ export default function Page({params}: { params: { lang: string } }) {
                 if (!tgUsername) {
                     tgUsername = "" + tgId;
                 }
-                initOrder.sellerTgId = "" + tgId;
-                initOrder.sellerTgUsername = tgUsername;
-                initOrder.feeNumerator = 5;
-                initOrder.feeDenominator = 1000;
-
-                // let result404 = await createSellOrder(initOrder);
-                // console.log(result404)
+                order.sellerTgId = "" + tgId;
+                order.sellerTgUsername = tgUsername;
+                order.feeNumerator = 5;
+                order.feeDenominator = 1000;
 
                 const res = await fetch(BASE_URL + '/api/pink/sell', {
                     method: 'POST',
-                    body: JSON.stringify(initOrder),
+                    body: JSON.stringify(order),
                     headers: {
                         'content-type': 'application/json'
                     }
@@ -202,11 +200,19 @@ export default function Page({params}: { params: { lang: string } }) {
                 // ==================== save to DB end ====================
 
 
-                let sendTransactionRequest = buildTx(initOrder);
+                let sendTransactionRequest = buildTx(order);
                 setTx(sendTransactionRequest);
-                tonConnectUi.sendTransaction(sendTransactionRequest).catch(e => {
-                    setLogMsg404(e);
-                });
+                let sellTx: SendTransactionResponse = await tonConnectUi.sendTransaction(sendTransactionRequest);
+                let txCells = Cell.fromBoc(Buffer.from(sellTx.boc, 'base64'));
+                console.info(txCells)
+                if (txCells && txCells[0]) {
+                    let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=ONSALE&access404=error_code_404`;
+                    const response = await fetch(urlWithParams);
+                    if (!response.ok) {
+                        log404("ONSALE", logMsg404, setLogMsg404);
+                        return;
+                    }
+                }
             } else {
                 if (!tonConnectUi.connected) {
                     return tonConnectUi.openModal();

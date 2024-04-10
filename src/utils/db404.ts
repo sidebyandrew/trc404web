@@ -2,6 +2,7 @@ import {getRequestContext} from '@cloudflare/next-on-pages'
 import {
     PINK_SELL_ORDER_CREATE,
     PINK_SELL_ORDER_LIST_FOUND,
+    PINK_SELL_ORDER_UPDATED,
     REF_USER_LIST_FOUND,
     USER_COUNT_FOUND,
     USER_CREATED,
@@ -186,7 +187,7 @@ export async function createSellOrder(order: SellOrderInfo): Promise<Result404> 
     let current = Date.now();
     let orderType = "SEPARABLE"; //SEPARABLE, INSEPARABLE
     let orderMode = "FREE";//FREE, CUTOFF
-    let status = "INIT"; // INIT, SUBMITTED, PENDING, ONSALE, SOLD, CANCEL
+    let status = "INIT"; // INIT, SUBMITTED, PENDING, ONSALE, SOLD, CANCELED
 
     let d1Response: D1Response = await db404().prepare(
         'INSERT INTO PinkSellOrder (sellOrderId,extBizId,sellerTgId,sellerAddress,sellerT404Address,pinkMarketAddress,pinkOrderSaleAddress,sellAmount,unitPriceInTon,feeNumerator,feeDenominator,orderType,orderMode,status,createBy,createDt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
@@ -197,15 +198,30 @@ export async function createSellOrder(order: SellOrderInfo): Promise<Result404> 
 }
 
 
-export async function queryListedSellOrder(): Promise<Result404> {
+export async function queryListedSellOrder(tgId?: string, history?: string): Promise<Result404> {
     let result: Result404 = {success: false, code: "", msg: "",};
+    let d1Response;
+    if (tgId) {
+        // INIT, SUBMITTED, PENDING, ONSALE, SOLD, CANCELED
+        let sql = "select * from PinkSellOrder where sellerTgId=? and status not in('INIT','SOLD','CANCELED')   order by unitPriceInTon limit 20";
 
-    // @ts-ignore
-    let d1Response = await db404()
-        .prepare(
-            "select * from PinkSellOrder order by unitPriceInTon limit 20",
-        )
-        .all();
+        if (history) {
+            sql = "select * from PinkSellOrder where sellerTgId=?  order by unitPriceInTon limit 20";
+        }
+        d1Response = await db404()
+            .prepare(
+                sql,
+            ).bind(tgId)
+            .all();
+
+
+    } else {
+        d1Response = await db404()
+            .prepare(
+                "select * from PinkSellOrder where status = 'ONSALE' order by unitPriceInTon limit 20",
+            )
+            .all();
+    }
     if (d1Response.success) {
         result.success = d1Response.success;
         if (d1Response.results.length >= 1) {
@@ -219,5 +235,23 @@ export async function queryListedSellOrder(): Promise<Result404> {
     }
     return result;
 }
+
+
+export async function updateSellOrderStatus(tgId: string, extBizId: string, status: string): Promise<Result404> {
+    let result: Result404 = {
+        success: false,
+        code: '',
+        msg: '',
+    };
+    // @ts-ignore
+    let current = Date.now();
+    let d1Response = await db404().prepare('update PinkSellOrder set status=?,modifyBy=?,modifyDt=? where extBizId=?').bind(status, tgId, current, extBizId).all();
+    if (d1Response.success) {
+        result.success = d1Response.success;
+        result.code = PINK_SELL_ORDER_UPDATED;
+    }
+    return result;
+}
+
 
 // ================  Pink Market End  =====================
