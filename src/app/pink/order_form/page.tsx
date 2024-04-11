@@ -10,6 +10,15 @@ import {SendTransactionResponse, useTonConnectUI, useTonWallet} from "@tonconnec
 import {SendTransactionRequest} from "@tonconnect/sdk";
 import {Address, Cell, contractAddress, toNano,} from "@ton/core";
 import {beginCell, TonClient, TupleItem} from "@ton/ton";
+import {Alert, AlertDescription, AlertTitle,} from "@/components/ui/alert"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import {
     BASE_URL,
     ENDPOINT_MAINNET_RPC,
@@ -24,7 +33,7 @@ import {v4 as uuidv4} from "uuid";
 import {log404} from "@/utils/util404";
 import {SellOrderInfo} from "@/utils/interface404";
 import {useRouter} from "next/navigation";
-import {ReloadIcon} from "@radix-ui/react-icons";
+import {CheckIcon, ReloadIcon} from "@radix-ui/react-icons";
 
 function generateUnique64BitInteger(): string {
     const uuid: string = uuidv4().replace(/-/g, '');
@@ -98,6 +107,7 @@ export default function Page({params}: { params: { lang: string } }) {
     const wallet = useTonWallet();
     const [tonConnectUi] = useTonConnectUI();
     const [processing, setProcessing] = useState(false)
+    const [submitted, setSubmitted] = useState(false)
     const [logMsg404, setLogMsg404] = useState("");
 
     const formSchema = z.object({
@@ -215,6 +225,7 @@ export default function Page({params}: { params: { lang: string } }) {
                         log404("ONSALE", logMsg404, setLogMsg404);
                         return;
                     }
+                    setSubmitted(true);
                 }
             } else {
                 if (!tonConnectUi.connected) {
@@ -235,55 +246,95 @@ export default function Page({params}: { params: { lang: string } }) {
 
     return (
         <div className={"px-6"}>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    <FormField
-                        control={form.control}
-                        name="sellAmount"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Sell Amount</FormLabel>
-                                <FormControl>
-                                    <Input type="number" placeholder="" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                    How many T404 you want to sell.
-                                </FormDescription>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="unitPrice"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Unit Price in Toncoin</FormLabel>
-                                <FormControl>
-                                    <Input type="number" placeholder="" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                    How much is a T404 for Toncoin?
-                                </FormDescription>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-                    <Button type="submit" variant={'blue'} disabled={processing}>
-                        {processing && <ReloadIcon className="mr-2 h-4 w-4 animate-spin"/>}
-                        Submit</Button>
-                    <Button disabled={processing}
+            <Breadcrumb className="pb-3">
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                    </BreadcrumbItem>
 
-                            variant={'outline'}
-                            className="ml-3" type="button"
-                            onClick={() => {
-                                router.back()
-                            }}
-                    >
+                    <BreadcrumbSeparator/>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/#tab3">Pink Market</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator/>
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>New Sell Order</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+            {!submitted &&
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                        <FormField
+                            control={form.control}
+                            name="sellAmount"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Sell Amount</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" placeholder="" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                        How many T404 you want to sell.
+                                    </FormDescription>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="unitPrice"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Unit Price in Toncoin</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" placeholder="" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                        How much is a T404 for Toncoin?
+                                    </FormDescription>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <Button type="submit" variant={'blue'} disabled={processing}>
+                            {processing && <ReloadIcon className="mr-2 h-4 w-4 animate-spin"/>}
+                            Submit</Button>
+                        <Button disabled={processing}
 
-                        Back</Button>
-                </form>
-            </Form>
+                                variant={'outline'}
+                                className="ml-3" type="button"
+                                onClick={() => {
+                                    router.push("/#tab3")
+                                }}
+                        >
+
+                            Back</Button>
+                    </form>
+                </Form>}
+
+            {submitted && <div className="h-full my-auto ">
+                <div className="mt-36"></div>
+                <Alert>
+                    <CheckIcon className="h-4 w-4"/>
+                    <AlertTitle>Congratulation!</AlertTitle>
+                    <AlertDescription>
+                        Your order submitted successfully.
+                    </AlertDescription>
+                </Alert>
+                <div className="mt-5"></div>
+
+                <Button disabled={processing}
+                        variant={'blue'}
+                        className="ml-3" type="button"
+                        onClick={() => {
+                            router.push("/#tab3")
+                        }}
+                >
+
+                    Back to Market
+                </Button>
+            </div>}
         </div>
     );
 }

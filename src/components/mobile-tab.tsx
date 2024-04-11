@@ -1,5 +1,5 @@
 // MobileTab.tsx
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 interface MobileTabProps {
     onTabChange: (tab: string) => void;
@@ -12,7 +12,16 @@ const MobileTab: React.FC<MobileTabProps> = ({onTabChange}) => {
         setActiveTab(tab);
         onTabChange(tab);
     };
-
+    useEffect(() => {
+        const hash = window.location.hash;
+        if (hash === '#tab1') {
+            handleTabClick('tab1');
+        } else if (hash === '#tab2') {
+            handleTabClick('tab2');
+        } else if (hash === '#tab3') {
+            handleTabClick('tab3');
+        }
+    }, []);
 
     return (
         <>
