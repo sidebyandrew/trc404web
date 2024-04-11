@@ -18,14 +18,13 @@ import {useToast} from "@/components/ui/use-toast";
 import {ToastAction} from "@/components/ui/toast";
 import {useRouter} from "next/navigation";
 import {BASE_URL, pink_mkt_cancel_sell_order_gas_fee} from "@/constant/trc404_config";
-import {addressTrim, calculateTotal, log404} from "@/utils/util404";
+import {addressTrim, calculateTotal, decimalFriendly, log404} from "@/utils/util404";
 import {Result404, SellOrderInfo} from "@/utils/interface404";
 import {PINK_SELL_ORDER_LIST_FOUND} from "@/utils/static404";
 import {useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 import {Address, Cell, toNano} from "@ton/core";
 import {SendTransactionRequest} from "@tonconnect/sdk";
 import {beginCell} from "@ton/ton";
-import {useInitData} from "@tma.js/sdk-react";
 
 const orders = [
     {

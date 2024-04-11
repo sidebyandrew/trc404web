@@ -24,7 +24,7 @@ import {v4 as uuidv4} from "uuid";
 import {log404} from "@/utils/util404";
 import {SellOrderInfo} from "@/utils/interface404";
 import {useRouter} from "next/navigation";
-import {useInitData} from "@tma.js/sdk-react";
+import {ReloadIcon} from "@radix-ui/react-icons";
 
 function generateUnique64BitInteger(): string {
     // 生成 UUID，并去除横杠
