@@ -293,7 +293,7 @@ export default function Tab2Asset() {
                                 aria-label="Loading Spinner"
                                 data-testid="loader"
                             />
-                            {jettonBalance}
+                            {decimalFriendly(jettonBalance)}
                         </TableCell>
                         <TableCell className="text-center">-</TableCell>
                     </TableRow>

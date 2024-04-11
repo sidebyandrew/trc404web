@@ -166,7 +166,7 @@ export default function Tab3Marketplace() {
             && order.sellerAddress && wallet?.account?.address
         ) {
             if (Address.parse(order.sellerAddress).equals(Address.parse(wallet?.account?.address))) {
-                quickToast("Oops", "You cannot buy your order. Try to cancel it?");
+                quickToast("Oops", "You cannot buy your own order. Do you want to cancel it?");
                 return;
             }
 
@@ -305,8 +305,8 @@ export default function Tab3Marketplace() {
                                     <TableCell className="">{index + 1}</TableCell>
                                     <TableCell
                                         className="font-extralight text-sm">{addressTrim(order.sellerAddress)}</TableCell>
-                                    <TableCell>{order.sellAmount}</TableCell>
-                                    <TableCell>{order.unitPriceInTon}</TableCell>
+                                    <TableCell>{decimalFriendly(order.sellAmount)}</TableCell>
+                                    <TableCell>{decimalFriendly(order.unitPriceInTon)}</TableCell>
                                     <TableCell
                                         className="">{calculateTotal(order.sellAmount, order.unitPriceInTon)}</TableCell>
                                     <TableCell className="ml-auto">
@@ -352,8 +352,8 @@ export default function Tab3Marketplace() {
                             {mySellOrderList.map((order, index) => (
                                 <TableRow key={index}>
                                     <TableCell className="">{index + 1}</TableCell>
-                                    <TableCell>{order.sellAmount}</TableCell>
-                                    <TableCell>{order.unitPriceInTon}</TableCell>
+                                    <TableCell>{decimalFriendly(order.sellAmount)}</TableCell>
+                                    <TableCell>{decimalFriendly(order.unitPriceInTon)}</TableCell>
                                     <TableCell
                                         className="">{calculateTotal(order.sellAmount, order.unitPriceInTon)}</TableCell>
                                     <TableCell className="">
@@ -397,8 +397,10 @@ export default function Tab3Marketplace() {
                             {historySellOrderList.map((order, index) => (
                                 <TableRow key={index}>
                                     <TableCell className="">{index + 1}</TableCell>
-                                    <TableCell>{order.sellAmount}</TableCell>
-                                    <TableCell>{order.unitPriceInTon}</TableCell>
+                                    <TableCell>{decimalFriendly(order.sellAmount)}</TableCell>
+                                    <TableCell>{decimalFriendly(order.unitPriceInTon)}</TableCell>
+                                    <TableCell
+                                        className="">{calculateTotal(order.sellAmount, order.unitPriceInTon)}</TableCell>
                                     <TableCell className="">
                                         <Badge
                                             variant={order.status == 'CANCELED' ? 'destructive' : 'secondary'}>{order.status}</Badge>

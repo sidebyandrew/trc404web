@@ -27,11 +27,8 @@ import {useRouter} from "next/navigation";
 import {ReloadIcon} from "@radix-ui/react-icons";
 
 function generateUnique64BitInteger(): string {
-    // 生成 UUID，并去除横杠
     const uuid: string = uuidv4().replace(/-/g, '');
-    // 取 UUID 的前 64 位
     const uuid64Bit: string = uuid.substr(0, 16);
-    // 将 16 进制字符串转换为 BigInt 字符串
     return BigInt('0x' + uuid64Bit).toString();
 }
 
@@ -100,6 +97,7 @@ export default function Page({params}: { params: { lang: string } }) {
     const [tx, setTx] = useState(buildTx(sellOrderInfo));
     const wallet = useTonWallet();
     const [tonConnectUi] = useTonConnectUI();
+    const [processing, setProcessing] = useState(false)
     const [logMsg404, setLogMsg404] = useState("");
 
     const formSchema = z.object({
@@ -115,6 +113,7 @@ export default function Page({params}: { params: { lang: string } }) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {sellAmount: 1, unitPrice: 1},
+        // defaultValues: {sellAmount: 1, unitPrice: 1},
     })
 
     // 2. Define a submit handler.
@@ -124,6 +123,7 @@ export default function Page({params}: { params: { lang: string } }) {
         console.log(values)
 
         try {
+            setProcessing(true);
             let loginWalletAddress = wallet?.account?.address;
             console.info("0 loginWalletAddress=", loginWalletAddress)
 
@@ -150,7 +150,10 @@ export default function Page({params}: { params: { lang: string } }) {
                 console.info("1", loginWalletAddress)
                 let order: SellOrderInfo = {};
                 order.pinkMarketAddress = pink_market_address;
-                order.sellerAddress = Address.parse(loginWalletAddress).toString();
+                order.sellerAddress = Address.parse(loginWalletAddress).toString({
+                    bounceable: false,
+                    testOnly: !isMainnet
+                });
 
                 order.sellerT404Address = jettonWalletAddress.toString();
 
@@ -220,7 +223,9 @@ export default function Page({params}: { params: { lang: string } }) {
                     console.error("  connected, but not have wallet address?????????????")
                 }
             }
+            setProcessing(false);
         } catch (error) {
+            setProcessing(false);
             if (error instanceof Error) {
                 log404("" + error.message, logMsg404, setLogMsg404);
             }
@@ -264,12 +269,18 @@ export default function Page({params}: { params: { lang: string } }) {
                             </FormItem>
                         )}
                     />
-                    <Button type="submit" variant={'blue'}>Submit</Button>
-                    <Button variant={'outline'} className="ml-3" type="button"
+                    <Button type="submit" variant={'blue'} disabled={processing}>
+                        {processing && <ReloadIcon className="mr-2 h-4 w-4 animate-spin"/>}
+                        Submit</Button>
+                    <Button disabled={processing}
+
+                            variant={'outline'}
+                            className="ml-3" type="button"
                             onClick={() => {
                                 router.back()
                             }}
                     >
+
                         Back</Button>
                 </form>
             </Form>
