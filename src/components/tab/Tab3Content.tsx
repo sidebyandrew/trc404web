@@ -17,7 +17,7 @@ import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {useToast} from "@/components/ui/use-toast";
 import {ToastAction} from "@/components/ui/toast";
 import {useRouter} from "next/navigation";
-import {BASE_URL, pink_mkt_cancel_sell_order_gas_fee} from "@/constant/trc404_config";
+import {BASE_URL, isMainnet, pink_mkt_cancel_sell_order_gas_fee} from "@/constant/trc404_config";
 import {addressTrim, calculateTotal, decimalFriendly, log404} from "@/utils/util404";
 import {Result404, SellOrderInfo} from "@/utils/interface404";
 import {PINK_SELL_ORDER_LIST_FOUND} from "@/utils/static404";
@@ -66,6 +66,8 @@ export default function Tab3Marketplace() {
     const router = useRouter();
     const wallet = useTonWallet();
     const [tonConnectUi] = useTonConnectUI();
+    const [jettonWallet, setJettonWallet] = useState("");
+    let [jettonLoading, setJettonLoading] = useState(true);
 
     const [sellOrderList, setSellOrderList] = useState<SellOrderInfo[]>([]);
     const [mySellOrderList, setMySellOrderList] = useState<SellOrderInfo[]>([]);
@@ -107,17 +109,26 @@ export default function Tab3Marketplace() {
             let logUrl;
 
             try {
-                let tgId = tgInitData?.user?.id;
-                let urlWithParams = `${BASE_URL}/api/pink/my_orders?tgId=${tgId}&access404=error_code_404`;
-                const response = await fetch(urlWithParams);
-                if (!response.ok) {
-                    log404(urlWithParams, logMsg404, setLogMsg404);
-                    return;
-                }
-                const responseData = await response.json<Result404>();
-                log404(responseData.success + "-" + responseData.code, logMsg404, setLogMsg404);
-                if (responseData.success && responseData.code == PINK_SELL_ORDER_LIST_FOUND) {
-                    setMySellOrderList(responseData.result)
+                let loginWallet = wallet?.account?.address;
+                console.info("0 loginWalletAddress=", loginWallet)
+                if (loginWallet) {
+                    let loginWalletAddress = Address.parse(loginWallet).toString({
+                        bounceable: false,
+                        testOnly: !isMainnet
+                    });
+
+                    let tgId = tgInitData?.user?.id;
+                    let urlWithParams = `${BASE_URL}/api/pink/my_orders?tgId=${tgId}&loginWalletAddress=${loginWalletAddress}&access404=error_code_404`;
+                    const response = await fetch(urlWithParams);
+                    if (!response.ok) {
+                        log404(urlWithParams, logMsg404, setLogMsg404);
+                        return;
+                    }
+                    const responseData = await response.json<Result404>();
+                    log404(responseData.success + "-" + responseData.code, logMsg404, setLogMsg404);
+                    if (responseData.success && responseData.code == PINK_SELL_ORDER_LIST_FOUND) {
+                        setMySellOrderList(responseData.result)
+                    }
                 }
             } catch (error) {
                 if (error instanceof Error) {
@@ -135,17 +146,26 @@ export default function Tab3Marketplace() {
             let logUrl;
 
             try {
-                let tgId = tgInitData?.user?.id;
-                let urlWithParams = `${BASE_URL}/api/pink/history?tgId=${tgId}&access404=error_code_404`;
-                const response = await fetch(urlWithParams);
-                if (!response.ok) {
-                    log404(urlWithParams, logMsg404, setLogMsg404);
-                    return;
-                }
-                const responseData = await response.json<Result404>();
-                log404(responseData.success + "-" + responseData.code, logMsg404, setLogMsg404);
-                if (responseData.success && responseData.code == PINK_SELL_ORDER_LIST_FOUND) {
-                    setHistorySellOrderList(responseData.result)
+                let loginWallet = wallet?.account?.address;
+                console.info("0 loginWalletAddress=", loginWallet)
+                if (loginWallet) {
+                    let loginWalletAddress = Address.parse(loginWallet).toString({
+                        bounceable: false,
+                        testOnly: !isMainnet
+                    });
+
+                    let tgId = tgInitData?.user?.id;
+                    let urlWithParams = `${BASE_URL}/api/pink/history?tgId=${tgId}&loginWalletAddress=${loginWalletAddress}&access404=error_code_404`;
+                    const response = await fetch(urlWithParams);
+                    if (!response.ok) {
+                        log404(urlWithParams, logMsg404, setLogMsg404);
+                        return;
+                    }
+                    const responseData = await response.json<Result404>();
+                    log404(responseData.success + "-" + responseData.code, logMsg404, setLogMsg404);
+                    if (responseData.success && responseData.code == PINK_SELL_ORDER_LIST_FOUND) {
+                        setHistorySellOrderList(responseData.result)
+                    }
                 }
             } catch (error) {
                 if (error instanceof Error) {

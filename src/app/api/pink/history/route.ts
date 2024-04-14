@@ -8,6 +8,7 @@ export async function GET(request: Request) {
     try {
         const {searchParams} = new URL(request.url);
         const tgId = searchParams.get('tgId');
+        const loginWalletAddress = searchParams.get('loginWalletAddress');
         let access404 = searchParams.get('access404');
         if (access404 != "error_code_404") {
             result404.code = "ERROR: 404";
@@ -17,8 +18,12 @@ export async function GET(request: Request) {
             result404.code = "ERROR: tgId 404";
             return Response.json(result404);
         }
+        if (!loginWalletAddress) {
+            result404.code = "ERROR: Login WalletAddress 404";
+            return Response.json(result404);
+        }
 
-        let queryRes = await queryListedSellOrder(tgId, "history");
+        let queryRes = await queryListedSellOrder(tgId, loginWalletAddress, "history");
         return Response.json(queryRes);
     } catch (error) {
         if (error instanceof Error) {

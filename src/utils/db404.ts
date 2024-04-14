@@ -198,23 +198,21 @@ export async function createSellOrder(order: SellOrderInfo): Promise<Result404> 
 }
 
 
-export async function queryListedSellOrder(tgId?: string, history?: string): Promise<Result404> {
+export async function queryListedSellOrder(tgId?: string, loginWalletAddress?: string, history?: string): Promise<Result404> {
     let result: Result404 = {success: false, code: "", msg: "",};
     let d1Response;
-    if (tgId) {
+    if (tgId && loginWalletAddress) {
         // INIT, SUBMITTED, PENDING, ONSALE, SOLD, CANCELED
-        let sql = "select * from PinkSellOrder where sellerTgId=? and status not in('INIT','SOLD','CANCELED')   order by unitPriceInTon limit 20";
+        let sql = "select * from PinkSellOrder where sellerTgId=? and sellerAddress=? and status not in('INIT','SOLD','CANCELED') order by unitPriceInTon limit 20";
 
         if (history) {
-            sql = "select * from PinkSellOrder where sellerTgId=?  order by unitPriceInTon limit 20";
+            sql = "select * from PinkSellOrder where sellerTgId=? and sellerAddress=?  order by unitPriceInTon limit 20";
         }
         d1Response = await db404()
             .prepare(
                 sql,
-            ).bind(tgId)
+            ).bind(tgId, loginWalletAddress)
             .all();
-
-
     } else {
         d1Response = await db404()
             .prepare(
