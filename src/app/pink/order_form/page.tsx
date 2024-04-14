@@ -1,5 +1,5 @@
 'use client';
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {z} from "zod"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
@@ -7,7 +7,7 @@ import {Button} from "@/components/ui/button"
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {Input} from "@/components/ui/input"
 import {SendTransactionResponse, useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
-import {SendTransactionRequest} from "@tonconnect/sdk";
+import {CHAIN, SendTransactionRequest} from "@tonconnect/sdk";
 import {Address, Cell, contractAddress, toNano,} from "@ton/core";
 import {beginCell, TonClient, TupleItem} from "@ton/ton";
 import {Alert, AlertDescription, AlertTitle,} from "@/components/ui/alert"
@@ -20,6 +20,7 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import {
+    BASE_NANO_NUMBER,
     BASE_URL,
     ENDPOINT_MAINNET_RPC,
     ENDPOINT_TESTNET_RPC,
@@ -30,10 +31,15 @@ import {
     t404_jetton_master_address
 } from "@/constant/trc404_config";
 import {v4 as uuidv4} from "uuid";
-import {log404} from "@/utils/util404";
+import {decimalFriendly, log404} from "@/utils/util404";
 import {SellOrderInfo} from "@/utils/interface404";
 import {useRouter} from "next/navigation";
 import {CheckIcon, ReloadIcon} from "@radix-ui/react-icons";
+import {Table, TableBody, TableCell, TableFooter, TableRow} from "@/components/ui/table";
+import Image from "next/image";
+import {BeatLoader} from "react-spinners";
+import {ToastAction} from "@/components/ui/toast";
+import {toast} from "@/components/ui/use-toast";
 
 function generateUnique64BitInteger(): string {
     const uuid: string = uuidv4().replace(/-/g, '');
@@ -106,6 +112,9 @@ export default function Page({params}: { params: { lang: string } }) {
     const [tx, setTx] = useState(buildTx(sellOrderInfo));
     const wallet = useTonWallet();
     const [tonConnectUi] = useTonConnectUI();
+    const [jettonWallet, setJettonWallet] = useState("");
+    const [jettonBalance, setJettonBalance] = useState("");
+    let [jettonLoading, setJettonLoading] = useState(true);
     const [processing, setProcessing] = useState(false)
     const [submitted, setSubmitted] = useState(false)
     const [logMsg404, setLogMsg404] = useState("");
@@ -122,8 +131,8 @@ export default function Page({params}: { params: { lang: string } }) {
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {sellAmount: 1, unitPrice: 1},
-        // defaultValues: {sellAmount: 1, unitPrice: 1},
+        defaultValues: {},
+
     })
 
     // 2. Define a submit handler.
@@ -133,6 +142,27 @@ export default function Page({params}: { params: { lang: string } }) {
         console.log(values)
 
         try {
+            if (jettonLoading) {
+                toast({
+                    title: "WARN",
+                    description: `Please wait the app to load your T404 balance!`,
+                    action: (
+                        <ToastAction altText="Goto schedule to undo">OK</ToastAction>
+                    ),
+                });
+                return;
+            }
+            if (values.sellAmount && values.sellAmount > parseFloat(jettonBalance)) {
+                toast({
+                    title: "ERROR",
+                    description: `You cannot sell more than your balance ${jettonBalance}!`,
+                    action: (
+                        <ToastAction altText="Goto schedule to undo">OK</ToastAction>
+                    ),
+                });
+                return;
+            }
+
             setProcessing(true);
             let loginWalletAddress = wallet?.account?.address;
             console.info("0 loginWalletAddress=", loginWalletAddress)
@@ -140,24 +170,6 @@ export default function Page({params}: { params: { lang: string } }) {
             if (loginWalletAddress) {
                 console.info("loginWalletAddress=", Address.parseRaw(loginWalletAddress + "").toString())
 
-                // get T404 wallet address
-                const client = new TonClient(
-                    {
-                        endpoint: isMainnet ? ENDPOINT_MAINNET_RPC : ENDPOINT_TESTNET_RPC,
-                    });
-
-                let ownerAddressCell = beginCell().storeAddress(Address.parse(loginWalletAddress)).endCell();
-                let stack: TupleItem[] = [];
-                stack.push({type: 'slice', cell: ownerAddressCell});
-                const master_tx = await client.runMethod(
-                    Address.parse(t404_jetton_master_address), 'get_wallet_address', stack);
-                let jetton_master_result = master_tx.stack;
-                let jettonWalletAddress = jetton_master_result.readAddress();
-                console.info("jettonWalletAddress", jettonWalletAddress.toString())
-                // get T404 wallet address end
-
-
-                console.info("1", loginWalletAddress)
                 let order: SellOrderInfo = {};
                 order.pinkMarketAddress = pink_market_address;
                 order.sellerAddress = Address.parse(loginWalletAddress).toString({
@@ -165,7 +177,17 @@ export default function Page({params}: { params: { lang: string } }) {
                     testOnly: !isMainnet
                 });
 
-                order.sellerT404Address = jettonWalletAddress.toString();
+                if (!jettonWallet) {
+                    toast({
+                        title: "ERROR!",
+                        description: "Cannot find the T404 wallet address!",
+                        action: (
+                            <ToastAction altText="Goto schedule to undo">OK</ToastAction>
+                        ),
+                    });
+                    return;
+                }
+                order.sellerT404Address = jettonWallet;
 
                 order.sellAmount = values.sellAmount;
                 order.unitPriceInTon = values.unitPrice;
@@ -244,6 +266,72 @@ export default function Page({params}: { params: { lang: string } }) {
         }
     }
 
+    useEffect(() => {
+        if (wallet?.account) {
+            if (isMainnet && wallet?.account.chain == CHAIN.TESTNET) {
+                toast({
+                    title: "Warning",
+                    description: "You need to connect mainnet!",
+                    action: (
+                        <ToastAction altText="Goto schedule to undo">OK</ToastAction>
+                    ),
+                });
+                return;
+            }
+
+            if (!isMainnet && wallet?.account.chain == CHAIN.MAINNET) {
+                toast({
+                    title: "Warning",
+                    description: "You need to connect testnet!",
+                    action: (
+                        <ToastAction altText="Goto schedule to undo">OK</ToastAction>
+                    ),
+                });
+                return;
+            }
+
+            const fetchData = async () => {
+                try {
+                    const client = new TonClient(
+                        {
+                            endpoint: isMainnet ? ENDPOINT_MAINNET_RPC : ENDPOINT_TESTNET_RPC,
+                        });
+
+                    let ownerAddressCell = beginCell().storeAddress(Address.parse(wallet?.account.address)).endCell();
+                    let stack: TupleItem[] = [];
+                    stack.push({type: 'slice', cell: ownerAddressCell});
+                    const master_tx = await client.runMethod(
+                        Address.parse(t404_jetton_master_address), 'get_wallet_address', stack);
+                    let jetton_master_result = master_tx.stack;
+                    let jettonWalletAddress = jetton_master_result.readAddress();
+                    const jetton_wallet_tx = await client.runMethod(
+                        jettonWalletAddress, 'get_wallet_data');
+                    let jetton_wallet_result = jetton_wallet_tx.stack;
+                    let jetton_balance_bigint = jetton_wallet_result.readBigNumber();
+
+                    let jettonBalance: string = Number(Number(jetton_balance_bigint) / BASE_NANO_NUMBER).toFixed(3)
+                    setJettonWallet(jettonWalletAddress.toString());
+                    setJettonBalance(jettonBalance);
+                    setJettonLoading(false);
+
+
+                } catch (error) {
+                    setJettonBalance("-");
+                    setJettonLoading(false);
+                    log404("Error fetching data:", logMsg404, setLogMsg404)
+                    console.error('Error: Fail to fetch data from TON RPC.');
+                }
+            };
+
+            // Only execute fetchData if running in the browser
+            if (typeof window !== "undefined") {
+                fetchData().catch(r => {
+                    console.error("Sorry, I need window to run." + r)
+                });
+            }
+        }//if (wallet?.account){
+    }, []);
+
     return (
         <div className={"px-6"}>
             <Breadcrumb className="pb-3">
@@ -263,8 +351,38 @@ export default function Page({params}: { params: { lang: string } }) {
                 </BreadcrumbList>
             </Breadcrumb>
             {!submitted &&
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+                <Form {...form} >
+
+                    <div className=" text-xl font-bold">Your Balance</div>
+
+                    <Table>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell className="font-medium">
+                                    <Image src="/logo-circle.png" height={36} width={36}
+                                           alt="pop"/></TableCell>
+                                <TableCell>T404</TableCell>
+                                <TableCell>
+                                    <BeatLoader
+                                        color={"#ffffff"}
+                                        loading={jettonLoading}
+                                        size={12}
+                                        aria-label="Loading Spinner"
+                                        data-testid="loader"
+                                    />
+                                    {decimalFriendly(jettonBalance)}
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TableCell colSpan={4}></TableCell>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
                         <FormField
                             control={form.control}
                             name="sellAmount"
@@ -300,6 +418,7 @@ export default function Page({params}: { params: { lang: string } }) {
                         <Button type="submit" variant={'blue'} disabled={processing}>
                             {processing && <ReloadIcon className="mr-2 h-4 w-4 animate-spin"/>}
                             Submit</Button>
+
                         <Button disabled={processing}
 
                                 variant={'outline'}

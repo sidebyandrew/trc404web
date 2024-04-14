@@ -63,25 +63,23 @@ export function calculateTotal(amount: any, unit: any): string {
     }
 }
 
-export function decimalFriendly(num: any): string {
+function roundToTwoDecimalPlaces(num: number): number {
+    return Math.round(num * 100) / 100;
+}
 
+export function decimalFriendly(num: any): string {
     if (!num) {
         return '';
     }
-
     try {
         const decimalPlaces = num.toString().split('.')[1]?.length || 0;
         if (decimalPlaces === 0) {
-            // 如果是整数，则直接返回整数部分
             return num.toString();
-        } else if (decimalPlaces === 1) {
-            // 如果只有1位小数，则只显示1位小数
-            return parseFloat(num).toFixed(1);
+        } else if (decimalPlaces === 1 || decimalPlaces === 2 || decimalPlaces === 3) {
+            return roundToTwoDecimalPlaces(parseFloat(num)).toFixed(decimalPlaces);
         } else {
-            // 如果有多于1位小数，则保留最多两位小数
-            return parseFloat(num).toFixed(2);
+            return roundToTwoDecimalPlaces(parseFloat(num)).toFixed(3);
         }
-
     } catch (e) {
         console.error("decimalFriendly error:", num);
         return '';

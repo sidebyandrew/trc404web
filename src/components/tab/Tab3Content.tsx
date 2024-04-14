@@ -71,6 +71,8 @@ export default function Tab3Marketplace() {
     const [mySellOrderList, setMySellOrderList] = useState<SellOrderInfo[]>([]);
     const [historySellOrderList, setHistorySellOrderList] = useState<SellOrderInfo[]>([]);
     const [logMsg404, setLogMsg404] = useState("");
+    const [listedChanged, setListedChanged] = useState("");
+    const [myOrderChanged, setMyOrderChanged] = useState("");
     const {toast} = useToast();
 
 
@@ -98,7 +100,7 @@ export default function Tab3Marketplace() {
         }
 
         fetchData();
-    }, []);
+    }, [listedChanged]);
 
     useEffect(() => {
         async function fetchData() {
@@ -126,7 +128,7 @@ export default function Tab3Marketplace() {
         }
 
         fetchData();
-    }, []);
+    }, [myOrderChanged]);
 
     useEffect(() => {
         async function fetchData() {
@@ -195,10 +197,11 @@ export default function Tab3Marketplace() {
             console.info(txCells)
             let tgId = tgInitData?.user?.id;
             if (txCells && txCells[0] && tgId) {
-                let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=ONSALE&access404=error_code_404`;
+                let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=SOLD&access404=error_code_404`;
                 const response = await fetch(urlWithParams);
                 if (!response.ok) {
-                    log404("ONSALE", logMsg404, setLogMsg404);
+                    setListedChanged(order.extBizId);
+                    log404("SOLD", logMsg404, setLogMsg404);
                     return;
                 }
             }
@@ -236,12 +239,13 @@ export default function Tab3Marketplace() {
 
             let cancelTx = await tonConnectUi.sendTransaction(tx);
             let txCells = Cell.fromBoc(Buffer.from(cancelTx.boc, 'base64'));
-            console.info(txCells)
+
             let tgId = tgInitData?.user?.id;
             if (txCells && txCells[0] && tgId) {
                 let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=CANCELED&access404=error_code_404`;
                 const response = await fetch(urlWithParams);
                 if (!response.ok) {
+                    setMyOrderChanged(order.extBizId);
                     log404("CANCELED", logMsg404, setLogMsg404);
                     return;
                 }
