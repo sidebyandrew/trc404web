@@ -40,6 +40,7 @@ import Image from "next/image";
 import {BeatLoader} from "react-spinners";
 import {ToastAction} from "@/components/ui/toast";
 import {toast} from "@/components/ui/use-toast";
+import {useInitData} from "@tma.js/sdk-react";
 
 function generateUnique64BitInteger(): string {
     const uuid: string = uuidv4().replace(/-/g, '');

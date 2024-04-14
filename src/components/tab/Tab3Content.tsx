@@ -25,6 +25,7 @@ import {useTonConnectUI, useTonWallet} from "@tonconnect/ui-react";
 import {Address, Cell, toNano} from "@ton/core";
 import {SendTransactionRequest} from "@tonconnect/sdk";
 import {beginCell} from "@ton/ton";
+import {useInitData} from "@tma.js/sdk-react";
 
 const orders = [
     {

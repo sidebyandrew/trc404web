@@ -31,6 +31,7 @@ import {useToast} from "@/components/ui/use-toast";
 import {REF_USER_LIST_FOUND} from "@/utils/static404";
 import {decimalFriendly, log404} from "@/utils/util404";
 import {Result404} from "@/utils/interface404";
+import {useInitData} from "@tma.js/sdk-react";
 
 
 const override: CSSProperties = {
