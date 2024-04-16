@@ -1,6 +1,7 @@
 import type {NextRequest} from 'next/server'
 import {Result404, SellOrderInfo} from "@/utils/interface404";
 import {createSellOrder} from "@/utils/db404";
+import { ERROR_PINK_SELL_ORDER_POST_FAIL } from '@/utils/static404';
 
 export const runtime = 'edge'
 
@@ -13,7 +14,11 @@ export async function POST(request: NextRequest) {
         result404.success = resultDB.success;
         result404.code = resultDB.code;
     } catch (error) {
-        result404.code = 'POST SellOrderInfo Error'
+        let msg = 'ERROR_PINK_SELL_ORDER_POST_FAIL \n';
+        if (error instanceof Error) {
+            msg = msg+ error.message;
+        }
+        result404.code = ERROR_PINK_SELL_ORDER_POST_FAIL
         result404.msg = "" + error;
     }
     return Response.json(result404);

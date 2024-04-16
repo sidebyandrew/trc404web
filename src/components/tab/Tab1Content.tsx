@@ -199,6 +199,10 @@ export default function Tab1Content() {
                 // );
 
             } catch (error) {
+                let msg = 'Error: Fail to fetch data from TON RPC. \n';
+                if (error instanceof Error) {
+                    msg = msg+ error.message;
+                }
                 console.log('convert: get_jetton_data freemint_current_supply:', mintInfo.freemintCurrentSupply,
                     ',freemintMaxSupply:', mintInfo.freemintMaxSupply,
                     ",freemintTonPrice", mintInfo.freemintTonPrice,
@@ -206,9 +210,9 @@ export default function Tab1Content() {
                     ',progressRate:', mintInfo.progressRate,
                     ',fetchFormRemote:', mintInfo.fetchFormRemote
                 );
-                log404(error, logMsg404, setLogMsg404);
+                log404(msg, logMsg404, setLogMsg404);
                 log404(mintInfo, logMsg404, setLogMsg404);
-                setRpcErrorInfo({isRpcError: true, errorMsg: "error"});
+                setRpcErrorInfo({isRpcError: true, errorMsg: msg});
             }
         };
 

@@ -12,6 +12,7 @@ npx wrangler d1 execute d1-trc404-prod --local --command="SELECT * FROM PinkSell
 # 2.2 Deploy
 npx wrangler d1 execute d1-trc404-prod --file=./ignore_schema.sql
 npx wrangler d1 execute d1-trc404-prod --file=./db_schema/d2_pink_market_schema.sql
+npx wrangler d1 execute d1-trc404-prod --file=./db_schema/d2_pink_market_schema.sql
 npx wrangler d1 execute d1-trc404-prod --command="SELECT * FROM TrcUser"
 
 

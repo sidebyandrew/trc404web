@@ -107,10 +107,11 @@ export default function Tab4Bridge() {
                     setUserData(count);
                 }
             } catch (error) {
+                let msg = 'Error: /api/user/count \n';
                 if (error instanceof Error) {
-                    log404(logUrl + "" + error.message, logMsg404, setLogMsg404);
+                    msg = msg+ error.message;
                 }
-                console.error('Error fetching data:', error);
+                console.error('Error fetching data:', msg);
             }
         }
 

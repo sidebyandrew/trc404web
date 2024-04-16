@@ -169,6 +169,11 @@ export async function log2db(tgId: string, opCode: string, logs: string) {
             .bind("Bs Beverages")
             .all();
     } catch (error) {
+        let msg = 'Error: log2db \n';
+        if (error instanceof Error) {
+            msg = msg+ error.message;
+        }
+        console.error(msg)
     }
 }
 
@@ -203,7 +208,7 @@ export async function queryListedSellOrder(tgId?: string, loginWalletAddress?: s
     let d1Response;
     if (tgId && loginWalletAddress) {
         // INIT, SUBMITTED, PENDING, ONSALE, SOLD, CANCELED
-        let sql = "select * from PinkSellOrder where sellerTgId=? and sellerAddress=? and status not in('INIT','SOLD','CANCELED') order by unitPriceInTon limit 20";
+        let sql = "select * from PinkSellOrder where sellerTgId=? and sellerAddress=? and status not in('SOLD','CANCELED') order by unitPriceInTon limit 20";
 
         if (history) {
             sql = "select * from PinkSellOrder where sellerTgId=? and sellerAddress=?  order by unitPriceInTon limit 20";
@@ -247,6 +252,7 @@ export async function updateSellOrderStatus(tgId: string, extBizId: string, stat
     if (d1Response.success) {
         result.success = d1Response.success;
         result.code = PINK_SELL_ORDER_UPDATED;
+        result.msg = `extBizId=${extBizId}`;
     }
     return result;
 }
