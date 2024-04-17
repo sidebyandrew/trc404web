@@ -25,7 +25,7 @@ import {
   ENDPOINT_MAINNET_RPC,
   ENDPOINT_TESTNET_RPC,
   isMainnet,
-  pink_market_address,
+  pink_market_address, pink_market_fee_denominator, pink_market_fee_numerator,
   pink_mkt_create_sell_order_gas_fee,
   pink_order_sale_code_base64,
   t404_jetton_master_address,
@@ -225,8 +225,8 @@ export default function Page({ params }: { params: { lang: string } }) {
         }
         order.sellerTgId = '' + tgId;
         order.sellerTgUsername = tgUsername;
-        order.feeNumerator = 5;
-        order.feeDenominator = 1000;
+        order.feeNumerator = pink_market_fee_numerator;
+        order.feeDenominator = pink_market_fee_denominator;
 
         const res = await fetch(BASE_URL + '/api/pink/sell', {
           method: 'POST',
@@ -235,10 +235,7 @@ export default function Page({ params }: { params: { lang: string } }) {
             'content-type': 'application/json',
           },
         });
-        console.log(res);
-        if (res.ok) {
-          console.log('Yeai! Call API Success.');
-        } else {
+        if (!res.ok) {
           console.log('Oops! Something is wrong when call API.');
         }
 
@@ -345,6 +342,19 @@ export default function Page({ params }: { params: { lang: string } }) {
     }//if (wallet?.account){
   }, []);
 
+
+  const normalizeInput = (value: any) => {
+    if (parseFloat(value) < 0 || value === '-') {
+      return '1';
+    }
+
+    if (/\.\d{3,}/.test(value)) {
+      return parseFloat(value).toFixed(2);
+    }
+
+    return value;
+  };
+
   return (
     <div className={'px-6'} style={{
       touchAction: 'manipulation',
@@ -416,7 +426,10 @@ export default function Page({ params }: { params: { lang: string } }) {
                 <FormItem>
                   <FormLabel>Sell Amount</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="" {...field} />
+                    <Input type="number" className="text-lg" placeholder=""
+                           {...field}
+                           onChange={(e) => field.onChange(normalizeInput(e.target.value))}
+                    />
                   </FormControl>
                   <FormDescription>
                     How many T404 you want to sell.
@@ -432,7 +445,8 @@ export default function Page({ params }: { params: { lang: string } }) {
                 <FormItem>
                   <FormLabel>Unit Price in Toncoin</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="" {...field} />
+                    <Input type="number" className="text-lg" placeholder="" {...field}
+                           onChange={(e) => field.onChange(normalizeInput(e.target.value))} />
                   </FormControl>
                   <FormDescription>
                     How much is a T404 for Toncoin?

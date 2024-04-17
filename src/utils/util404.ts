@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-
+import BigNumber from 'bignumber.js';
 
 export function uuid404(): string {
   return uuidv4().replace(/-/g, '');
@@ -44,29 +44,46 @@ export function calculateTotal(amount: any, unit: any): string {
   }
 
   if (typeof amount == 'number' && typeof unit == 'number') {
-    const result = amount * unit;
-    return decimalFriendly(result);
+    let a = new BigNumber(amount);
+    let u = new BigNumber(unit);
+    let result = a.multipliedBy(u);
+    return decimalFriendly(result.toNumber());
   } else {
     return '';
   }
 }
 
 
-export function decimalFriendly(num: any): string {
-  if (!num) {
+export function decimalFriendly(input: number | string | undefined): string {
+  if (!input) {
     return '';
   }
   try {
-    const decimalPlaces = num.toString().split('.')[1]?.length || 0;
-    if (decimalPlaces === 0) {
-      return num.toString();
-    } else if (decimalPlaces === 1 || decimalPlaces === 2 || decimalPlaces === 3) {
-      return num.toString();
-    } else {
-      return num.toString();
+    const numValue: number = typeof input === 'string' ? parseFloat(input) : input;
+
+    if (isNaN(numValue)) {
+      return '';
     }
+
+    if (Number.isInteger(numValue)) {
+      return '' + numValue;
+    }
+
+    const stringValue = numValue.toString();
+    const decimalIndex = stringValue.indexOf('.');
+    if (decimalIndex !== -1) {
+      const decimalPlaces = stringValue.length - decimalIndex - 1;
+      if (decimalPlaces <= 4) {
+        return '' + numValue;
+      } else {
+        const truncatedValue = stringValue.substr(0, decimalIndex + 5);
+        return '' + parseFloat(truncatedValue);
+      }
+    }
+
+    return '' + numValue;
   } catch (e) {
-    console.error('decimalFriendly error:', num);
+    console.error('decimalFriendly error:', input);
     return '';
   }
 }
