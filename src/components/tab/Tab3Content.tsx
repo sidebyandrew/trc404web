@@ -18,7 +18,7 @@ import { toast, useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { useRouter } from 'next/navigation';
 import { BASE_URL, isMainnet, pink_mkt_cancel_sell_order_gas_fee } from '@/constant/trc404_config';
-import { addressTrim, calculateTotal, decimalFriendly, log404 } from '@/utils/util404';
+import { addressTrim, calculateTotal, decimalFriendly } from '@/utils/util404';
 import { Result404, SellOrderInfo } from '@/utils/interface404';
 import { PINK_SELL_ORDER_LIST_FOUND } from '@/utils/static404';
 import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
@@ -57,11 +57,10 @@ export default function Tab3Marketplace() {
         let urlWithParams = `${BASE_URL}/api/pink/listed?access404=error_code_404`;
         const response = await fetch(urlWithParams);
         if (!response.ok) {
-          log404(urlWithParams, logMsg404, setLogMsg404);
+          console.error(urlWithParams);
           return;
         }
         const responseData = await response.json<Result404>();
-        log404(responseData.success + '-' + responseData.code, logMsg404, setLogMsg404);
         if (responseData.success && responseData.code == PINK_SELL_ORDER_LIST_FOUND) {
           setSellOrderList(responseData.result);
         }
@@ -94,11 +93,10 @@ export default function Tab3Marketplace() {
           let urlWithParams = `${BASE_URL}/api/pink/my_orders?tgId=${tgId}&loginWalletAddress=${loginWalletAddress}&access404=error_code_404`;
           const response = await fetch(urlWithParams);
           if (!response.ok) {
-            log404(urlWithParams, logMsg404, setLogMsg404);
+            console.error(urlWithParams);
             return;
           }
           const responseData = await response.json<Result404>();
-          log404(responseData.success + '-' + responseData.code, logMsg404, setLogMsg404);
           if (responseData.success && responseData.code == PINK_SELL_ORDER_LIST_FOUND) {
             setMySellOrderList(responseData.result);
           }
@@ -130,11 +128,10 @@ export default function Tab3Marketplace() {
           let urlWithParams = `${BASE_URL}/api/pink/history?tgId=${tgId}&loginWalletAddress=${loginWalletAddress}&access404=error_code_404`;
           const response = await fetch(urlWithParams);
           if (!response.ok) {
-            log404(urlWithParams, logMsg404, setLogMsg404);
+            console.error(urlWithParams);
             return;
           }
           const responseData = await response.json<Result404>();
-          log404(responseData.success + '-' + responseData.code, logMsg404, setLogMsg404);
           if (responseData.success && responseData.code == PINK_SELL_ORDER_LIST_FOUND) {
             setHistorySellOrderList(responseData.result);
           }
@@ -238,7 +235,7 @@ export default function Tab3Marketplace() {
         const response = await fetch(urlWithParams);
         setListedChanged(order.extBizId);
         if (!response.ok) {
-          log404('SOLD', logMsg404, setLogMsg404);
+          console.error(urlWithParams);
           return;
         }
       }
@@ -287,7 +284,7 @@ export default function Tab3Marketplace() {
         const response = await fetch(urlWithParams);
         setMyOrderChanged(order.extBizId);
         if (!response.ok) {
-          log404('CANCELED', logMsg404, setLogMsg404);
+          console.error(urlWithParams);
           return;
         }
       }
@@ -314,7 +311,7 @@ export default function Tab3Marketplace() {
         setMyOrderChanged(order.extBizId);
         setListedChanged(order.extBizId);
         if (!response.ok) {
-          log404('List For Sale', logMsg404, setLogMsg404);
+          console.error(urlWithParams);
           return;
         }
       }

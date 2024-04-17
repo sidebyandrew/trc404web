@@ -31,7 +31,7 @@ import {
   t404_jetton_master_address,
 } from '@/constant/trc404_config';
 import { v4 as uuidv4 } from 'uuid';
-import { decimalFriendly, log404 } from '@/utils/util404';
+import { decimalFriendly } from '@/utils/util404';
 import { SellOrderInfo } from '@/utils/interface404';
 import { useRouter } from 'next/navigation';
 import { ReloadIcon } from '@radix-ui/react-icons';
@@ -254,7 +254,7 @@ export default function Page({ params }: { params: { lang: string } }) {
           let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=ONSALE&access404=error_code_404`;
           const response = await fetch(urlWithParams);
           if (!response.ok) {
-            log404('ONSALE', logMsg404, setLogMsg404);
+            console.error(urlWithParams);
             return;
           }
           setSubmitted(true);
@@ -270,7 +270,7 @@ export default function Page({ params }: { params: { lang: string } }) {
     } catch (error) {
       setProcessing(false);
       if (error instanceof Error) {
-        log404('' + error.message, logMsg404, setLogMsg404);
+        console.error(error.message);
       }
       console.error('Error fetching data:', error);
     }
@@ -325,14 +325,13 @@ export default function Page({ params }: { params: { lang: string } }) {
           setJettonLoading(false);
 
         } catch (error) {
-          let msg = 'Error: Fail to fetch data from TON RPC. \n';
+          let msg = 'Error: Fail to fetch data from TON RPC.';
           if (error instanceof Error) {
             msg = msg + error.message;
           }
 
           setJettonBalance('-');
           setJettonLoading(false);
-          log404(msg, logMsg404, setLogMsg404);
           console.error(msg);
         }
       };
