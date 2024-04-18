@@ -116,12 +116,12 @@ export default function Tab4Bridge() {
   return (
     <div className="p-3">
       <div className="mb-3 text-2xl font-bold">TRC-404 Ecosystem</div>
-      <div className="mt-5">
+      <div className="mt-5 flex flex-col items-center justify-center">
         {projectList.map((project, index) => {
           let variant = project.badge === 'Building' ? 'green' : project.badge === 'Planning' ? 'blue' : project.badge === 'Partnership' ? 'purple' : 'gray';
           return <>
             <div key={project.title}>
-              <Card className="w-[350px] mb-2" key={project.title}>
+              <Card className=" mb-2" key={project.title}>
                 <CardHeader className="p-3 pt-2">
                   <CardTitle>
                     <div className={'flex'}>

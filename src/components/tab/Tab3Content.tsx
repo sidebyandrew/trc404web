@@ -30,9 +30,9 @@ import { useInitData } from '@tma.js/sdk-react';
 
 export default function Tab3Marketplace() {
   /* todo remove tma */
-  const tgInitData = useInitData();
-
-  // const tgInitData = {user: {id: 5499157826, username: ""}};
+  // const tgInitData = useInitData();
+  //
+  const tgInitData = { user: { id: 5499157826, username: '' } };
 
   const router = useRouter();
   const wallet = useTonWallet();
@@ -65,11 +65,12 @@ export default function Tab3Marketplace() {
           setSellOrderList(responseData.result);
         }
       } catch (error) {
-        let msg = 'Error: /api/pink/listed. \n';
+        let msg = 'Network Error: /api/pink/listed. \n';
         if (error instanceof Error) {
           msg = msg + error.message;
         }
         console.error('Error fetching data:', msg);
+        quickToast('Error', msg);
       }
     }
 
@@ -102,10 +103,11 @@ export default function Tab3Marketplace() {
           }
         }
       } catch (error) {
-        let msg = 'Error: /api/pink/my_orders. \n';
+        let msg = 'Network Error: /api/pink/my_orders. \n';
         if (error instanceof Error) {
           msg = msg + error.message;
         }
+        quickToast('Network Error', msg);
         console.error('Error fetching data:', msg);
       }
     }
@@ -141,47 +143,29 @@ export default function Tab3Marketplace() {
         if (error instanceof Error) {
           msg = msg + error.message;
         }
+        quickToast('Network Error', msg);
         console.error('Error fetching data:', msg);
       }
     }
 
     fetchData();
-  }, []);
+  }, [listedChanged, myOrderChanged]);
 
   function isValidWallet() {
     let success = true;
     if (isMainnet && wallet?.account.chain == CHAIN.TESTNET) {
       success = false;
-      toast({
-        title: 'Warning',
-        description: 'You need to connect mainnet!',
-        action: (
-          <ToastAction altText="Goto schedule to undo">OK</ToastAction>
-        ),
-      });
-
+      quickToast('Warning', 'You need to connect mainnet!');
     }
 
     if (!isMainnet && wallet?.account.chain == CHAIN.MAINNET) {
       success = false;
-      toast({
-        title: 'Warning',
-        description: 'You need to connect testnet!',
-        action: (
-          <ToastAction altText="Goto schedule to undo">OK</ToastAction>
-        ),
-      });
+      quickToast('Warning', 'You need to connect mainnet!');
     }
 
     if (!wallet?.account?.address) {
       success = false;
-      toast({
-        title: 'WARN',
-        description: `Please connect your wallet firstly!`,
-        action: (
-          <ToastAction altText="Goto schedule to undo">OK</ToastAction>
-        ),
-      });
+      quickToast('Warning', 'You need to connect mainnet!');
     }
 
     return success;
@@ -348,7 +332,7 @@ export default function Tab3Marketplace() {
         </TabsList>
         <TabsContent value="listed" className="">
           <div className="  ">
-            <Button variant="blue" className="flex ml-auto"
+            <Button className="flex ml-auto"
                     onClick={() => {
                       if (!isValidWallet()) {
                         return;
@@ -435,7 +419,7 @@ export default function Tab3Marketplace() {
                   </TableCell>
                   <TableCell className="">
                     {order.status == 'INIT' && <Button
-                      variant={'blue'}
+                      variant={'default'}
                       size={'sm'}
                       onClick={() => {
                         if (order.sellOrderId) {

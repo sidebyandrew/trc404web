@@ -54,9 +54,9 @@ export default function Tab2Asset() {
   const { toast } = useToast();
 
   // /* todo remove tma */
-  const tgInitData = useInitData();
-
-  // const tgInitData = {user: {id: 5499157826, username: ""}};
+  // const tgInitData = useInitData();
+  //
+  const tgInitData = { user: { id: 5499157826, username: '' } };
 
 
   useEffect(() => {
@@ -130,6 +130,11 @@ export default function Tab2Asset() {
             Address.parse(t404_jetton_master_address), 'get_wallet_address', stack);
           let jetton_master_result = master_tx.stack;
           let jettonWalletAddress = jetton_master_result.readAddress();
+          console.info(jettonWalletAddress);
+          console.info(jettonWalletAddress.toString({
+            bounceable: false,
+            testOnly: !isMainnet,
+          }));
           const jetton_wallet_tx = await client.runMethod(
             jettonWalletAddress, 'get_wallet_data');
           let jetton_wallet_result = jetton_wallet_tx.stack;
@@ -170,6 +175,8 @@ export default function Tab2Asset() {
 
 
           let jettonBalance: string = Number(Number(jetton_balance_bigint) / BASE_NANO_NUMBER).toFixed(3);
+          console.info(jetton_balance_bigint);
+          console.info(jettonBalance);
           setJettonBalance(jettonBalance);
           setJettonLoading(false);
 

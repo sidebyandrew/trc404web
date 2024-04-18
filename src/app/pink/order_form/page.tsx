@@ -103,9 +103,9 @@ export default function Page({ params }: { params: { lang: string } }) {
   const router = useRouter();
 
   /* todo remove tma */
-  const tgInitData = useInitData();
-
-  // const tgInitData = {user: {id: 5499157826, username: ""}};
+  // const tgInitData = useInitData();
+  //
+  const tgInitData = { user: { id: 5499157826, username: '' } };
 
   let initOrder: SellOrderInfo = {};
   const [sellOrderInfo, setSellOrderInfo] = useState<SellOrderInfo>(initOrder);
@@ -122,10 +122,10 @@ export default function Page({ params }: { params: { lang: string } }) {
   const formSchema = z.object({
     sellAmount: z.coerce.number().gte(0, {
       message: 'T404 sell amount must be greater than 0.',
-    }).max(1000, 'Sell amount must less than 1000 in one order.'),
+    }).max(1000, 'Sell amount must less than 1,000 in one order.'),
     unitPrice: z.coerce.number().gte(0, {
       message: 'Unit price must be greater than 0.',
-    }).max(10000, 'Unit price must less than 10,000 Toncoins.'),
+    }).max(100000, 'Unit price must less than 100,000 Toncoins.'),
   });
 
   // 1. Define your form.
@@ -137,10 +137,6 @@ export default function Page({ params }: { params: { lang: string } }) {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-
     try {
       if (!wallet?.account?.address) {
         toast({
@@ -455,7 +451,7 @@ export default function Page({ params }: { params: { lang: string } }) {
                 </FormItem>
               )}
             />
-            <Button type="submit" variant={'blue'} disabled={processing}>
+            <Button type="submit" variant={'default'} disabled={processing}>
               {processing && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
               Submit</Button>
 
@@ -467,7 +463,6 @@ export default function Page({ params }: { params: { lang: string } }) {
                       router.push('/#tab3');
                     }}
             >
-
               Back</Button>
           </form>
         </Form>}
@@ -480,7 +475,7 @@ export default function Page({ params }: { params: { lang: string } }) {
         <div className="mt-5"></div>
 
         <Button disabled={processing}
-                variant={'blue'}
+                variant={'default'}
                 className="" type="button"
                 onClick={() => {
                   router.push('/#tab3');

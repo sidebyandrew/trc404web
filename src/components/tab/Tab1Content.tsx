@@ -323,7 +323,7 @@ export default function Tab1Content() {
 
               <Button
                 size={'lg'}
-                variant={mintInfo.freemintIsOpen ? 'blue' : 'outline'}
+                variant={mintInfo.freemintIsOpen ? 'default' : 'outline'}
                 disabled={mintInfo.freemintIsOpen === false}
                 onClick={() => {
                   if (isMainnet && wallet?.account.chain == CHAIN.TESTNET) {
