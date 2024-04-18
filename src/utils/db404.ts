@@ -209,7 +209,7 @@ export async function querySellOrders(tgId?: string, loginWalletAddress?: string
   if (tgId && loginWalletAddress) {
     // INIT, PENDING, ONSALE, LOCK, SOLD, CANCELED, INVALID
     // INIT, PENDING,LOCK
-    let sql = 'select * from PinkSellOrder where sellerTgId=? and sellerAddress=? and status in("INIT","PENDING","LOCK") order by unitPriceInTon limit 20';
+    let sql = 'select * from PinkSellOrder where sellerTgId=? and sellerAddress=? and status in("INIT","PENDING","LOCK","ONSALE") order by unitPriceInTon limit 20';
     if (history) {
       sql = 'select * from PinkSellOrder where sellerTgId=? and sellerAddress=?  order by unitPriceInTon limit 20';
     }

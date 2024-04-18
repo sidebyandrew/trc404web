@@ -117,6 +117,13 @@ export default function Tab3Marketplace() {
               for (const order of mySellOrderList) {
                 console.info('auto check status', order.extBizId);
                 if (order.pinkOrderSaleAddress) {
+                  if (order.status == 'ONSALE'
+                    || order.status == 'CANCELED'
+                    || order.status == 'LOCK'
+                    || order.status == 'SOLD'
+                    || order.status == 'INVALID') {
+                    return;
+                  }
                   const get_sale_data_tx = await client.runMethod(
                     Address.parse(order.pinkOrderSaleAddress), 'get_sale_data');
                   let get_sale_data_result = get_sale_data_tx.stack;
