@@ -203,13 +203,13 @@ export async function createSellOrder(order: SellOrderInfo): Promise<Result404> 
 }
 
 
-export async function queryListedSellOrder(tgId?: string, loginWalletAddress?: string, history?: string): Promise<Result404> {
+export async function querySellOrders(tgId?: string, loginWalletAddress?: string, history?: string): Promise<Result404> {
   let result: Result404 = { success: false, code: '', msg: '' };
   let d1Response;
   if (tgId && loginWalletAddress) {
-    // INIT, SUBMITTED, PENDING, ONSALE, LOCK, SOLD, CANCELED, ERROR
-    let sql = 'select * from PinkSellOrder where sellerTgId=? and sellerAddress=? and status not in("SOLD","CANCELED") order by unitPriceInTon limit 20';
-
+    // INIT, PENDING, ONSALE, LOCK, SOLD, CANCELED, INVALID
+    // INIT, PENDING,LOCK
+    let sql = 'select * from PinkSellOrder where sellerTgId=? and sellerAddress=? and status in("INIT","PENDING","LOCK") order by unitPriceInTon limit 20';
     if (history) {
       sql = 'select * from PinkSellOrder where sellerTgId=? and sellerAddress=?  order by unitPriceInTon limit 20';
     }

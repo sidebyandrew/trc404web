@@ -14,25 +14,30 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { toast, useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { useRouter } from 'next/navigation';
-import { BASE_URL, isMainnet, pink_mkt_cancel_sell_order_gas_fee } from '@/constant/trc404_config';
+import {
+  BASE_URL,
+  ENDPOINT_MAINNET_RPC, ENDPOINT_TESTNET_RPC,
+  isMainnet,
+  pink_mkt_cancel_sell_order_gas_fee,
+} from '@/constant/trc404_config';
 import { addressTrim, calculateTotal, decimalFriendly } from '@/utils/util404';
 import { Result404, SellOrderInfo } from '@/utils/interface404';
 import { PINK_SELL_ORDER_LIST_FOUND } from '@/utils/static404';
 import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import { Address, Cell, toNano } from '@ton/core';
 import { CHAIN, SendTransactionRequest } from '@tonconnect/sdk';
-import { beginCell } from '@ton/ton';
+import { beginCell, TonClient } from '@ton/ton';
 import { useInitData } from '@tma.js/sdk-react';
 
 
 export default function Tab3Marketplace() {
   /* todo remove tma */
-  // const tgInitData = useInitData();
-  //
-  const tgInitData = { user: { id: 5499157826, username: '' } };
+  const tgInitData = useInitData();
+
+  // const tgInitData = { user: { id: 5499157826, username: '' } };
 
   const router = useRouter();
   const wallet = useTonWallet();
@@ -99,7 +104,42 @@ export default function Tab3Marketplace() {
           }
           const responseData = await response.json<Result404>();
           if (responseData.success && responseData.code == PINK_SELL_ORDER_LIST_FOUND) {
+            console.info('need auto check status');
             setMySellOrderList(responseData.result);
+            setMyOrderChanged('' + new Date());
+            // auto  check status
+            try {
+              const client = new TonClient(
+                {
+                  endpoint: isMainnet ? ENDPOINT_MAINNET_RPC : ENDPOINT_TESTNET_RPC,
+                });
+
+              for (const order of mySellOrderList) {
+                console.info('auto check status', order.extBizId);
+                if (order.pinkOrderSaleAddress) {
+                  const get_sale_data_tx = await client.runMethod(
+                    Address.parse(order.pinkOrderSaleAddress), 'get_sale_data');
+                  let get_sale_data_result = get_sale_data_tx.stack;
+                  // -1 init ok，0 not init
+                  let initFlagBigInt = get_sale_data_result.readBigNumber();
+                  if (initFlagBigInt && Number(initFlagBigInt) == -1) {
+                    if (order.sellerTgId) {
+                      let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${order.sellerTgId}&extBizId=${order.extBizId}&status=ONSALE&access404=error_code_404`;
+                      const response = await fetch(urlWithParams);
+                      if (!response.ok) {
+                        console.error(urlWithParams);
+                        return;
+                      } else {
+                        console.info('check status successful, set to ONSALE', order.extBizId);
+                      }
+                    }
+                  }
+                }
+              }
+            } catch (e) {
+              console.error(e);
+            }
+            // auto  check status end
           }
         }
       } catch (error) {
@@ -217,7 +257,7 @@ export default function Tab3Marketplace() {
       if (txCells && txCells[0] && tgId) {
         let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=SOLD&access404=error_code_404`;
         const response = await fetch(urlWithParams);
-        setListedChanged(order.extBizId);
+        setListedChanged(order.extBizId + Date.now());
         if (!response.ok) {
           console.error(urlWithParams);
           return;
@@ -266,7 +306,7 @@ export default function Tab3Marketplace() {
       if (txCells && txCells[0] && tgId) {
         let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=CANCELED&access404=error_code_404`;
         const response = await fetch(urlWithParams);
-        setMyOrderChanged(order.extBizId);
+        setMyOrderChanged(order.extBizId + Date.now());
         if (!response.ok) {
           console.error(urlWithParams);
           return;
@@ -288,15 +328,63 @@ export default function Tab3Marketplace() {
 
     if (order && order.sellAmount && order.unitPriceInTon
       && order.pinkOrderSaleAddress && order.extBizId) {
-      let tgId = tgInitData?.user?.id;
-      if (tgId) {
-        let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=ONSALE&access404=error_code_404`;
-        const response = await fetch(urlWithParams);
-        setMyOrderChanged(order.extBizId);
-        setListedChanged(order.extBizId);
-        if (!response.ok) {
-          console.error(urlWithParams);
-          return;
+
+      console.info('order.pinkOrderSaleAddress=');
+      console.info(order.pinkOrderSaleAddress);
+
+      try {
+        const client = new TonClient(
+          {
+            endpoint: isMainnet ? ENDPOINT_MAINNET_RPC : ENDPOINT_TESTNET_RPC,
+          });
+        const get_sale_data_tx = await client.runMethod(
+          Address.parse(order.pinkOrderSaleAddress), 'get_sale_data');
+        let get_sale_data_result = get_sale_data_tx.stack;
+        // -1 init ok，0 not init
+        let initFlagBigInt = get_sale_data_result.readBigNumber();
+        if (initFlagBigInt && Number(initFlagBigInt) == -1) {
+          quickToast('Congratulation!', 'This order is valid for public on-sale.');
+          let tgId = tgInitData?.user?.id;
+          if (tgId) {
+            let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=ONSALE&access404=error_code_404`;
+            const response = await fetch(urlWithParams);
+            setMyOrderChanged(order.extBizId + Date.now());
+            setListedChanged(order.extBizId + Date.now());
+            if (!response.ok) {
+              console.error(urlWithParams);
+              return;
+            }
+          }
+        } else {
+          quickToast('Waiting', 'Please wait for smart contract initialization');
+        }
+      } catch (e) {
+        console.error(e);
+        if (e instanceof Error) {
+          if (e.message.indexOf('Unable to execute get method.') == 0) {
+            if (order.createDt && Date.now() - order.createDt > 1000 * 60 * 10) {
+              quickToast('WARNING', 'This order is invalid, maybe you haven\'t sign with your wallet. Order status will set to INVALID.');
+              let tgId = tgInitData?.user?.id;
+              if (tgId) {
+                let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=INVALID&access404=error_code_404`;
+                setMyOrderChanged(order.extBizId + Date.now());
+                setListedChanged(order.extBizId + Date.now());
+                const response = await fetch(urlWithParams);
+                if (!response.ok) {
+                  console.error(urlWithParams);
+                  return;
+                }
+              }
+            } else {
+              if (order.status == 'INIT') {
+                quickToast('Please wait...', 'Please make sure to sign with your wallet.\nThe smart contract of this order need some time to deploy. ');
+              } else {
+                quickToast('Please wait...', 'The smart contract of this order need some time to deploy. ');
+              }
+            }
+          } else {
+            quickToast('Congratulation!', 'This order is valid for public on-sale.');
+          }
         }
       }
     } else {
@@ -326,8 +414,12 @@ export default function Tab3Marketplace() {
 
       <Tabs defaultValue="listed" className="mx-auto">
         <TabsList>
-          <TabsTrigger value="listed">Listed</TabsTrigger>
-          <TabsTrigger value="myOrders">My Orders</TabsTrigger>
+          <TabsTrigger onClick={() => {
+            setListedChanged('' + new Date());
+          }} value="listed">Public On-Sale</TabsTrigger>
+          <TabsTrigger onClick={() => {
+            setMyOrderChanged('' + new Date());
+          }} value="myOrders">My Open Orders</TabsTrigger>
           <TabsTrigger value="history">My History</TabsTrigger>
         </TabsList>
         <TabsContent value="listed" className="">
@@ -396,16 +488,16 @@ export default function Tab3Marketplace() {
           <Table>
             <TableCaption>List the last 20 records by default.</TableCaption>
             <TableHeader>
-              <TableRow>
-                <TableHead>#</TableHead>
-                <TableHead>T404</TableHead>
-                <TableHead className="">Price</TableHead>
-                <TableHead className="">Total</TableHead>
-                <TableHead className="">Status</TableHead>
-                <TableHead className="">Action</TableHead>
+              <TableRow className="text-center text-sm">
+                <TableHead className="px-0 text-center">#</TableHead>
+                <TableHead className="px-0 text-center">T404</TableHead>
+                <TableHead className="px-0 text-center">Price</TableHead>
+                <TableHead className="px-0 text-center">Total</TableHead>
+                <TableHead className="px-0 text-center">Status</TableHead>
+                <TableHead className="px-0 text-center">Action</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="text-sm">
               {mySellOrderList.map((order, index) => (
                 <TableRow key={index}>
                   <TableCell className="">{index + 1}</TableCell>
@@ -418,7 +510,7 @@ export default function Tab3Marketplace() {
                       variant={order.status == 'CANCELED' ? 'destructive' : 'secondary'}>{order.status}</Badge>
                   </TableCell>
                   <TableCell className="">
-                    {order.status == 'INIT' && <Button
+                    {(order.status == 'INIT' || order.status == 'PENDING') && <Button
                       variant={'default'}
                       size={'sm'}
                       onClick={() => {
@@ -429,7 +521,7 @@ export default function Tab3Marketplace() {
                         }
                       }}
                     >
-                      List for Sale
+                      Check Status
                     </Button>}
                     {order.status == 'ONSALE' && <Button
                       variant={'outline'}
@@ -443,7 +535,6 @@ export default function Tab3Marketplace() {
                       }}
                     >
                       Cancel</Button>}
-
                   </TableCell>
                 </TableRow>
               ))}

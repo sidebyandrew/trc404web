@@ -103,9 +103,9 @@ export default function Page({ params }: { params: { lang: string } }) {
   const router = useRouter();
 
   /* todo remove tma */
-  // const tgInitData = useInitData();
-  //
-  const tgInitData = { user: { id: 5499157826, username: '' } };
+  const tgInitData = useInitData();
+
+  // const tgInitData = { user: { id: 5499157826, username: '' } };
 
   let initOrder: SellOrderInfo = {};
   const [sellOrderInfo, setSellOrderInfo] = useState<SellOrderInfo>(initOrder);
@@ -128,11 +128,9 @@ export default function Page({ params }: { params: { lang: string } }) {
     }).max(100000, 'Unit price must less than 100,000 Toncoins.'),
   });
 
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {},
-
   });
 
   // 2. Define a submit handler.
@@ -194,7 +192,6 @@ export default function Page({ params }: { params: { lang: string } }) {
           return;
         }
         order.sellerT404Address = jettonWallet;
-
         order.sellAmount = values.sellAmount;
         order.unitPriceInTon = values.unitPrice;
         let extBizId = generateUnique64BitInteger();
@@ -234,9 +231,7 @@ export default function Page({ params }: { params: { lang: string } }) {
         if (!res.ok) {
           console.log('Oops! Something is wrong when call API.');
         }
-
         // ==================== save to DB end ====================
-
 
         let sendTransactionRequest = buildTx(order);
         setTx(sendTransactionRequest);
@@ -244,7 +239,7 @@ export default function Page({ params }: { params: { lang: string } }) {
         let txCells = Cell.fromBoc(Buffer.from(sellTx.boc, 'base64'));
         console.info(txCells);
         if (txCells && txCells[0]) {
-          let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=ONSALE&access404=error_code_404`;
+          let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=PENDING&access404=error_code_404`;
           const response = await fetch(urlWithParams);
           if (!response.ok) {
             console.error(urlWithParams);
@@ -256,7 +251,7 @@ export default function Page({ params }: { params: { lang: string } }) {
         if (!tonConnectUi.connected) {
           return tonConnectUi.openModal();
         } else {
-          console.error('  connected, but not have wallet address?????????????');
+          console.error('Wallet connected, but not have wallet address!');
         }
       }
       setProcessing(false);
@@ -456,7 +451,6 @@ export default function Page({ params }: { params: { lang: string } }) {
               Submit</Button>
 
             <Button disabled={processing}
-
                     variant={'outline'}
                     className="ml-3" type="button"
                     onClick={() => {
@@ -474,16 +468,16 @@ export default function Page({ params }: { params: { lang: string } }) {
 
         <div className="mt-5"></div>
 
-        <Button disabled={processing}
-                variant={'default'}
-                className="" type="button"
-                onClick={() => {
-                  router.push('/#tab3');
-                }}
+        <div className="flex gap-2"><Button disabled={processing}
+                                            variant={'default'}
+                                            className="" type="button"
+                                            onClick={() => {
+                                              router.push('/#tab3');
+                                            }}
         >
-
           Back to Market
         </Button>
+        </div>
       </div>}
     </div>
   );

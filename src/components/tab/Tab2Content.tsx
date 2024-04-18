@@ -54,9 +54,9 @@ export default function Tab2Asset() {
   const { toast } = useToast();
 
   // /* todo remove tma */
-  // const tgInitData = useInitData();
-  //
-  const tgInitData = { user: { id: 5499157826, username: '' } };
+  const tgInitData = useInitData();
+
+  // const tgInitData = { user: { id: 5499157826, username: '' } };
 
 
   useEffect(() => {

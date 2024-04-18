@@ -43,16 +43,16 @@ export default function RootLayout({
       fontSans.variable,
     )}>
     {/* todo remove tma */}
-    {/*<TMAProvider headers={headersForContext}>*/}
-    <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>
-      <div className="relative flex h-screen flex-col">
-        <main className="">
-          {children}
-        </main>
-        <Toaster />
-      </div>
-    </Providers>
-    {/*</TMAProvider>*/}
+    <TMAProvider headers={headersForContext}>
+      <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>
+        <div className="relative flex h-screen flex-col">
+          <main className="">
+            {children}
+          </main>
+          <Toaster />
+        </div>
+      </Providers>
+    </TMAProvider>
     </body>
     </html>
   );
