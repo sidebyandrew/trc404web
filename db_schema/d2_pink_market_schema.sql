@@ -28,6 +28,7 @@ CREATE INDEX IF NOT EXISTS idx_pink_sell_order_tg_id ON PinkSellOrder(sellerTgId
 CREATE INDEX IF NOT EXISTS idx_pink_sell_order_tg_id_address ON PinkSellOrder(sellerTgId, sellerAddress);
 CREATE INDEX IF NOT EXISTS idx_pink_sell_order_tg_status ON PinkSellOrder(status);
 CREATE INDEX IF NOT EXISTS idx_pink_sell_order_unit_price ON PinkSellOrder(unitPriceInTon);
+CREATE INDEX IF NOT EXISTS idx_pink_sell_order_create_dt ON PinkSellOrder(createDt);
 
 
 

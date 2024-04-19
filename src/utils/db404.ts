@@ -160,23 +160,6 @@ export async function createUser(tgId: string, tgUsername: string, ref?: User404
   return result;
 }
 
-export async function log2db(tgId: string, opCode: string, logs: string) {
-  try {
-    // @ts-ignore
-    const { results } = await db404().prepare(
-      'SELECT * FROM Customers WHERE CompanyName = ?',
-    )
-      .bind('Bs Beverages')
-      .all();
-  } catch (error) {
-    let msg = 'Error: log2db \n';
-    if (error instanceof Error) {
-      msg = msg + error.message;
-    }
-    console.error(msg);
-  }
-}
-
 
 // ================  Pink Market  =========================
 
@@ -203,26 +186,28 @@ export async function createSellOrder(order: SellOrderInfo): Promise<Result404> 
 }
 
 
-export async function querySellOrders(tgId?: string, loginWalletAddress?: string, history?: string): Promise<Result404> {
+export async function querySellOrders(pagination: number, tgId?: string, loginWalletAddress?: string, history?: string): Promise<Result404> {
   let result: Result404 = { success: false, code: '', msg: '' };
+  let offsetNumber = (pagination - 1) * 10;
   let d1Response;
   if (tgId && loginWalletAddress) {
     // INIT, PENDING, ONSALE, LOCK, SOLD, CANCELED, INVALID
-    // INIT, PENDING,LOCK
-    let sql = 'select * from PinkSellOrder where sellerTgId=? and sellerAddress=? and status in("INIT","PENDING","LOCK","ONSALE") order by unitPriceInTon limit 20';
+    // INIT, PENDING, LOCK
+
+    let sql = 'select * from PinkSellOrder where sellerTgId=? and sellerAddress=? and status in("INIT","PENDING","LOCK","ONSALE") order by createDt desc limit 10 offset ?';
     if (history) {
-      sql = 'select * from PinkSellOrder where sellerTgId=? and sellerAddress=?  order by unitPriceInTon limit 20';
+      sql = 'select * from PinkSellOrder where sellerTgId=? and sellerAddress=?  order by createDt desc limit 10 offset ?';
     }
     d1Response = await db404()
       .prepare(
         sql,
-      ).bind(tgId, loginWalletAddress)
+      ).bind(tgId, loginWalletAddress, offsetNumber)
       .all();
   } else {
     d1Response = await db404()
       .prepare(
-        'select * from PinkSellOrder where status = \'ONSALE\' order by unitPriceInTon limit 20',
-      )
+        'select * from PinkSellOrder where status = \'ONSALE\' order by unitPriceInTon limit 10 offset ?',
+      ).bind(offsetNumber)
       .all();
   }
   if (d1Response.success) {

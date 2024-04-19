@@ -23,8 +23,15 @@ export async function GET(request: Request) {
       result404.code = 'ERROR: 404';
       return Response.json(result404);
     }
-
-    let queryRes = await querySellOrders(tgId, loginWalletAddress);
+    let pagination = searchParams.get('pagination');
+    if (!pagination) {
+      pagination = '1';
+    }
+    if (pagination && parseInt(pagination) <= 0) {
+      result404.code = 'ERROR: Pagination 404';
+      return Response.json(result404);
+    }
+    let queryRes = await querySellOrders(parseInt(pagination), tgId, loginWalletAddress);
     return Response.json(queryRes);
   } catch (error) {
     if (error instanceof Error) {

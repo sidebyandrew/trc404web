@@ -2,6 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+
+import {
   Table,
   TableBody,
   TableCaption,
@@ -42,8 +52,6 @@ export default function Tab3Marketplace() {
   const router = useRouter();
   const wallet = useTonWallet();
   const [tonConnectUi] = useTonConnectUI();
-  const [jettonWallet, setJettonWallet] = useState('');
-  let [jettonLoading, setJettonLoading] = useState(true);
 
   const [sellOrderList, setSellOrderList] = useState<SellOrderInfo[]>([]);
   const [mySellOrderList, setMySellOrderList] = useState<SellOrderInfo[]>([]);
@@ -53,13 +61,16 @@ export default function Tab3Marketplace() {
   const [myOrderChanged, setMyOrderChanged] = useState('');
   const { toast } = useToast();
 
+  const [onsalePageNumber, setOnsalePageNumber] = useState(1);
+  const [myOpenPageNumber, setMyOpenPageNumber] = useState(1);
+  const [myHistoryNumber, setMyHistoryNumber] = useState(1);
 
   useEffect(() => {
     async function fetchData() {
       console.info('call /api/pink/listed');
       let logUrl;
       try {
-        let urlWithParams = `${BASE_URL}/api/pink/listed?access404=error_code_404`;
+        let urlWithParams = `${BASE_URL}/api/pink/listed?pagination=${onsalePageNumber}&access404=error_code_404`;
         const response = await fetch(urlWithParams);
         if (!response.ok) {
           console.error(urlWithParams);
@@ -80,7 +91,7 @@ export default function Tab3Marketplace() {
     }
 
     fetchData();
-  }, [listedChanged]);
+  }, [listedChanged, onsalePageNumber]);
 
   useEffect(() => {
     async function fetchData() {
@@ -96,7 +107,7 @@ export default function Tab3Marketplace() {
           });
 
           let tgId = tgInitData?.user?.id;
-          let urlWithParams = `${BASE_URL}/api/pink/my_orders?tgId=${tgId}&loginWalletAddress=${loginWalletAddress}&access404=error_code_404`;
+          let urlWithParams = `${BASE_URL}/api/pink/my_orders?tgId=${tgId}&pagination=${myOpenPageNumber}&loginWalletAddress=${loginWalletAddress}&access404=error_code_404`;
           const response = await fetch(urlWithParams);
           if (!response.ok) {
             console.error(urlWithParams);
@@ -160,7 +171,7 @@ export default function Tab3Marketplace() {
     }
 
     fetchData();
-  }, [myOrderChanged]);
+  }, [myOrderChanged, myOpenPageNumber]);
 
   useEffect(() => {
     async function fetchData() {
@@ -174,7 +185,7 @@ export default function Tab3Marketplace() {
           });
 
           let tgId = tgInitData?.user?.id;
-          let urlWithParams = `${BASE_URL}/api/pink/history?tgId=${tgId}&loginWalletAddress=${loginWalletAddress}&access404=error_code_404`;
+          let urlWithParams = `${BASE_URL}/api/pink/history?tgId=${tgId}&pagination=${myHistoryNumber}&loginWalletAddress=${loginWalletAddress}&access404=error_code_404`;
           const response = await fetch(urlWithParams);
           if (!response.ok) {
             console.error(urlWithParams);
@@ -196,7 +207,7 @@ export default function Tab3Marketplace() {
     }
 
     fetchData();
-  }, [listedChanged, myOrderChanged]);
+  }, [listedChanged, myOrderChanged, myHistoryNumber]);
 
   function isValidWallet() {
     let success = true;
@@ -270,7 +281,6 @@ export default function Tab3Marketplace() {
           return;
         }
       }
-
     } else {
       errorToast('SELL ORDER NOT FOUND WITH ID:' + sellOrderId);
     }
@@ -443,7 +453,39 @@ export default function Tab3Marketplace() {
 
           {/*  orders  */}
           <Table>
-            <TableCaption>Sort by unit price. </TableCaption>
+            <TableCaption>
+              <div className={'p-1'}>Sort by price from lowest to highest.</div>
+
+              {/*pagination */}
+              <Pagination className={'p-2'}>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious onClick={
+                      () => {
+                        if (onsalePageNumber > 1) {
+                          setOnsalePageNumber(onsalePageNumber - 1);
+                        }
+                      }
+                    } />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLink isActive>{onsalePageNumber}</PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationNext onClick={
+                      () => {
+                        if (sellOrderList && sellOrderList.length == 10) {
+                          setOnsalePageNumber(onsalePageNumber + 1);
+                        }
+                      }
+                    } />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+              {/*pagination end*/}
+
+
+            </TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>#</TableHead>
@@ -493,7 +535,36 @@ export default function Tab3Marketplace() {
         </TabsContent>
         <TabsContent value="myOrders">
           <Table>
-            <TableCaption>List the last 20 records by default.</TableCaption>
+            <TableCaption>
+              <div className={'p-1'}>Sort by create time.</div>
+              {/*pagination */}
+              <Pagination className={'p-2'}>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious onClick={
+                      () => {
+                        if (myOpenPageNumber > 1) {
+                          setMyOpenPageNumber(myOpenPageNumber - 1);
+                        }
+                      }
+                    } />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLink isActive>{myOpenPageNumber}</PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationNext onClick={
+                      () => {
+                        if (mySellOrderList && mySellOrderList.length == 10) {
+                          setMyOpenPageNumber(myOpenPageNumber + 1);
+                        }
+                      }
+                    } />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+              {/*pagination end*/}
+            </TableCaption>
             <TableHeader>
               <TableRow className="text-center text-sm">
                 <TableHead className="px-0 text-center">#</TableHead>
@@ -557,7 +628,37 @@ export default function Tab3Marketplace() {
         </TabsContent>
         <TabsContent value="history">
           <Table>
-            <TableCaption>List the last 20 records by default.</TableCaption>
+            <TableCaption>
+              <div className={'p-1'}>Sort by create time.</div>
+              {/*pagination */}
+              <Pagination className={'p-2'}>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious onClick={
+                      () => {
+                        if (myHistoryNumber > 1) {
+                          setMyHistoryNumber(myHistoryNumber - 1);
+                        }
+                      }
+                    } />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLink isActive>{myHistoryNumber}</PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationNext onClick={
+                      () => {
+                        if (historySellOrderList && historySellOrderList.length == 10) {
+                          setMyHistoryNumber(myHistoryNumber + 1);
+                        }
+                      }
+                    } />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+              {/*pagination end*/}
+
+            </TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>#</TableHead>

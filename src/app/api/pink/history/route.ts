@@ -22,8 +22,16 @@ export async function GET(request: Request) {
       result404.code = 'ERROR: Login WalletAddress 404';
       return Response.json(result404);
     }
+    let pagination = searchParams.get('pagination');
+    if (!pagination) {
+      pagination = '1';
+    }
+    if (pagination && parseInt(pagination) <= 0) {
+      result404.code = 'ERROR: Pagination 404';
+      return Response.json(result404);
+    }
 
-    let queryRes = await querySellOrders(tgId, loginWalletAddress, 'history');
+    let queryRes = await querySellOrders(parseInt(pagination), tgId, loginWalletAddress, 'history');
     return Response.json(queryRes);
   } catch (error) {
     if (error instanceof Error) {
