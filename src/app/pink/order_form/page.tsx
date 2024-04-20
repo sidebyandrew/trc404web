@@ -103,9 +103,9 @@ export default function Page({ params }: { params: { lang: string } }) {
   const router = useRouter();
 
   /* todo remove tma */
-  const tgInitData = useInitData();
-
-  // const tgInitData = { user: { id: 5499157826, username: '' } };
+  // const tgInitData = useInitData();
+  //
+  const tgInitData = { user: { id: 5499157826, username: '' } };
 
   let initOrder: SellOrderInfo = {};
   const [sellOrderInfo, setSellOrderInfo] = useState<SellOrderInfo>(initOrder);
@@ -117,7 +117,6 @@ export default function Page({ params }: { params: { lang: string } }) {
   let [jettonLoading, setJettonLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [logMsg404, setLogMsg404] = useState('');
 
   const formSchema = z.object({
     sellAmount: z.coerce.number().gte(0, {
@@ -135,6 +134,8 @@ export default function Page({ params }: { params: { lang: string } }) {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    let rollbackTgId = '';
+    let rollbackExtBizId = '';
     try {
       if (!wallet?.account?.address) {
         toast({
@@ -221,6 +222,8 @@ export default function Page({ params }: { params: { lang: string } }) {
         order.feeNumerator = pink_market_fee_numerator;
         order.feeDenominator = pink_market_fee_denominator;
 
+        rollbackTgId = order.sellerTgId;
+        rollbackExtBizId = order.extBizId;
         const res = await fetch(BASE_URL + '/api/pink/sell', {
           method: 'POST',
           body: JSON.stringify(order),
@@ -237,7 +240,6 @@ export default function Page({ params }: { params: { lang: string } }) {
         setTx(sendTransactionRequest);
         let sellTx: SendTransactionResponse = await tonConnectUi.sendTransaction(sendTransactionRequest);
         let txCells = Cell.fromBoc(Buffer.from(sellTx.boc, 'base64'));
-        console.info(txCells);
         if (txCells && txCells[0]) {
           let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${tgId}&extBizId=${order.extBizId}&status=PENDING&access404=error_code_404`;
           const response = await fetch(urlWithParams);
@@ -246,6 +248,9 @@ export default function Page({ params }: { params: { lang: string } }) {
             return;
           }
           setSubmitted(true);
+        } else {
+          console.info('User have not sign the tx!!!!!!');
+          console.info(txCells);
         }
       } else {
         if (!tonConnectUi.connected) {
@@ -259,6 +264,14 @@ export default function Page({ params }: { params: { lang: string } }) {
       setProcessing(false);
       if (error instanceof Error) {
         console.error(error.message);
+        if (error.message.indexOf('TON_CONNECT_SDK_ERROR')) {
+          let urlWithParams = `${BASE_URL}/api/sell_order/update_state?tgId=${rollbackTgId}&extBizId=${rollbackExtBizId}&status=INVALID&access404=error_code_404`;
+          const response = await fetch(urlWithParams);
+          if (!response.ok) {
+            console.error(urlWithParams);
+            return;
+          }
+        }
       }
       console.error('Error fetching data:', error);
     }

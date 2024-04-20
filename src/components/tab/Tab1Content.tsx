@@ -404,17 +404,17 @@ export default function Tab1Content() {
         <AccordionItem value="3" aria-label="Accordion 3">
           <AccordionTrigger>What about Tokenomics?</AccordionTrigger>
           <AccordionContent>
-            <p className="text-gray-400">Total Supply: 1,000 K.</p>
-
+            <p className="text-gray-400">Total Supply(TF): 1,000K.</p>
+            <p className="text-gray-400">Circulation Supply In 1 Year: 50K.</p>
             <ul className="px-1">
               <li className="text-gray-400">1. Fair Mint 1st round: 1%</li>
               <li className="text-gray-400">2. Airdrop 2%</li>
               <li className="text-gray-400">3. Fair Mint 2nd round: 2%</li>
-              <li className="text-gray-400">4. Developer Team: 15%</li>
-              <li className="text-gray-400">5. DEX: 10%</li>
-              <li className="text-gray-400">6. Advisor: 5%</li>
-              <li className="text-gray-400">7. Investor: 20%</li>
-              <li className="text-gray-400">8. Ecosystem Locked: 45%</li>
+              <li className="text-gray-400">4. Developer Team: 15% (Locked)</li>
+              <li className="text-gray-400">5. DEX: 10% (Locked)</li>
+              <li className="text-gray-400">6. Advisor: 5% (Locked)</li>
+              <li className="text-gray-400">7. Investor: 20% (Locked)</li>
+              <li className="text-gray-400">8. Ecosystem Reserved: 45% (Locked)</li>
             </ul>
           </AccordionContent>
         </AccordionItem>

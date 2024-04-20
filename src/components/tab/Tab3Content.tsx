@@ -45,9 +45,9 @@ import { useInitData } from '@tma.js/sdk-react';
 
 export default function Tab3Marketplace() {
   /* todo remove tma */
-  const tgInitData = useInitData();
-
-  // const tgInitData = { user: { id: 5499157826, username: '' } };
+  // const tgInitData = useInitData();
+  //
+  const tgInitData = { user: { id: 5499157826, username: '' } };
 
   const router = useRouter();
   const wallet = useTonWallet();
@@ -290,11 +290,15 @@ export default function Tab3Marketplace() {
     if (!isValidWallet()) {
       return;
     }
+    console.info('sellOrderId to search', sellOrderId);
+    console.info('sellOrderList', sellOrderList);
 
-    let order = sellOrderList.find(o => {
+    let order = mySellOrderList.find(o => {
       return o.sellOrderId == sellOrderId;
     });
 
+
+    console.info('order', order);
     if (order && order.sellAmount && order.unitPriceInTon
       && order.pinkOrderSaleAddress && order.extBizId) {
 
@@ -334,7 +338,7 @@ export default function Tab3Marketplace() {
     }
   }
 
-  async function clickListForSale(sellOrderId: string) {
+  async function checkStatus(sellOrderId: string) {
     if (!isValidWallet()) {
       return;
     }
@@ -499,7 +503,7 @@ export default function Tab3Marketplace() {
             <TableBody>
               {sellOrderList.map((order, index) => (
                 <TableRow key={index}>
-                  <TableCell className="">{index + 1}</TableCell>
+                  <TableCell className="">{(onsalePageNumber - 1) * 10 + index + 1}</TableCell>
                   <TableCell
                     className="font-extralight text-sm">{addressTrim(order.sellerAddress)}</TableCell>
                   <TableCell>{decimalFriendly(order.sellAmount)}</TableCell>
@@ -578,7 +582,7 @@ export default function Tab3Marketplace() {
             <TableBody className="text-sm">
               {mySellOrderList.map((order, index) => (
                 <TableRow key={index}>
-                  <TableCell className="">{index + 1}</TableCell>
+                  <TableCell className="">{(myOpenPageNumber - 1) * 10 + index + 1}</TableCell>
                   <TableCell>{decimalFriendly(order.sellAmount)}</TableCell>
                   <TableCell>{decimalFriendly(order.unitPriceInTon)}</TableCell>
                   <TableCell
@@ -593,7 +597,7 @@ export default function Tab3Marketplace() {
                       size={'sm'}
                       onClick={() => {
                         if (order.sellOrderId) {
-                          clickListForSale(order.sellOrderId);
+                          checkStatus(order.sellOrderId);
                         } else {
                           errorToast('SELL ORDER ID NOT FOUND');
                         }
@@ -671,7 +675,7 @@ export default function Tab3Marketplace() {
             <TableBody>
               {historySellOrderList.map((order, index) => (
                 <TableRow key={index}>
-                  <TableCell className="">{index + 1}</TableCell>
+                  <TableCell className="">{(myHistoryNumber - 1) * 10 + index + 1}</TableCell>
                   <TableCell>{decimalFriendly(order.sellAmount)}</TableCell>
                   <TableCell>{decimalFriendly(order.unitPriceInTon)}</TableCell>
                   <TableCell
