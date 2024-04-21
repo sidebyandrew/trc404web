@@ -84,7 +84,7 @@ let projectList: Project[] = [
   },
 ];
 
-export default function Tab4Airdrop() {
+export default function Tab4Eco() {
   const [userData, setUserData] = useState(null);
   useEffect(() => {
     async function fetchData() {

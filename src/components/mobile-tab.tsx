@@ -20,6 +20,8 @@ const MobileTab: React.FC<MobileTabProps> = ({ onTabChange }) => {
       handleTabClick('tab2');
     } else if (hash === '#tab3') {
       handleTabClick('tab3');
+    } else if (hash === '#tab4') {
+      handleTabClick('tab4');
     }
   }, []);
 
@@ -31,7 +33,7 @@ const MobileTab: React.FC<MobileTabProps> = ({ onTabChange }) => {
           <button
             className={`${
               activeTab === 'tab1' ? 'text-yellow-600 ' : ''
-            } rounded px-2 py-2 mb-2`}
+            } rounded px-1 py-2 mb-2`}
             onClick={() => handleTabClick('tab1')}
           >
             <div className="flex flex-col items-center">
@@ -47,7 +49,7 @@ const MobileTab: React.FC<MobileTabProps> = ({ onTabChange }) => {
           <button
             className={`${
               activeTab === 'tab2' ? 'text-yellow-600 ' : ''
-            } rounded px-2 py-2 mb-2`}
+            } rounded px-1 py-2 mb-2`}
             onClick={() => handleTabClick('tab2')}
           >
 
@@ -65,7 +67,7 @@ const MobileTab: React.FC<MobileTabProps> = ({ onTabChange }) => {
           <button
             className={`${
               activeTab === 'tab3' ? 'text-yellow-600 ' : ''
-            } rounded px-2 py-2 mb-2`}
+            } rounded px-1 py-2 mb-2`}
             onClick={() => handleTabClick('tab3')}
           >
             <div className="flex flex-col items-center">
@@ -83,8 +85,24 @@ const MobileTab: React.FC<MobileTabProps> = ({ onTabChange }) => {
           <button
             className={`${
               activeTab === 'tab4' ? 'text-yellow-600 ' : ''
-            } rounded px-2 py-2 mb-2`}
+            } rounded px-1 py-2 mb-2`}
             onClick={() => handleTabClick('tab4')}
+          >
+            <div className="flex flex-col items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
+                   stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round"
+                      d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+              </svg>
+              <div>Airdrop</div>
+            </div>
+
+          </button>
+          <button
+            className={`${
+              activeTab === 'tab5' ? 'text-yellow-600 ' : ''
+            } rounded px-1 py-2 mb-2`}
+            onClick={() => handleTabClick('tab5')}
           >
             <div className="flex flex-col items-center">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}

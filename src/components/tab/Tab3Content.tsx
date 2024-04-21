@@ -428,6 +428,30 @@ export default function Tab3Marketplace() {
     quickToast('Error', `There is a system error, contact us pls. Error Code:[${errorCode}]`);
   }
 
+  function badgeColor(status: string | undefined) {
+
+    // INIT, PENDING, ONSALE, LOCK, SOLD, CANCELED, INVALID;
+
+    if ('INIT' == status) {
+      return 'gray';
+    } else if ('PENDING' == status) {
+      return 'purple';
+    } else if ('ONSALE' == status) {
+      return 'green';
+    } else if ('LOCK' == status) {
+      return 'purple';
+    } else if ('SOLD' == status) {
+      return 'blue';
+    } else if ('CANCELED' == status) {
+      return 'destructive';
+    } else if ('INVALID' == status) {
+      return 'secondary';
+    } else {
+      return 'outline';
+    }
+
+  }
+
   return (
     <div className="p-3">
       <div className="mb-3 text-2xl font-bold">TRC-404 Pink Market <div
@@ -589,7 +613,9 @@ export default function Tab3Marketplace() {
                     className="">{calculateTotal(order.sellAmount, order.unitPriceInTon)}</TableCell>
                   <TableCell className="">
                     <Badge
-                      variant={order.status == 'CANCELED' ? 'destructive' : 'secondary'}>{order.status}</Badge>
+                      variant={badgeColor(order.status)}>
+                      {order.status}
+                    </Badge>
                   </TableCell>
                   <TableCell className="">
                     {(order.status == 'INIT' || order.status == 'PENDING') && <Button
@@ -682,7 +708,9 @@ export default function Tab3Marketplace() {
                     className="">{calculateTotal(order.sellAmount, order.unitPriceInTon)}</TableCell>
                   <TableCell className="">
                     <Badge
-                      variant={order.status == 'CANCELED' ? 'destructive' : 'secondary'}>{order.status}</Badge>
+                      variant={badgeColor(order.status)}>
+                      {order.status}
+                    </Badge>
                   </TableCell>
                 </TableRow>
               ))}
