@@ -408,8 +408,8 @@ export default function Tab1Content() {
             <p className="text-gray-400">Circulation Supply In 1 Year: 50K.</p>
             <ul className="px-1">
               <li className="text-gray-400">1. Fair Mint 1st round: 1%</li>
-              <li className="text-gray-400">2. Airdrop 2%</li>
-              <li className="text-gray-400">3. Fair Mint 2nd round: 2%</li>
+              <li className="text-gray-400">2. Fair Mint 2nd round: 2%</li>
+              <li className="text-gray-400">3. Airdrop 2% (Linear)</li>
               <li className="text-gray-400">4. Developer Team: 15% (Locked)</li>
               <li className="text-gray-400">5. DEX: 10% (Locked)</li>
               <li className="text-gray-400">6. Advisor: 5% (Locked)</li>
