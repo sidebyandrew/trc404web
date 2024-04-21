@@ -45,9 +45,9 @@ import { useInitData } from '@tma.js/sdk-react';
 
 export default function Tab3Marketplace() {
   /* todo remove tma */
-  // const tgInitData = useInitData();
-  //
-  const tgInitData = { user: { id: 5499157826, username: '' } };
+  const tgInitData = useInitData();
+
+  // const tgInitData = { user: { id: 5499157826, username: '' } };
 
   const router = useRouter();
   const wallet = useTonWallet();
@@ -79,6 +79,8 @@ export default function Tab3Marketplace() {
         const responseData = await response.json<Result404>();
         if (responseData.success && responseData.code == PINK_SELL_ORDER_LIST_FOUND) {
           setSellOrderList(responseData.result);
+        } else {
+          setOnsalePageNumber(onsalePageNumber - 1);
         }
       } catch (error) {
         let msg = 'Network Error: /api/pink/listed. \n';
@@ -158,6 +160,8 @@ export default function Tab3Marketplace() {
               console.error(e);
             }
             // auto  check status end
+          } else {
+            setMyOpenPageNumber(myOpenPageNumber - 1);
           }
         }
       } catch (error) {
@@ -194,6 +198,8 @@ export default function Tab3Marketplace() {
           const responseData = await response.json<Result404>();
           if (responseData.success && responseData.code == PINK_SELL_ORDER_LIST_FOUND) {
             setHistorySellOrderList(responseData.result);
+          } else {
+            setMyHistoryNumber(myHistoryNumber - 1);
           }
         }
       } catch (error) {
@@ -454,8 +460,8 @@ export default function Tab3Marketplace() {
 
   return (
     <div className="p-3">
-      <div className="mb-3 text-2xl font-bold">TRC-404 Pink Market <div
-        className="text-gray-400 text-sm">(Under construction)</div></div>
+      <div className="mb-3 text-2xl font-bold">TRC-404 Pink Market
+      </div>
 
       <Tabs defaultValue="listed" className="mx-auto">
         <TabsList>

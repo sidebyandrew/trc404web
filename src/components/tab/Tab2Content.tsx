@@ -53,12 +53,6 @@ export default function Tab2Asset() {
   const wallet = useTonWallet();
   const { toast } = useToast();
 
-  // /* todo remove tma */
-  // const tgInitData = useInitData();
-  //
-  const tgInitData = { user: { id: 5499157826, username: '' } };
-
-
   useEffect(() => {
     if (wallet?.account) {
       if (isMainnet && wallet?.account.chain == CHAIN.TESTNET) {

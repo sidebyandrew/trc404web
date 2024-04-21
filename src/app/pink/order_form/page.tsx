@@ -103,9 +103,9 @@ export default function Page({ params }: { params: { lang: string } }) {
   const router = useRouter();
 
   /* todo remove tma */
-  // const tgInitData = useInitData();
-  //
-  const tgInitData = { user: { id: 5499157826, username: '' } };
+  const tgInitData = useInitData();
+
+  // const tgInitData = { user: { id: 5499157826, username: '' } };
 
   let initOrder: SellOrderInfo = {};
   const [sellOrderInfo, setSellOrderInfo] = useState<SellOrderInfo>(initOrder);

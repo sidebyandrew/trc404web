@@ -32,19 +32,21 @@ import { BASE_URL } from '@/constant/trc404_config';
 import { Result404, User404 } from '@/utils/interface404';
 import { REF_USER_LIST_FOUND } from '@/utils/static404';
 import { useInitData } from '@tma.js/sdk-react';
+import { ToastAction } from '@/components/ui/toast';
+import { toast } from '@/components/ui/use-toast';
 
 const rules = [
   {
     title: 'Invite friends with your personal link.',
-    description: '10 points per friends. (Max 1000)',
+    description: '1 points per friends. (Max 1000 points)',
   },
   {
     title: 'Your friends mint a T404!',
-    description: 'If your friends mint 1 T404, you will get 50 points reward.',
+    description: 'If your friends mint 1 T404, you will get 10 points reward.',
   },
   {
     title: 'Your friends buy a T404!',
-    description: 'If your friends buy 1 T404, you will get 30 points reward.',
+    description: 'If your friends buy 1 T404, you will get 5 points reward.',
   },
   {
     title: 'More rules in brew',
@@ -55,9 +57,9 @@ const rules = [
 export default function Tab4Airdrop() {
 
   // /* todo remove tma */
-  // const tgInitData = useInitData();
-  //
-  const tgInitData = { user: { id: 5499157826, username: '' } };
+  const tgInitData = useInitData();
+
+  // const tgInitData = { user: { id: 5499157826, username: '' } };
 
 
   const [userData, setUserData] = useState<User404>({
@@ -69,21 +71,33 @@ export default function Tab4Airdrop() {
   });
   const [logMsg404, setLogMsg404] = useState('');
 
-  const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
-      const textToCopy = '这是要复制的文本';
-      await navigator.clipboard.writeText(textToCopy);
-      setCopied(true);
 
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
+      if (userData && userData.refCode) {
+        let refLink = `https://t.me/trc404bot?start=${userData.refCode}`;
+        await navigator.clipboard.writeText(refLink);
+        quickToast('Copied!', refLink);
+      } else {
+        quickToast('Error!', 'please reload and try again!');
+      }
     } catch (error) {
       console.error('Fail to copy referral code：', error);
     }
   };
+
+
+  function quickToast(title: string, description: string) {
+    toast({
+      title: title,
+      description: description,
+      action: (
+        <ToastAction
+          altText="OK">OK</ToastAction>
+      ),
+    });
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -143,16 +157,16 @@ export default function Tab4Airdrop() {
               <Image src="/icon/best-icon.jpg" height={36} width={36}
                      alt="pop" />
             </TableCell>
-            <TableCell className="font-extralight">calculating</TableCell>
-            <TableCell>
-              {userData ? userData.refCount : '-'} {userData ? userData.refCode : '-'}
+            <TableCell className="font-extralight text-center">calculating</TableCell>
+            <TableCell className="text-center">
+              {userData ? userData.refCount : '-'}
             </TableCell>
             <TableCell className="text-center">
               <Button
                 variant={'outline'}
                 disabled={true}
               >
-                View
+                Details
               </Button>
             </TableCell>
           </TableRow>
