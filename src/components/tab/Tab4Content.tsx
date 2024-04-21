@@ -29,10 +29,11 @@ import {
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { BASE_URL } from '@/constant/trc404_config';
-import { Result404 } from '@/utils/interface404';
+import { Result404, User404 } from '@/utils/interface404';
 import { REF_USER_LIST_FOUND } from '@/utils/static404';
+import { useInitData } from '@tma.js/sdk-react';
 
-const notifications = [
+const rules = [
   {
     title: 'Invite friends with your personal link.',
     description: '10 points per friends. (Max 1000)',
@@ -59,12 +60,30 @@ export default function Tab4Airdrop() {
   const tgInitData = { user: { id: 5499157826, username: '' } };
 
 
-  const [userData, setUserData] = useState('{}');
+  const [userData, setUserData] = useState<User404>({
+    tgId: '',
+    tgUsername: '',
+    refCode: '',
+    refTgId: '',
+    refTgUsername: '',
+  });
   const [logMsg404, setLogMsg404] = useState('');
 
-  const textToCopy = '这是要复制的文本';
   const [copied, setCopied] = useState(false);
 
+  const handleCopy = async () => {
+    try {
+      const textToCopy = '这是要复制的文本';
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error('Fail to copy referral code：', error);
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -83,8 +102,7 @@ export default function Tab4Airdrop() {
         }
         const responseData = await response.json<Result404>();
         if (responseData.success && responseData.code == REF_USER_LIST_FOUND) {
-          let { count } = responseData.result;
-          setUserData(count);
+          setUserData(responseData.result);
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -127,7 +145,7 @@ export default function Tab4Airdrop() {
             </TableCell>
             <TableCell className="font-extralight">calculating</TableCell>
             <TableCell>
-              {userData ? userData : '-'}
+              {userData ? userData.refCount : '-'} {userData ? userData.refCode : '-'}
             </TableCell>
             <TableCell className="text-center">
               <Button
@@ -155,7 +173,7 @@ export default function Tab4Airdrop() {
         </CardHeader>
         <CardContent className="grid gap-1 rounded-sm">
           <div>
-            {notifications.map((notification, index) => (
+            {rules.map((rule, index) => (
               <div
                 key={index}
                 className="mb-3 grid grid-cols-[25px_1fr] items-start pb-2 last:mb-0 last:pb-0"
@@ -163,10 +181,10 @@ export default function Tab4Airdrop() {
                 <span className="flex h-2 w-2 translate-y-1 rounded-md bg-sky-500" />
                 <div className="space-y-1">
                   <p className="text-sm font-medium leading-none">
-                    {notification.title}
+                    {rule.title}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {notification.description}
+                    {rule.description}
                   </p>
                 </div>
               </div>
@@ -174,7 +192,7 @@ export default function Tab4Airdrop() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full">
+          <Button className="w-full" onClick={handleCopy}>
             <ClipboardCopyIcon className="mr-2 h-4 w-4" /> Copy Your Referral Link
           </Button>
         </CardFooter>

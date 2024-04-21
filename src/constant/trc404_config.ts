@@ -13,8 +13,8 @@ export const BASE_NANO_NUMBER: number = 1000000000;
 // TODO: to change for production
 ///* todo remove tma */
 
-export const BASE_URL: string = 'http://localhost:3000';
-// export const BASE_URL: string = 'https://staging.trc404web.pages.dev';
+// export const BASE_URL: string = 'http://localhost:3000';
+export const BASE_URL: string = 'https://staging.trc404web.pages.dev';
 // export const BASE_URL: string = "https://trc404web.pages.dev";
 export const isMainnet: boolean = false;
 export const defaultMintPrice: number = 5;

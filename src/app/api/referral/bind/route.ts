@@ -1,43 +1,43 @@
-import type {NextRequest} from 'next/server'
-import {createUser, queryUser, queryUserByRefCode,} from "@/utils/db404";
-import {USER_FOUND} from "@/utils/static404";
-import {Result404, User404} from "@/utils/interface404";
+import type { NextRequest } from 'next/server';
+import { createUser, queryUser, queryUserByRefCode } from '@/utils/db404';
+import { USER_FOUND } from '@/utils/static404';
+import { Result404, User404 } from '@/utils/interface404';
 
-export const runtime = 'edge'
+export const runtime = 'edge';
 
 
 export async function POST(request: NextRequest) {
-    let result: Result404 = {success: false, code: '', msg: '',};
-    try {
-        let requestJson = await request.json<User404>();
-        let tgId = requestJson.tgId;
-        let tgUsername = requestJson.tgUsername;
-        let refCode = requestJson.refCode;
-        if (tgId && tgUsername) {
-            let queryResult = await queryUser(tgId);
-            if (queryResult.success && USER_FOUND == queryResult.code) {
-                result.success = true;
-                result.code = 'USER_EXISTED';
-                result.msg = "User is existed, cannot referral.";
-            } else {
-                let refUserResult = await queryUserByRefCode(refCode);
-                if (refUserResult.success && USER_FOUND == refUserResult.code) {
-                    result = await createUser(tgId, tgUsername, refUserResult.result as User404);
-                    result.code = 'REF_SUCCESS';
-                    result.msg = "referral bound.";
-                } else {
-                    result = await createUser(tgId, tgUsername);
-                }
-            }
+  let result: Result404 = { success: false, code: '', msg: '' };
+  try {
+    let requestJson = await request.json<User404>();
+    let tgId = requestJson.tgId;
+    let tgUsername = requestJson.tgUsername;
+    let refCode = requestJson.refCode;
+    if (tgId && tgUsername) {
+      let queryResult = await queryUser(tgId);
+      if (queryResult.success && USER_FOUND == queryResult.code) {
+        result.success = true;
+        result.code = 'USER_EXISTED';
+        result.msg = 'User is existed, cannot referral.';
+      } else {
+        let refUserResult = await queryUserByRefCode(refCode);
+        if (refUserResult.success && USER_FOUND == refUserResult.code) {
+          result = await createUser(tgId, tgUsername, refUserResult.result as User404);
+          result.code = 'REF_SUCCESS';
+          result.msg = 'referral bound.';
         } else {
-            result.code = 'referral error'
-            result.msg = "tgId or refCode not found.";
+          result = await createUser(tgId, tgUsername);
         }
-    } catch (error) {
-        result.code = 'login error'
-        result.msg = "" + error;
+      }
+    } else {
+      result.code = 'referral error';
+      result.msg = 'tgId or refCode not found.';
     }
-    return Response.json(result);
+  } catch (error) {
+    result.code = 'login error';
+    result.msg = '' + error;
+  }
+  return Response.json(result);
 }
 
 
