@@ -38,11 +38,11 @@ import { toast } from '@/components/ui/use-toast';
 const rules = [
   {
     title: 'Invite friends with your personal link.',
-    description: '1 points per friends. (Max 1000 points)',
+    description: '2 points per friends. (Max 1000 points)',
   },
   {
     title: 'Your friends mint a T404!',
-    description: 'If your friends mint 1 T404, you will get 10 points reward.',
+    description: 'If your friends mint 1 T404, you will get 50 points reward.',
   },
   {
     title: 'Your friends buy a T404!',
@@ -157,7 +157,8 @@ export default function Tab4Airdrop() {
               <Image src="/icon/best-icon.jpg" height={36} width={36}
                      alt="pop" />
             </TableCell>
-            <TableCell className="font-extralight text-center">calculating</TableCell>
+            <TableCell
+              className="font-extralight text-center">{userData?.refCount ? parseInt(userData.refCount) * 2 : '-'}</TableCell>
             <TableCell className="text-center">
               {userData ? userData.refCount : '-'}
             </TableCell>

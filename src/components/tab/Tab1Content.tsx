@@ -251,7 +251,7 @@ export default function Tab1Content() {
 
 
       <div className="mt-4 mb-2 text-2xl">Fair Mint
-        {!isMainnet && <span className="text-yellow-600 text-lg">&nbsp;Testnet 3rd Round</span>}
+        {!isMainnet && <span className="text-pink-400 text-lg">&nbsp;Pink Round</span>}
       </div>
       <div className="flex flex-col">
 
