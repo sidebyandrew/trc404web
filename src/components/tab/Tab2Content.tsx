@@ -60,39 +60,6 @@ export default function Tab2Asset() {
 
 
   useEffect(() => {
-    async function fetchData() {
-      let logUrl;
-      try {
-        let tgId = tgInitData?.user?.id;
-        let tgUsername = tgInitData?.user?.username;
-        if (!tgUsername) {
-          tgUsername = '' + tgId;
-        }
-
-        let urlWithParams = `${BASE_URL}/api/user?tgId=${tgId}&tgUsername=${tgUsername}&access404=error_code_404`;
-        logUrl = urlWithParams;
-        const response = await fetch(urlWithParams);
-        if (!response.ok) {
-          console.error(urlWithParams);
-          return;
-        }
-        const responseData = await response.json<Result404>();
-        if (responseData.success && responseData.code == REF_USER_LIST_FOUND) {
-          let { count } = responseData.result;
-          setUserData(count);
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error(error.message);
-        }
-        console.error('Error fetching data:', error);
-      }
-    }
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
     if (wallet?.account) {
       if (isMainnet && wallet?.account.chain == CHAIN.TESTNET) {
         toast({
@@ -229,48 +196,7 @@ export default function Tab2Asset() {
 
   return (
     <div className="p-3">
-      {/*  Points  */}
-      <div className="mt-2 text-xl font-bold">404 Honor Points</div>
-      <Table>
-        <TableCaption></TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="">
-              #
-            </TableHead>
-            <TableHead>Points</TableHead>
-            <TableHead>Invited Friends</TableHead>
-            <TableHead className="text-center">Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell className="font-medium">
-              <Image src="/icon/best-icon.jpg" height={36} width={36}
-                     alt="pop" />
-            </TableCell>
-            <TableCell className="font-extralight">calculating</TableCell>
-            <TableCell>
-              {userData ? userData : '-'}
-            </TableCell>
-            <TableCell className="text-center">
-              <Button
-                variant={'outline'}
-                disabled={true}
 
-              >
-                View
-              </Button>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TableCell colSpan={4}></TableCell>
-          </TableRow>
-        </TableFooter>
-      </Table>
-      {/*  Points End */}
 
       <div className=" text-xl font-bold">404 Jettons</div>
 
